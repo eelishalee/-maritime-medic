@@ -88,7 +88,7 @@ export default function CrewManagement({ onSelectPatient }) {
   const fld = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
 
   return (
-    <div style={{ display:'flex', height:'calc(100vh - 48px)', overflow:'hidden', background:'#050d1a' }}>
+    <div style={{ display:'flex', height:'calc(100vh - 44px)', overflow:'hidden', background:'#050d1a' }}>
 
       {/* ── 좌: 리스트 ── */}
       <div style={{ width: editing ? 340 : selected ? 360 : '100%', flexShrink:0, display:'flex', flexDirection:'column', borderRight:'1.5px solid rgba(13,217,197,0.13)', transition:'width 0.3s' }}>

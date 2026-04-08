@@ -1,5 +1,8 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* ── 150% 전체 확대 ── */
+html { zoom: 1.5; }
+
 :root {
   --navy-950: #050d1a;
   --navy-900: #0a1628;

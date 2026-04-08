@@ -98,8 +98,8 @@ export default function Main({ patient, onNavigate }) {
 
   return (
     <div style={{
-      display:'grid', gridTemplateColumns:'380px 1fr 380px',
-      height:'calc(100vh - 48px)', overflow:'hidden', background:'#050d1a'
+      display:'grid', gridTemplateColumns:'300px 1fr 300px',
+      height:'calc(100vh - 44px)', overflow:'hidden', background:'#050d1a'
     }}>
 
       {/* ══ 좌: 환자정보 ══ */}

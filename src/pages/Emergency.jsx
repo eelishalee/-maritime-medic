@@ -222,7 +222,7 @@ export default function Emergency({ patient }) {
   const prev = () => { if (step > 0) goTo(step-1,'left') }
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'calc(100vh - 48px)', overflow:'hidden', background:'#050d1a' }}>
+    <div style={{ display:'flex', flexDirection:'column', height:'calc(100vh - 44px)', overflow:'hidden', background:'#050d1a' }}>
 
       {/* ── 탭 바 ── */}
       <div style={{ display:'flex', gap:6, padding:'10px 20px', background:'rgba(8,18,35,0.97)', borderBottom:'1.5px solid rgba(13,217,197,0.13)', overflowX:'auto', flexShrink:0 }}>
@@ -250,7 +250,7 @@ export default function Emergency({ patient }) {
       </div>
 
       {/* ── 2-panel ── */}
-      <div style={{ flex:1, display:'grid', gridTemplateColumns:'500px 1fr', overflow:'hidden' }}>
+      <div style={{ flex:1, display:'grid', gridTemplateColumns:'400px 1fr', overflow:'hidden' }}>
 
         {/* 좌: 이미지 + 진행 */}
         <div style={{ borderRight:'1.5px solid rgba(13,217,197,0.13)', display:'flex', flexDirection:'column', background:'rgba(12,25,50,0.4)' }}>

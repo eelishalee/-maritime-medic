@@ -28,7 +28,7 @@ export default function Settings({ auth }) {
   }
 
   return (
-    <div style={{ height:'calc(100vh - 48px)', overflowY:'auto', background:'#050d1a', padding:'20px 24px' }}>
+    <div style={{ height:'calc(100vh - 44px)', overflowY:'auto', background:'#050d1a', padding:'20px 24px' }}>
       <div style={{ maxWidth:960, margin:'0 auto' }}>
         <div style={{ fontSize:20, fontWeight:900, color:'#fff', marginBottom:24, display:'flex', alignItems:'center', gap:10 }}>
           시스템 설정
