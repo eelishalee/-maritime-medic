@@ -63,4 +63,57 @@ div, span, button, input {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(1.4); }
 }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes imgSlideIn {
+  from { opacity: 0; transform: translateX(40px) scale(1.03); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes imgSlideInLeft {
+  from { opacity: 0; transform: translateX(-40px) scale(1.03); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* 스텝 아이콘 애니메이션들 */
+@keyframes stepPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.25); }
+}
+@keyframes stepBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
+@keyframes stepBreathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.15); opacity: 0.7; }
+}
+@keyframes stepShake {
+  0%, 100% { transform: rotate(0deg); }
+  25%       { transform: rotate(-8deg); }
+  75%       { transform: rotate(8deg); }
+}
+@keyframes stepFlash {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  50%       { opacity: 0.4; filter: brightness(2); }
+}
+@keyframes stepFadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 .fade-in { animation: fadeInUp 0.35s ease both; }
