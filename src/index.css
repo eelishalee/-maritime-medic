@@ -1,0 +1,66 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --navy-950: #050d1a;
+  --navy-900: #0a1628;
+  --navy-800: #0f2040;
+  --navy-700: #162b55;
+  --navy-600: #1e3a6e;
+  --navy-500: #2a4d8a;
+  --teal-400: #0dd9c5;
+  --teal-300: #3de8d6;
+  --teal-200: #7ef5ec;
+  --teal-500: #09b8a6;
+  --red-400: #ff4d6d;
+  --red-300: #ff6b84;
+  --orange-400: #ff9f43;
+  --green-400: #26de81;
+  --blue-400: #4fc3f7;
+  --text-primary: #e8f0fe;
+  --text-secondary: #8da2c0;
+  --text-muted: #4a6080;
+  --border: rgba(13, 217, 197, 0.12);
+  --border-hover: rgba(13, 217, 197, 0.3);
+  --card-bg: rgba(15, 32, 64, 0.7);
+  --card-bg-solid: #0f2040;
+  --glass: rgba(10, 22, 40, 0.85);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--navy-900);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  height: 100vh;
+  /* 모든 텍스트 크기를 30% 확대 */
+  font-size: 21px; 
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+}
+
+/* 기존 작은 글씨들도 상대적으로 확대되도록 설정 */
+div, span, button, input {
+  font-size: 1.3rem; 
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--navy-600); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--teal-500); }
+
+/* Animations */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
+}
+.fade-in { animation: fadeInUp 0.35s ease both; }
