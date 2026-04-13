@@ -161,8 +161,8 @@ export default function Main() {
         {/* ══ 상단 네비 바 ══ */}
         <div style={{ position:'relative', zIndex:10, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'22px 48px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <div style={{ width:36, height:36, borderRadius:10, overflow:'hidden', boxShadow:'0 4px 16px rgba(0,229,200,0.28)', border:'1px solid rgba(0,229,200,0.22)' }}>
-              <MdtsLogo size={36} />
+            <div style={{ width:36, height:36, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 16px rgba(0,229,200,0.22)', border:'1px solid rgba(0,229,200,0.22)', background:'rgba(4,18,32,0.6)' }}>
+              <MdtsLogo size={30} />
             </div>
             <div>
               <div style={{ fontSize:10, fontWeight:700, color:'rgba(56,189,248,0.7)', letterSpacing:2.5 }}>MEDITISING</div>
@@ -229,14 +229,45 @@ export default function Main() {
           <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%, -50%)', width:460 }}>
             <div style={{ background:'rgba(5,14,28,0.88)', backdropFilter:'blur(32px)', borderRadius:28, border:'1px solid rgba(0,229,200,0.15)', boxShadow:'0 40px 100px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)', padding:'48px 44px' }}>
               <div style={{ textAlign:'center', marginBottom:36 }}>
-                <div style={{ width:72, height:72, borderRadius:22, overflow:'hidden', margin:'0 auto 16px', boxShadow:'0 8px 32px rgba(0,229,200,0.3)', border:'1px solid rgba(0,229,200,0.22)' }}>
-                  <MdtsLogo size={72} />
+                <div style={{ width:72, height:72, borderRadius:22, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px', boxShadow:'0 8px 32px rgba(0,229,200,0.28)', border:'1px solid rgba(0,229,200,0.22)', background:'rgba(4,18,32,0.7)' }}>
+                  <MdtsLogo size={60} />
                 </div>
                 <div style={{ fontSize:22, fontWeight:900, letterSpacing:0.3, marginBottom:6 }}>MDTS 시스템 접속</div>
+                <div style={{ display:'inline-block' }}>
                 <div style={{ fontSize:13.5, color:'rgba(100,116,139,0.9)' }}>바다 위 어디서든, 멈추지 않는 의료 AI</div>
-                {/* 좌→우 흐르는 빛 라인 */}
-                <div style={{ position:'relative', height:1.5, margin:'16px 0 0', borderRadius:2, background:'rgba(255,255,255,0.06)', overflow:'hidden' }}>
-                  <div style={{ position:'absolute', top:0, left:0, height:'100%', width:'40%', background:'linear-gradient(90deg, transparent 0%, #00e5cc 40%, #00d4ff 60%, transparent 100%)', animation:'shimmerLine 2.2s ease-in-out infinite', borderRadius:2 }}/>
+                {/* 심장박동 ECG 라인 — 텍스트 너비에 맞춤 */}
+                <div style={{ position:'relative', height:18, margin:'6px 0 0', overflow:'hidden' }}>
+                  <svg
+                    width="200%" height="18"
+                    viewBox="0 0 800 18"
+                    preserveAspectRatio="none"
+                    style={{ position:'absolute', left:0, top:0, animation:'ecgScroll 5s linear infinite' }}
+                  >
+                    <defs>
+                      <linearGradient id="ecg-grad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%"   stopColor="rgba(0,229,200,0)"/>
+                        <stop offset="20%"  stopColor="rgba(0,229,200,0.15)"/>
+                        <stop offset="45%"  stopColor="#00e5cc"/>
+                        <stop offset="55%"  stopColor="#00d4ff"/>
+                        <stop offset="80%"  stopColor="rgba(0,212,255,0.15)"/>
+                        <stop offset="100%" stopColor="rgba(0,212,255,0)"/>
+                      </linearGradient>
+                      <filter id="ecg-glow">
+                        <feDropShadow dx="0" dy="0" stdDeviation="1.5" floodColor="#00e5cc" floodOpacity="0.6"/>
+                      </filter>
+                    </defs>
+                    {/* QRS 스파이크 2회 반복 (400 unit/cycle) */}
+                    <path
+                      d="M0,9 L175,9 L178,12 L182,1 L186,17 L190,9 L400,9 L575,9 L578,12 L582,1 L586,17 L590,9 L800,9"
+                      stroke="url(#ecg-grad)"
+                      strokeWidth="1.5"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      filter="url(#ecg-glow)"
+                    />
+                  </svg>
+                </div>
                 </div>
               </div>
               <form onSubmit={handleLogin} style={{ display:'flex', flexDirection:'column', gap:13 }}>
@@ -275,7 +306,7 @@ export default function Main() {
           @keyframes waveFlow2 { 0%{transform:translateX(-50%)} 100%{transform:translateX(0)} }
           @keyframes waveFlow3 { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
           @keyframes loginPulse { 0%,100%{opacity:1;box-shadow:0 0 6px #00e5cc} 50%{opacity:0.4;box-shadow:0 0 14px #00e5cc} }
-          @keyframes shimmerLine { 0%{left:-40%} 100%{left:100%} }
+          @keyframes ecgScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
         `}</style>
       </div>
     )
@@ -287,8 +318,8 @@ export default function Main() {
       {/* --- Top Status Bar & Navigation --- */}
       <header style={{ background: '#0f172a', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0 27px', height: 80, display: 'flex', alignItems: 'center', gap: 36 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-          <div style={{ width:38, height:38, borderRadius:10, overflow:'hidden', border:'1px solid rgba(56,189,248,0.3)', flexShrink:0 }}>
-            <MdtsLogo size={38} />
+          <div style={{ width:38, height:38, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid rgba(56,189,248,0.28)', background:'rgba(4,18,32,0.6)', flexShrink:0 }}>
+            <MdtsLogo size={32} />
           </div>
           <span style={{ fontWeight: 900, fontSize: 22 }}>MDTS <span style={{ color: '#38bdf8', fontWeight: 400 }}>엣지 AI</span></span>
         </div>
