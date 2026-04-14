@@ -1,4 +1,5 @@
 import { Activity, History, Droplets, Upload, AlertTriangle, Camera, Mic, User } from 'lucide-react'
+import logoImg from '../../../assets/logo.png'
 import MdtsLogo from '../../../components/MdtsLogo.jsx'
 import { DashboardVital, InfoItem, TimelineItem } from '../../../components/ui'
 import EmergencyGuide from './EmergencyGuide.jsx'
@@ -14,6 +15,7 @@ export default function DashboardView({
       {/* [Left] Patient Info Panel */}
       <aside style={{ borderRight: '1px solid rgba(255,255,255,0.05)', background: '#05070a', display: 'flex', flexDirection: 'column', overflow: 'hidden', height: '100%' }}>
         <div style={{ flex: 1, overflowY: 'auto', padding: '28px' }}>
+          
           <div style={{ background: 'rgba(56,189,248,0.05)', border: '1px solid rgba(56,189,248,0.1)', borderRadius: 24, padding: '24px 24px 20px 24px', marginBottom: 30 }}>
             <div style={{ display: 'flex', gap: 24, marginBottom: 24 }}>
               <div style={{ width: 110, height: 110, borderRadius: 27, background: '#fff', border: '2px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', boxShadow: '0 0 24px rgba(56,189,248,0.2)' }}>
@@ -87,7 +89,18 @@ export default function DashboardView({
           </div>
         </div>
         <div style={{ padding: '20px 28px 24px 28px', borderTop: '1px solid rgba(255,255,255,0.05)', background: '#05070a' }}>
-          <button onClick={() => startEmergencyAction('CARDIAC')} className="emergency-action-btn" style={{ width: '100%', padding: '22px', borderRadius: 18, background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 20 }}><AlertTriangle size={26} /> 응급 처치 액션 시작</button>
+          <button 
+            onClick={() => startEmergencyAction('CARDIAC')} 
+            className="emergency-action-btn" 
+            style={{ 
+              width: '100%', padding: '22px', borderRadius: 18, background: '#f43f5e', 
+              color: '#fff', border: 'none', fontWeight: 900, cursor: 'pointer', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 20,
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <AlertTriangle size={26} /> 응급 처치 액션 시작
+          </button>
         </div>
       </aside>
 
@@ -103,12 +116,47 @@ export default function DashboardView({
           </div>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 45px 45px 45px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 45px 45px 45px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {activeTab === 'DASHBOARD' && (
             <div style={{ position: 'relative', paddingLeft: 45 }}>
-              <div style={{ position: 'absolute', left: 8.5, top: 0, bottom: 0, width: 3, background: 'rgba(255,255,255,0.05)' }} />
-              <TimelineItem time="14:02" label="급성 흉부 통증 발생 및 최초 발견" detail="선교 내 이동 중 갑작스러운 심장 쪼임 호소하며 쓰러짐" />
-              <TimelineItem time="14:05" label="AI 분석 : 심근경색(STEMI) 고위험 판정" detail="ECG 데이터 및 증상 기반 엣지 AI 정밀 분석 완료" highlight />
+              <div style={{ position: 'absolute', left: 8.5, top: 0, bottom: 0, width: 3, background: 'rgba(255,255,255,0.05)', borderRadius: 2 }} />
+              
+              <TimelineItem 
+                time="14:02" 
+                label="급성 흉부 통증 발생 및 최초 발견" 
+                detail="선교 내 이동 중 갑작스러운 심장 쪼임 호소하며 쓰러짐. 주변 인원에 의해 즉시 보고됨." 
+              />
+              
+              <TimelineItem 
+                time="14:05" 
+                label="AI 분석 : 심근경색(STEMI) 고위험 판정" 
+                detail="ECG 실시간 데이터 및 증상 기반 엣지 AI 정밀 분석 완료. 즉각적인 응급 처치 필요 판정." 
+                highlight 
+              />
+              
+              <TimelineItem 
+                time="14:08" 
+                label="산소 공급 및 니트로글리세린 투여" 
+                detail="AI 가이드에 따라 설하정 1정 투여 완료. 비강 캐뉼라를 통한 4L/min 산소 공급 시작." 
+              />
+              
+              <TimelineItem 
+                time="14:12" 
+                label="실시간 바이탈 변화 감시" 
+                detail="혈압 128/84 → 115/78 mmHg 하강 추세 확인. 지속적인 모니터링 및 기록 중." 
+              />
+              
+              <TimelineItem 
+                time="14:15" 
+                label="육상 의료 센터(KMCC) 데이터 전송" 
+                detail="환자의 기저질환 정보 및 현재 AI 분석 리포트 육상 의료진에게 일괄 동기화 완료." 
+              />
+              
+              <TimelineItem 
+                time="14:18" 
+                label="응급 처치 2단계 프로토콜 진입" 
+                detail="AED(자동심장충격기) 배치 완료 및 주변 구역 확보. 추가 의료 요원 현장 도착." 
+              />
             </div>
           )}
           {activeTab === 'GUIDE' && (
@@ -121,31 +169,130 @@ export default function DashboardView({
           )}
         </div>
 
-        <div style={{ padding: '20px 40px 36px 40px', background: 'transparent' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(8, 14, 28, 0.75)', borderRadius: 24, padding: '10px 14px 10px 18px', border: '1px solid rgba(56,189,248,0.25)', backdropFilter: 'blur(20px)' }}>
-            <button style={{ width: 42, height: 42, borderRadius: 12, background: 'rgba(56,189,248,0.08)', border: '1px solid rgba(56,189,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Mic size={20} color="#38bdf8" /></button>
-            <input placeholder="환자 증상 입력 또는 AI 질문..." value={prompt} onChange={e => setPrompt(e.target.value)} onKeyPress={e => e.key === 'Enter' && handlePromptAnalysis()} style={{ flex: 1, background: 'none', border: 'none', color: '#e2e8f0', fontSize: 18, outline: 'none' }} />
-            <button onClick={handlePromptAnalysis} style={{ padding: '10px 28px', borderRadius: 16, background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)', color: '#000', fontWeight: 900, fontSize: 17 }}>분석 실행</button>
+        <div style={{ padding: '0 40px 42px 40px', background: 'transparent', position: 'relative' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 16, 
+            background: 'rgba(10, 18, 35, 0.85)', 
+            borderRadius: 30, 
+            padding: '12px 14px 12px 24px', 
+            border: '1px solid rgba(56, 189, 248, 0.35)', 
+            backdropFilter: 'blur(32px)',
+            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 189, 248, 0.08)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}>
+            <button style={{ 
+              width: 44, height: 44, borderRadius: '50%', 
+              background: 'rgba(56, 189, 248, 0.1)', 
+              border: '1px solid rgba(56, 189, 248, 0.2)', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', transition: 'all 0.2s ease'
+            }}>
+              <Mic size={22} color="#38bdf8" />
+            </button>
+            <input 
+              placeholder="환자 증상 또는 AI에게 명령어를 입력하세요..." 
+              value={prompt} 
+              onChange={e => setPrompt(e.target.value)} 
+              onKeyPress={e => e.key === 'Enter' && handlePromptAnalysis()} 
+              style={{ 
+                flex: 1, background: 'none', border: 'none', 
+                color: '#f1f5f9', fontSize: 19, fontWeight: 500, outline: 'none',
+                letterSpacing: '-0.3px'
+              }} 
+            />
+            <button 
+              onClick={handlePromptAnalysis} 
+              className="ai-analyze-btn"
+              style={{ 
+                padding: '12px 32px', 
+                borderRadius: 22, 
+                background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)', 
+                color: '#000', 
+                fontWeight: 900, 
+                fontSize: 18, 
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(56, 189, 248, 0.4)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              AI 분석 요청
+            </button>
           </div>
+          {/* Subtle Glow Effect below the input */}
+          <div style={{ position: 'absolute', bottom: 30, left: '50%', transform: 'translateX(-50%)', width: '80%', height: 1, background: 'linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.2), transparent)', filter: 'blur(4px)' }} />
         </div>
       </section>
 
       {/* [Right] AI Assistant Panel */}
-      <aside style={{ borderLeft: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', background: '#080b12', overflow: 'hidden', height: '100%' }}>
-        <div style={{ padding: 32, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ fontSize: 18, fontWeight: 900, display: 'flex', alignItems: 'center', gap: 11 }}><Activity size={22} color="#38bdf8" /> MDTS AI 의료 어시스턴트</div>
+      <aside style={{ borderLeft: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', background: '#05070a', overflow: 'hidden', height: '100%' }}>
+        <div style={{ padding: '32px', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ fontSize: 18, fontWeight: 900, display: 'flex', alignItems: 'center', gap: 11, color: '#e2e8f0' }}>
+            <Activity size={22} color="#38bdf8" /> MDTS AI 의료 어시스턴트
+          </div>
+          
+          {/* Flowing Light Effect */}
+          <div style={{ 
+            position: 'absolute', 
+            bottom: 0, 
+            left: 0, 
+            width: '100%', 
+            height: 1.5, 
+            background: 'linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.8), transparent)',
+            animation: 'lightFlow 4s linear infinite',
+            filter: 'blur(0.5px)'
+          }} />
         </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 18px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: 18, scrollbarWidth: 'none' }}>
           {chat?.map((m, i) => (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: m.role === 'ai' ? 'flex-start' : 'flex-end' }}>
-              <div style={{ padding: '12px 16px', borderRadius: 18, background: m.role === 'ai' ? 'rgba(56,189,248,0.1)' : 'rgba(99,102,241,0.18)', border: '1px solid rgba(255,255,255,0.1)', maxWidth: '88%', fontSize: 14, color: '#e2e8f0' }}>{m.text}</div>
+              <div style={{ 
+                padding: '14px 18px', 
+                borderRadius: m.role === 'ai' ? '0 20px 20px 20px' : '20px 0 20px 20px', 
+                background: m.role === 'ai' ? 'rgba(56, 189, 248, 0.05)' : 'rgba(255, 255, 255, 0.02)', 
+                border: m.role === 'ai' ? '1px solid rgba(56, 189, 248, 0.15)' : '1px solid rgba(255, 255, 255, 0.05)', 
+                maxWidth: '92%', 
+                fontSize: 15, 
+                lineHeight: 1.6,
+                color: m.role === 'ai' ? '#e2e8f0' : '#cbd5e1',
+                boxShadow: m.role === 'ai' ? '0 4px 20px rgba(56, 189, 248, 0.05)' : 'none'
+              }}>
+                {m.text}
+              </div>
             </div>
           ))}
         </div>
         <div style={{ padding: '20px 28px 24px 28px', borderTop: '1px solid rgba(255,255,255,0.05)', background: '#080b12' }}>
-          <button onClick={handleTraumaAnalysis} className="trauma-capture-btn" style={{ width: '100%', padding: '22px', borderRadius: 18, background: '#0ea5e9', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontWeight: 800, fontSize: 20 }}><Camera size={26} /> 외상 촬영 & AI 분석</button>
+          <button 
+            onClick={handleTraumaAnalysis} 
+            className="trauma-capture-btn" 
+            style={{ 
+              width: '100%', padding: '22px', borderRadius: 18, background: '#0ea5e9', 
+              color: '#fff', border: 'none', display: 'flex', alignItems: 'center', 
+              justifyContent: 'center', gap: 12, fontWeight: 800, fontSize: 20,
+              cursor: 'pointer', transition: 'all 0.2s ease'
+            }}
+          >
+            <Camera size={26} /> 외상 촬영 & AI 분석
+          </button>
         </div>
       </aside>
+
+      <style>{`
+        @keyframes lightFlow {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        .emergency-action-btn:hover { background: #e11d48 !important; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3); }
+        .emergency-action-btn:active { transform: scale(0.97); }
+        .ai-analyze-btn:hover { filter: brightness(0.85); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3); }
+        .ai-analyze-btn:active { transform: scale(0.96); }
+        .trauma-capture-btn:hover { background: #0284c7 !important; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); }
+        .trauma-capture-btn:active { transform: scale(0.97); }
+      `}</style>
     </div>
   )
 }
