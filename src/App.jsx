@@ -9,7 +9,7 @@ import Settings from './pages/Settings'
 import Patients from './pages/Patients'
 
 export default function App() {
-  const [auth, setAuth] = useState(true)
+  const [auth, setAuth] = useState(null)
   const [page, setPage] = useState('main')
 
   const [activePatient, setActivePatient] = useState({
@@ -23,14 +23,15 @@ export default function App() {
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200'
   })
 
-  if (!auth) return <Login onLogin={() => setAuth(true)} />
+  if (!auth) return <Login onLogin={setAuth} />
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       <Layout
         activePage={page}
         onNavigate={setPage}
-        auth={{ shipNo: 'MV KOREA STAR', deviceNo: 'MED-001' }}
+        auth={{ shipNo: auth.ship || 'MV KOREA STAR', deviceNo: auth.device || 'MED-001' }}
+        onLogout={() => setAuth(null)}
       />
       <div style={{ flex: 1, overflow: 'hidden' }}>
         {page === 'main'      && <Main patient={activePatient} />}

@@ -1,4 +1,4 @@
-import { Wifi, WifiOff, Brain } from 'lucide-react'
+import { Wifi, WifiOff, Brain, LogOut } from 'lucide-react'
 
 const NAV = [
   { id: 'main',      label: '메인' },
@@ -9,7 +9,7 @@ const NAV = [
   { id: 'settings',  label: '설정' },
 ]
 
-export default function Layout({ activePage, onNavigate, auth }) {
+export default function Layout({ activePage, onNavigate, auth, onLogout }) {
   const isOnline = true
 
   return (
@@ -91,13 +91,29 @@ export default function Layout({ activePage, onNavigate, auth }) {
           </span>
         </div>
         {auth && (
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', borderLeft: '1px solid var(--border)', paddingLeft: 12 }}>
-            <span style={{ color: 'var(--text-secondary)' }}>{auth.shipNo}</span>
-            <span style={{ margin: '0 6px', color: 'var(--border)' }}>|</span>
-            <span style={{ color: 'var(--text-secondary)' }}>{auth.deviceNo}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderLeft: '1px solid var(--border)', paddingLeft: 12 }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              <span style={{ color: 'var(--text-secondary)' }}>{auth.shipNo}</span>
+              <span style={{ margin: '0 6px', color: 'var(--border)' }}>|</span>
+              <span style={{ color: 'var(--text-secondary)' }}>{auth.deviceNo}</span>
+            </div>
+            <button 
+              onClick={onLogout}
+              title="로그아웃"
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: 'var(--text-secondary)', display: 'flex', alignItems: 'center',
+                padding: '4px', borderRadius: 4, transition: '0.2s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,77,109,0.1)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'none'}
+            >
+              <LogOut size={14} />
+            </button>
           </div>
         )}
       </div>
     </header>
   )
 }
+

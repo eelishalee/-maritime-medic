@@ -1,154 +1,144 @@
 import { useState } from 'react'
-import { Anchor, Lock, Monitor, Ship } from 'lucide-react'
+import { Database, Settings, Ship } from 'lucide-react'
+import logoImg from '../assets/logo.png'
 
 export default function Login({ onLogin }) {
-  const [form, setForm] = useState({ serialNo: '', deviceNo: '', shipNo: '' })
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loginData, setLoginData] = useState({ serial: 'SN-0001', device: 'MED-01', ship: 'KOREA STAR' })
+  const [focusedField, setFocusedField] = useState(null)
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!form.serialNo || !form.deviceNo || !form.shipNo) {
-      setError('모든 항목을 입력해주세요.')
-      return
-    }
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      onLogin(form)
-    }, 1200)
+    onLogin(loginData)
   }
-
-  const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
 
   return (
     <div style={{
-      width: '100vw', height: '100vh',
-      background: 'var(--navy-950)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      flexDirection: 'column', gap: 0,
-      position: 'relative', overflow: 'hidden',
+      height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'radial-gradient(ellipse 100% 90% at 82% 52%, #041c2e 0%, #020e1c 55%, #010810 100%)', 
+      color: '#fff', fontFamily: 'Pretendard, sans-serif', overflow: 'hidden', position: 'relative'
     }}>
-      {/* Background grid */}
-      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.04 }}>
-        {Array.from({ length: 20 }).map((_, i) => (
-          <line key={`h${i}`} x1="0" y1={`${i * 5}%`} x2="100%" y2={`${i * 5}%`} stroke="#0dd9c5" strokeWidth="0.5" />
-        ))}
-        {Array.from({ length: 30 }).map((_, i) => (
-          <line key={`v${i}`} x1={`${i * 4}%`} y1="0" x2={`${i * 4}%`} y2="100%" stroke="#0dd9c5" strokeWidth="0.5" />
-        ))}
-      </svg>
-      {/* Glow */}
-      <div style={{
-        position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%, -50%)',
-        width: 600, height: 400,
-        background: 'radial-gradient(ellipse, rgba(13,217,197,0.08) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
+      
+      {/* 배경 장식 (은은한 빛) */}
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 120% 100% at 50% 50%, transparent 40%, rgba(1, 8, 16, 0.6) 100%)', pointerEvents: 'none' }} />
 
-      {/* Card */}
-      <div style={{
-        background: 'rgba(15,32,64,0.92)',
-        border: '1px solid rgba(13,217,197,0.2)',
-        borderRadius: 20, padding: '40px 44px',
-        width: 420, position: 'relative',
-        backdropFilter: 'blur(16px)',
-        boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
-      }} className="fade-in">
-        {/* Logo */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 32 }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: 16,
-            background: 'linear-gradient(135deg, var(--teal-400), var(--teal-500))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            marginBottom: 14,
-            boxShadow: '0 8px 24px rgba(13,217,197,0.3)',
+      <div style={{ display: 'flex', alignItems: 'center', gap: '100px', maxWidth: '1300px', width: '100%', padding: '0 60px', position: 'relative', zIndex: 10 }}>
+        
+        {/* 좌측 헤드라인 섹션 */}
+        <div style={{ flex: 1 }}>
+          <div style={{ 
+            display: 'inline-flex', alignItems: 'center', gap: '10px', 
+            background: 'rgba(0, 229, 200, 0.08)', padding: '6px 16px', 
+            borderRadius: '30px', border: '1px solid rgba(0, 229, 200, 0.25)',
+            marginBottom: '16px'
           }}>
-            <Anchor size={26} color="#fff" strokeWidth={2.5} />
+            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#00e5cc', boxShadow: '0 0 8px #00e5cc' }} />
+            <span style={{ fontSize: '13px', fontWeight: '700', color: '#00e5cc', letterSpacing: '2.5px' }}>Maritime Medical AI System</span>
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>MDTS</div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Maritime Doctor Telemedicine System</div>
+
+          <div style={{ marginBottom: '40px' }}>
+            <h1 style={{ fontSize: '60px', fontWeight: '950', lineHeight: '1.1', letterSpacing: '-2px', margin: 0 }}>
+              선박 탑재형<br />엣지 의료 지원
+            </h1>
+            <h2 style={{ 
+              fontSize: '60px', fontWeight: '800', lineHeight: '1.1', fontStyle: 'italic', 
+              letterSpacing: '-1px', marginTop: '8px', 
+              background: 'linear-gradient(90deg, #39ff6a 0%, #00ffcc 55%, #00e5ff 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'
+            }}>
+              AI Medical System
+            </h2>
+          </div>
+
+          <div style={{ display: 'flex', gap: '40px' }}>
+            <StatItem val="24H" label="실시간 바이탈" />
+            <StatItem val="4종" label="응급처치 분류" />
+            <StatItem val="99%" label="오프라인 가용" />
+            <StatItem val="12단계" label="처치 프로토콜" />
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <InputField
-            icon={<Lock size={14} />}
-            label="시리얼 번호"
-            placeholder="MDTS-XXXX-XXXX"
-            value={form.serialNo}
-            onChange={set('serialNo')}
-          />
-          <InputField
-            icon={<Monitor size={14} />}
-            label="기기 번호"
-            placeholder="DEV-XXXX"
-            value={form.deviceNo}
-            onChange={set('deviceNo')}
-          />
-          <InputField
-            icon={<Ship size={14} />}
-            label="선박 번호"
-            placeholder="KS-7421"
-            value={form.shipNo}
-            onChange={set('shipNo')}
-          />
+        {/* 우측 로그인 카드 섹션 (흐르는 빛 효과 구현) */}
+        <div style={{ width: '460px', position: 'relative' }}>
+          <div style={{ 
+            position: 'relative', padding: '1.5px', borderRadius: '28px', 
+            background: 'rgba(0, 229, 200, 0.1)', overflow: 'hidden' 
+          }}>
+            {/* 회전하는 빛 레이어 */}
+            <div style={{ 
+              position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%', 
+              background: 'conic-gradient(transparent, transparent, transparent, #00e5cc)', 
+              animation: 'borderRotate 4s linear infinite', transformOrigin: 'center' 
+            }} />
 
-          {error && (
-            <div style={{ fontSize: 12, color: 'var(--red-400)', textAlign: 'center', padding: '8px', background: 'rgba(255,77,109,0.08)', borderRadius: 6 }}>
-              {error}
+            {/* 내부 폼 카드 */}
+            <div style={{ 
+              background: 'rgba(2, 12, 22, 0.92)', backdropFilter: 'blur(40px)', 
+              borderRadius: '26.5px', padding: '48px 44px', position: 'relative', zIndex: 2 
+            }}>
+              <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+                <img src={logoImg} alt="MDTS Logo" style={{ width: '86px', height: '86px', margin: '0 auto 16px', display: 'block', objectFit: 'contain' }} />
+                <h3 style={{ fontSize: '26px', fontWeight: '900', letterSpacing: '0.3px', marginBottom: '7px', color: '#fff' }}>MDTS</h3>
+                <p style={{ fontSize: '20.8px', color: 'rgba(0, 200, 180, 0.75)', fontWeight: '600' }}>
+                  바다 위 어디서든, 멈추지 않는 의료 AI
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <LoginInput icon={<Database size={20}/>} placeholder="시리얼 넘버" value={loginData.serial} onChange={v => setLoginData({...loginData, serial: v})} focused={focusedField === 'serial'} onFocus={() => setFocusedField('serial')} onBlur={() => setFocusedField(null)} />
+                <LoginInput icon={<Settings size={20}/>} placeholder="기기 번호" value={loginData.device} onChange={v => setLoginData({...loginData, device: v})} focused={focusedField === 'device'} onFocus={() => setFocusedField('device')} onBlur={() => setFocusedField(null)} />
+                <LoginInput icon={<Ship size={20}/>} placeholder="선박 번호" value={loginData.ship} onChange={v => setLoginData({...loginData, ship: v})} focused={focusedField === 'ship'} onFocus={() => setFocusedField('ship')} onBlur={() => setFocusedField(null)} />
+                
+                <button type="submit" style={{
+                  marginTop: '10px', padding: '22px', borderRadius: '18px', 
+                  background: 'linear-gradient(90deg, #00c9b1, #00a8e8)', color: '#000', 
+                  border: 'none', fontWeight: '900', fontSize: '19px', cursor: 'pointer',
+                  boxShadow: '0 4px 28px rgba(0, 200, 180, 0.4)'
+                }}>
+                  시스템 접속
+                </button>
+              </form>
             </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              marginTop: 8,
-              padding: '13px',
-              background: loading ? 'var(--navy-600)' : 'linear-gradient(135deg, var(--teal-400), var(--teal-500))',
-              border: 'none', borderRadius: 10, cursor: loading ? 'not-allowed' : 'pointer',
-              color: '#fff', fontSize: 14, fontWeight: 700,
-              transition: 'all 0.2s',
-              boxShadow: loading ? 'none' : '0 4px 16px rgba(13,217,197,0.3)',
-            }}
-          >
-            {loading ? '인증 중...' : '시스템 접속'}
-          </button>
-        </form>
-
-        <div style={{ marginTop: 20, textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
-          본 시스템은 인가된 선박 의료진만 사용 가능합니다
+          </div>
         </div>
+
       </div>
+
+      <style>{`
+        @keyframes borderRotate {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }
 
-function InputField({ icon, label, placeholder, value, onChange }) {
+function StatItem({ val, label }) {
   return (
     <div>
-      <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 6, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</label>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
-        borderRadius: 8, padding: '11px 14px',
-        transition: 'border-color 0.2s',
-      }}
-        onFocus={e => e.currentTarget.style.borderColor = 'var(--teal-400)'}
-        onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
-      >
-        <span style={{ color: 'var(--text-muted)' }}>{icon}</span>
-        <input
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          style={{
-            background: 'none', border: 'none', outline: 'none',
-            color: 'var(--text-primary)', fontSize: 13, width: '100%',
-            letterSpacing: '0.5px',
-          }}
-        />
-      </div>
+      <div style={{ fontSize: '26px', fontWeight: '950', color: '#fff', lineHeight: '1', letterSpacing: '-0.5px' }}>{val}</div>
+      <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.4)', marginTop: '3px' }}>{label}</div>
+    </div>
+  )
+}
+
+function LoginInput({ icon, placeholder, value, onChange, focused, onFocus, onBlur }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '14px', background: 'rgba(255, 255, 255, 0.03)',
+      borderRadius: '16px', padding: '0 20px', 
+      border: `1.5px solid ${focused ? '#00e5cc' : 'rgba(255, 255, 255, 0.08)'}`,
+      height: '60px', transition: 'all 0.2s',
+      boxShadow: focused ? '0 0 15px rgba(0, 229, 200, 0.1)' : 'none'
+    }}>
+      <div style={{ color: focused ? '#00e5cc' : '#64748b', transition: 'color 0.2s' }}>{icon}</div>
+      <input
+        placeholder={placeholder} value={value}
+        onChange={e => onChange(e.target.value)}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        style={{ flex: 1, background: 'none', border: 'none', color: '#fff', fontSize: '15px', outline: 'none', fontWeight: '500' }}
+      />
     </div>
   )
 }
