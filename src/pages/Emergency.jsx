@@ -120,7 +120,7 @@ const GUIDES = {
       {
         title: '지혈대(Tourniquet) 적용',
         desc: '직접 압박으로 지혈되지 않는 팔다리 대출혈 시, 상처 5~7cm 위쪽에 지혈대를 단단히 조입니다.',
-        img: 'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&q=80&w=800',
+        img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800',
         duration: 300,
         tip: '적용 시각을 기록하세요. 2시간 이상 유지 금지.',
         icon: '⏱',
@@ -245,7 +245,6 @@ const GUIDES = {
   },
 }
 
-// 환자 상태 → 추천 응급유형
 function getRecommendedTab(patient) {
   if (!patient) return null
   const chronic = (patient.chronic || '').toLowerCase()
@@ -256,137 +255,46 @@ function getRecommendedTab(patient) {
   return null
 }
 
-// CPR 메트로놈 컴포넌트
 function CPRMetronome() {
   const [active, setActive] = useState(false)
   const [beat, setBeat] = useState(false)
   const [count, setCount] = useState(0)
   const intervalRef = useRef(null)
-
   const toggle = () => {
-    if (active) {
-      clearInterval(intervalRef.current)
-      setActive(false)
-    } else {
-      setActive(true)
-      let c = 0
-      intervalRef.current = setInterval(() => {
-        setBeat(b => !b)
-        c++
-        setCount(c)
-      }, 500) // 120bpm = 500ms
+    if (active) { clearInterval(intervalRef.current); setActive(false) } 
+    else {
+      setActive(true); let c = 0
+      intervalRef.current = setInterval(() => { setBeat(b => !b); c++; setCount(c) }, 500)
     }
   }
   useEffect(() => () => clearInterval(intervalRef.current), [])
-
   return (
-    <div style={{
-      padding: '14px 18px', borderRadius: 16,
-      background: 'rgba(255,77,109,0.1)',
-      border: `2px solid ${active ? '#ff4d6d' : 'rgba(255,77,109,0.3)'}`,
-      display: 'flex', alignItems: 'center', gap: 14,
-      marginTop: 16,
-    }}>
-      <button
-        onClick={toggle}
-        style={{
-          width: 44, height: 44, borderRadius: 12,
-          background: active ? '#ff4d6d' : 'rgba(255,77,109,0.2)',
-          border: 'none', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: active ? '#fff' : '#ff4d6d',
-          transition: 'all 0.2s',
-        }}
-      >
-        {active ? <Pause size={20} /> : <Play size={20} />}
-      </button>
-      <div>
-        <div style={{ fontSize: 12, color: '#ff4d6d', fontWeight: 800, marginBottom: 3 }}>CPR 메트로놈 (120 bpm)</div>
-        {active && <div style={{ fontSize: 11, color: '#8da2c0' }}>압박 횟수: <span style={{ color: '#fff', fontWeight: 900 }}>{count}</span></div>}
-        {!active && <div style={{ fontSize: 11, color: '#4a6080' }}>시작하면 압박 리듬을 알려드립니다</div>}
-      </div>
-      {active && (
-        <div style={{
-          marginLeft: 'auto',
-          width: 20, height: 20, borderRadius: '50%',
-          background: beat ? '#ff4d6d' : 'rgba(255,77,109,0.2)',
-          transition: 'all 0.05s',
-          boxShadow: beat ? '0 0 12px #ff4d6d' : 'none',
-        }} />
-      )}
+    <div style={{ padding: '18px 24px', borderRadius: 20, background: 'rgba(255,77,109,0.1)', border: `2px solid ${active ? '#ff4d6d' : 'rgba(255,77,109,0.3)'}`, display: 'flex', alignItems: 'center', gap: 18, marginTop: 20 }}>
+      <button onClick={toggle} style={{ width: 56, height: 56, borderRadius: 16, background: active ? '#ff4d6d' : 'rgba(255,77,109,0.2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: active ? '#fff' : '#ff4d6d', transition: 'all 0.2s' }}>{active ? <Pause size={28} /> : <Play size={28} />}</button>
+      <div><div style={{ fontSize: 16, color: '#ff4d6d', fontWeight: 900, marginBottom: 4 }}>CPR 메트로놈 (120 bpm)</div>{active ? <div style={{ fontSize: 14, color: '#8da2c0' }}>압박 횟수: <span style={{ color: '#fff', fontWeight: 900 }}>{count}</span></div> : <div style={{ fontSize: 14, color: '#4a6080' }}>시작하면 압박 리듬을 알려드립니다</div>}</div>
+      {active && <div style={{ marginLeft: 'auto', width: 24, height: 24, borderRadius: '50%', background: beat ? '#ff4d6d' : 'rgba(255,77,109,0.2)', transition: 'all 0.05s', boxShadow: beat ? '0 0 15px #ff4d6d' : 'none' }} />}
     </div>
   )
 }
 
-// 타이머 컴포넌트
 function StepTimer({ seconds, label, color }) {
   const [remaining, setRemaining] = useState(seconds)
   const [running, setRunning] = useState(false)
   const intervalRef = useRef(null)
-
-  useEffect(() => {
-    setRemaining(seconds)
-    setRunning(false)
-    clearInterval(intervalRef.current)
-  }, [seconds])
-
+  useEffect(() => { setRemaining(seconds); setRunning(false); clearInterval(intervalRef.current) }, [seconds])
   const toggle = () => {
-    if (running) {
-      clearInterval(intervalRef.current)
-      setRunning(false)
-    } else {
-      setRunning(true)
-      intervalRef.current = setInterval(() => {
-        setRemaining(r => {
-          if (r <= 1) { clearInterval(intervalRef.current); setRunning(false); return 0 }
-          return r - 1
-        })
-      }, 1000)
-    }
+    if (running) { clearInterval(intervalRef.current); setRunning(false) } 
+    else { setRunning(true); intervalRef.current = setInterval(() => { setRemaining(r => { if (r <= 1) { clearInterval(intervalRef.current); setRunning(false); return 0 }; return r - 1 }) }, 1000) }
   }
   const reset = () => { clearInterval(intervalRef.current); setRunning(false); setRemaining(seconds) }
   useEffect(() => () => clearInterval(intervalRef.current), [])
-
   const pct = ((seconds - remaining) / seconds) * 100
-  const mins = Math.floor(remaining / 60)
-  const secs = remaining % 60
-
+  const mins = Math.floor(remaining / 60); const secs = remaining % 60
   return (
-    <div style={{
-      padding: '14px 18px', borderRadius: 16,
-      background: `${color}10`, border: `1.5px solid ${color}30`,
-      marginTop: 14,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-        <Clock size={15} color={color} />
-        <span style={{ fontSize: 12, fontWeight: 800, color }}>{label}</span>
-        <span style={{ marginLeft: 'auto', fontSize: 22, fontWeight: 900, color, fontVariantNumeric: 'tabular-nums' }}>
-          {mins}:{secs.toString().padStart(2,'0')}
-        </span>
-      </div>
-      <div style={{ height: 5, borderRadius: 3, background: 'rgba(255,255,255,0.06)', overflow: 'hidden', marginBottom: 12 }}>
-        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 3, transition: 'width 0.5s ease' }} />
-      </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <button onClick={toggle} style={{
-          flex: 1, padding: '8px', borderRadius: 10,
-          background: running ? `${color}30` : `${color}20`,
-          border: `1px solid ${color}40`,
-          color, fontSize: 12, fontWeight: 700, cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5
-        }}>
-          {running ? <><Pause size={13} /> 정지</> : <><Play size={13} /> 시작</>}
-        </button>
-        <button onClick={reset} style={{
-          padding: '8px 12px', borderRadius: 10,
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          color: '#4a6080', fontSize: 12, cursor: 'pointer',
-          display: 'flex', alignItems: 'center', gap: 4
-        }}>
-          <RotateCcw size={13} /> 초기화
-        </button>
-      </div>
+    <div style={{ padding: '18px 24px', borderRadius: 20, background: `${color}10`, border: `1.5px solid ${color}30`, marginTop: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}><Clock size={20} color={color} /><span style={{ fontSize: 15, fontWeight: 800, color }}>{label}</span><span style={{ marginLeft: 'auto', fontSize: 28, fontWeight: 900, color, fontVariantNumeric: 'tabular-nums' }}>{mins}:{secs.toString().padStart(2,'0')}</span></div>
+      <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.06)', overflow: 'hidden', marginBottom: 16 }}><div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 3, transition: 'width 0.5s ease' }} /></div>
+      <div style={{ display: 'flex', gap: 10 }}><button onClick={toggle} style={{ flex: 1, padding: '12px', borderRadius: 12, background: running ? `${color}30` : `${color}20`, border: `1px solid ${color}40`, color, fontSize: 15, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>{running ? <><Pause size={16} /> 정지</> : <><Play size={16} /> 시작</>}</button><button onClick={reset} style={{ padding: '12px 20px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#4a6080', fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><RotateCcw size={16} /> 초기화</button></div>
     </div>
   )
 }
@@ -395,272 +303,56 @@ export default function Emergency({ patient }) {
   const recommended = getRecommendedTab(patient)
   const [activeTab, setActiveTab] = useState(recommended || 'cpr')
   const [activeStep, setActiveStep] = useState(0)
-  const [prevStep, setPrevStep] = useState(null)
-  const [animDir, setAnimDir] = useState('right') // 'right' | 'left'
-  const guide = GUIDES[activeTab]
-  const step = guide.steps[activeStep]
-
-  const goTo = (i, dir = 'right') => {
-    setAnimDir(dir)
-    setPrevStep(activeStep)
-    setActiveStep(i)
-    setTimeout(() => setPrevStep(null), 400)
-  }
-
+  const [animDir, setAnimDir] = useState('right')
+  const guide = GUIDES[activeTab]; const step = guide.steps[activeStep]
+  const goTo = (i, dir = 'right') => { setAnimDir(dir); setActiveStep(i) }
   const next = () => { if (activeStep < guide.steps.length - 1) goTo(activeStep + 1, 'right') }
   const prev = () => { if (activeStep > 0) goTo(activeStep - 1, 'left') }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 46px)', overflow: 'hidden', background: '#050d1a' }}>
-
-      {/* 탭 바 */}
-      <div style={{
-        display: 'flex', gap: 8, padding: '12px 24px',
-        background: 'rgba(10,22,40,0.95)',
-        borderBottom: '1.5px solid rgba(13,217,197,0.15)',
-        overflowX: 'auto',
-        flexShrink: 0,
-      }}>
-        {/* 환자 상태 기반 추천 배지 */}
-        {recommended && (
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '8px 14px', borderRadius: 10,
-            background: 'rgba(255,77,109,0.12)',
-            border: '1.5px solid rgba(255,77,109,0.35)',
-            fontSize: 12, color: '#ff4d6d', fontWeight: 800, flexShrink: 0,
-            animation: 'pulse-dot 2s infinite',
-          }}>
-            <Zap size={13} /> 현재 환자 상태 기반 추천
-          </div>
-        )}
-        {TABS.map(t => (
-          <button
-            key={t.id}
-            onClick={() => { setActiveTab(t.id); setActiveStep(0) }}
-            style={{
-              padding: '10px 18px', borderRadius: 11, border: '2px solid',
-              borderColor: activeTab === t.id ? t.color : 'rgba(255,255,255,0.06)',
-              background: activeTab === t.id ? `${t.color}20` : 'rgba(255,255,255,0.02)',
-              color: activeTab === t.id ? '#fff' : '#8da2c0',
-              fontSize: 13, fontWeight: 800, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0,
-              position: 'relative', transition: 'all 0.2s',
-            }}
-          >
-            <span>{t.icon}</span> {t.label}
-            {t.id === recommended && activeTab !== t.id && (
-              <span style={{
-                position: 'absolute', top: -6, right: -6,
-                width: 12, height: 12, borderRadius: '50%',
-                background: '#ff4d6d', border: '2px solid #050d1a',
-                animation: 'pulse-dot 1s infinite',
-              }} />
-            )}
-          </button>
-        ))}
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 72px)', overflow: 'hidden', background: '#050d1a' }}>
+      <div style={{ display: 'flex', gap: 12, padding: '16px 32px', background: 'rgba(10,22,40,0.95)', borderBottom: '1.5px solid rgba(13,217,197,0.15)', overflowX: 'auto', flexShrink: 0 }}>
+        {recommended && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 12, background: 'rgba(255,77,109,0.12)', border: '1.5px solid rgba(255,77,109,0.35)', fontSize: 14, color: '#ff4d6d', fontWeight: 800, flexShrink: 0, animation: 'pulse-dot 2s infinite' }}><Zap size={16} /> 추천 대응</div>}
+        {TABS.map(t => (<button key={t.id} onClick={() => { setActiveTab(t.id); setActiveStep(0) }} style={{ padding: '12px 22px', borderRadius: 14, border: '2px solid', borderColor: activeTab === t.id ? t.color : 'rgba(255,255,255,0.06)', background: activeTab === t.id ? `${t.color}20` : 'rgba(255,255,255,0.02)', color: activeTab === t.id ? '#fff' : '#8da2c0', fontSize: 18, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, position: 'relative', transition: 'all 0.2s' }}><span style={{ fontSize: 24 }}>{t.icon}</span> {t.label}</button>))}
       </div>
-
-      {/* 메인 컨텐츠 */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '520px 1fr', overflow: 'hidden' }}>
-
-        {/* 좌측: 이미지 패널 */}
-        <div style={{
-          borderRight: '1.5px solid rgba(13,217,197,0.15)',
-          display: 'flex', flexDirection: 'column',
-          background: 'rgba(15,32,64,0.3)',
-          overflow: 'hidden',
-        }}>
-          {/* 진행 표시줄 */}
-          <div style={{ padding: '14px 24px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-            <div style={{ display: 'flex', gap: 6, marginBottom: 10, alignItems: 'center' }}>
-              {guide.steps.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => goTo(i, i > activeStep ? 'right' : 'left')}
-                  style={{
-                    flex: 1, height: 5, borderRadius: 3, border: 'none', cursor: 'pointer',
-                    background: i === activeStep
-                      ? guide.color
-                      : i < activeStep
-                        ? `${guide.color}60`
-                        : 'rgba(255,255,255,0.08)',
-                    transition: 'background 0.3s',
-                  }}
-                />
-              ))}
-              <span style={{ marginLeft: 8, fontSize: 12, color: '#4a6080', fontWeight: 700, flexShrink: 0 }}>
-                {activeStep + 1}/{guide.steps.length}
-              </span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 11, padding: '2px 9px', borderRadius: 6, background: `${guide.color}20`, color: guide.color, fontWeight: 800 }}>
-                STEP {activeStep + 1}
-              </span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{step.title}</span>
-            </div>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '650px 1fr', overflow: 'hidden' }}>
+        <div style={{ borderRight: '1.5px solid rgba(13,217,197,0.15)', display: 'flex', flexDirection: 'column', background: 'rgba(15,32,64,0.3)', overflow: 'hidden' }}>
+          <div style={{ padding: '24px 32px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14, alignItems: 'center' }}>{guide.steps.map((_, i) => (<button key={i} onClick={() => goTo(i, i > activeStep ? 'right' : 'left')} style={{ flex: 1, height: 8, borderRadius: 4, border: 'none', cursor: 'pointer', background: i === activeStep ? guide.color : i < activeStep ? `${guide.color}60` : 'rgba(255,255,255,0.08)', transition: 'background 0.3s' }} />))}<span style={{ marginLeft: 12, fontSize: 16, color: '#4a6080', fontWeight: 700 }}>{activeStep + 1}/{guide.steps.length}</span></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><span style={{ fontSize: 14, padding: '4px 14px', borderRadius: 8, background: `${guide.color}20`, color: guide.color, fontWeight: 800 }}>STEP {activeStep + 1}</span><span style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>{step.title}</span></div>
           </div>
-
-          {/* 이미지 영역 */}
           <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-            <img
-              key={`${activeTab}-${activeStep}`}
-              src={step.img}
-              alt={step.title}
-              style={{
-                width: '100%', height: '100%', objectFit: 'cover',
-                animation: `imgSlide${animDir === 'right' ? 'In' : 'InLeft'} 0.4s ease both`
-              }}
-            />
-            {/* 오버레이 */}
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'linear-gradient(to top, rgba(5,13,26,0.95) 0%, rgba(5,13,26,0.2) 50%, transparent 100%)'
-            }} />
-
-            {/* 애니메이션 아이콘 */}
-            <div style={{
-              position: 'absolute', top: 20, right: 20,
-              fontSize: 40,
-              animation: getIconAnimation(step.animation),
-              filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.5))'
-            }}>{step.icon}</div>
-
-            {/* 하단 텍스트 */}
-            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px' }}>
-              <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', marginBottom: 6 }}>{step.title}</div>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '10px 14px', borderRadius: 10,
-                background: `${step.tipColor || '#ff9f43'}18`,
-                border: `1px solid ${step.tipColor || '#ff9f43'}30`
-              }}>
-                <AlertTriangle size={14} color={step.tipColor || '#ff9f43'} />
-                <span style={{ fontSize: 12, color: step.tipColor || '#ff9f43', fontWeight: 600 }}>{step.tip}</span>
-              </div>
+            <img key={`${activeTab}-${activeStep}`} src={step.img} alt={step.title} style={{ width: '100%', height: '100%', objectFit: 'cover', animation: `imgSlide${animDir === 'right' ? 'In' : 'InLeft'} 0.4s ease both` }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(5,13,26,0.95) 0%, rgba(5,13,26,0.2) 50%, transparent 100%)' }} />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '40px' }}>
+              <div style={{ fontSize: 28, fontWeight: 950, color: '#fff', marginBottom: 12 }}>{step.title}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 24px', borderRadius: 16, background: `${step.tipColor || '#ff9f43'}18`, border: `1.5px solid ${step.tipColor || '#ff9f43'}35` }}><AlertTriangle size={24} color={step.tipColor || '#ff9f43'} /><span style={{ fontSize: 18, color: step.tipColor || '#ff9f43', fontWeight: 700 }}>{step.tip}</span></div>
             </div>
           </div>
-
-          {/* 네비게이션 버튼 */}
-          <div style={{
-            padding: '16px 24px',
-            background: 'rgba(5,13,26,0.9)',
-            borderTop: '1px solid rgba(255,255,255,0.04)',
-            display: 'flex', gap: 12
-          }}>
-            <button
-              onClick={prev}
-              disabled={activeStep === 0}
-              style={{
-                padding: '12px 20px', borderRadius: 14,
-                background: activeStep === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                color: activeStep === 0 ? '#4a6080' : '#e8f0fe',
-                fontSize: 14, fontWeight: 700, cursor: activeStep === 0 ? 'not-allowed' : 'pointer',
-                display: 'flex', alignItems: 'center', gap: 8
-              }}
-            ><ChevronLeft size={17} /> 이전 단계</button>
-            <button
-              onClick={next}
-              disabled={activeStep === guide.steps.length - 1}
-              style={{
-                flex: 1, padding: '12px', borderRadius: 14,
-                background: activeStep === guide.steps.length - 1 ? 'rgba(255,255,255,0.03)' : guide.color,
-                border: 'none',
-                color: activeStep === guide.steps.length - 1 ? '#4a6080' : '#050d1a',
-                fontSize: 14, fontWeight: 800, cursor: activeStep === guide.steps.length - 1 ? 'not-allowed' : 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
-              }}
-            >다음 단계 <ChevronRight size={17} /></button>
+          <div style={{ padding: '24px 32px', background: 'rgba(5,13,26,0.95)', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', gap: 16 }}>
+            <button onClick={prev} disabled={activeStep === 0} style={{ padding: '18px 28px', borderRadius: 18, background: activeStep === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: activeStep === 0 ? '#4a6080' : '#e8f0fe', fontSize: 18, fontWeight: 800, cursor: activeStep === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}><ChevronLeft size={24} /> 이전 단계</button>
+            <button onClick={next} disabled={activeStep === guide.steps.length - 1} style={{ flex: 1, padding: '18px', borderRadius: 18, background: activeStep === guide.steps.length - 1 ? 'rgba(255,255,255,0.03)' : guide.color, border: 'none', color: activeStep === guide.steps.length - 1 ? '#4a6080' : '#050d1a', fontSize: 20, fontWeight: 950, cursor: activeStep === guide.steps.length - 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>다음 단계 <ChevronRight size={24} /></button>
           </div>
         </div>
-
-        {/* 우측: 스텝 리스트 + 도구 */}
-        <div style={{ overflowY: 'auto', background: 'linear-gradient(135deg, #050d1a, #0a1628)' }}>
-          {/* 가이드 제목 */}
-          <div style={{ padding: '28px 32px 0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-              <ShieldAlert size={26} color={guide.color} />
-              <span style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>{guide.title}</span>
-            </div>
-            <p style={{ fontSize: 13, color: '#8da2c0', lineHeight: 1.6, marginBottom: 24 }}>{guide.description}</p>
-          </div>
-
-          {/* 스텝 리스트 */}
-          <div style={{ padding: '0 32px', position: 'relative' }}>
-            <div style={{ position: 'absolute', left: 64, top: 0, bottom: 0, width: 2, background: 'rgba(13,217,197,0.08)' }} />
-
+        <div style={{ overflowY: 'auto', background: 'linear-gradient(135deg, #050d1a, #0a1628)', paddingBottom: 40 }}>
+          <div style={{ padding: '40px 48px 0' }}><div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 12 }}><ShieldAlert size={44} color={guide.color} /><span style={{ fontSize: 32, fontWeight: 950, color: '#fff' }}>{guide.title}</span></div><p style={{ fontSize: 19, color: '#8da2c0', lineHeight: 1.6, marginBottom: 40 }}>{guide.description}</p></div>
+          <div style={{ padding: '0 48px', position: 'relative' }}>
+            <div style={{ position: 'absolute', left: 96, top: 0, bottom: 0, width: 2, background: 'rgba(13,217,197,0.08)' }} />
             {guide.steps.map((s, i) => {
-              const isActive = i === activeStep
-              const isDone = i < activeStep
+              const isActive = i === activeStep; const isDone = i < activeStep
               return (
-                <div
-                  key={i}
-                  onClick={() => goTo(i, i > activeStep ? 'right' : 'left')}
-                  style={{
-                    display: 'flex', gap: 24, marginBottom: 20,
-                    cursor: 'pointer',
-                    animation: `slideInLeft 0.3s ease ${i * 0.06}s both`,
-                  }}
-                >
-                  {/* 번호 원 */}
-                  <div style={{
-                    width: 56, height: 56, borderRadius: '50%', flexShrink: 0,
-                    background: isActive ? guide.color : isDone ? `${guide.color}40` : '#0a1628',
-                    border: `3px solid ${isActive ? '#fff' : isDone ? guide.color : 'rgba(13,217,197,0.2)'}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    zIndex: 2, fontSize: isDone ? 18 : 20, fontWeight: 900,
-                    color: isActive ? '#050d1a' : isDone ? guide.color : '#4a6080',
-                    boxShadow: isActive ? `0 0 24px ${guide.color}60` : 'none',
-                    transition: 'all 0.3s',
-                  }}>
-                    {isDone ? '✓' : i + 1}
-                  </div>
-
-                  {/* 카드 */}
-                  <div style={{
-                    flex: 1,
-                    background: isActive ? `${guide.color}12` : 'rgba(255,255,255,0.02)',
-                    border: `1.5px solid ${isActive ? guide.color : isDone ? `${guide.color}25` : 'rgba(255,255,255,0.06)'}`,
-                    borderRadius: 18, padding: '18px 22px',
-                    transition: 'all 0.3s',
-                    transform: isActive ? 'translateX(4px)' : 'none',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                      <span style={{ fontSize: 22 }}>{s.icon}</span>
-                      <span style={{ fontSize: 16, fontWeight: 800, color: isActive ? '#fff' : '#8da2c0' }}>{s.title}</span>
-                      {isActive && <CheckCircle2 size={18} color={guide.color} style={{ marginLeft: 'auto' }} />}
-                    </div>
-                    <p style={{ fontSize: 13, color: isActive ? '#e8f0fe' : '#4a6080', lineHeight: 1.65 }}>{s.desc}</p>
-
-                    {/* 타이머 (해당 스텝 활성 시) */}
-                    {isActive && s.duration > 0 && (
-                      <StepTimer seconds={s.duration} label={`${s.duration >= 60 ? Math.floor(s.duration / 60) + '분' : s.duration + '초'} 타이머`} color={guide.color} />
-                    )}
-                    {/* CPR 메트로놈 */}
+                <div key={i} onClick={() => goTo(i, i > activeStep ? 'right' : 'left')} style={{ display: 'flex', gap: 40, marginBottom: 32, cursor: 'pointer' }}>
+                  <div style={{ width: 96, height: 96, borderRadius: '50%', flexShrink: 0, background: isActive ? guide.color : isDone ? `${guide.color}40` : '#0a1628', border: `5px solid ${isActive ? '#fff' : isDone ? guide.color : 'rgba(13,217,197,0.2)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2, fontSize: isDone ? 32 : 36, fontWeight: 950, color: isActive ? '#050d1a' : isDone ? guide.color : '#4a6080', boxShadow: isActive ? `0 0 40px ${guide.color}60` : 'none', transition: 'all 0.3s' }}>{isDone ? '✓' : i + 1}</div>
+                  <div style={{ flex: 1, background: isActive ? `${guide.color}12` : 'rgba(255,255,255,0.02)', border: `1.5px solid ${isActive ? guide.color : isDone ? `${guide.color}25` : 'rgba(255,255,255,0.06)'}`, borderRadius: 28, padding: '32px 40px', transition: 'all 0.3s', transform: isActive ? 'translateX(8px)' : 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}><span style={{ fontSize: 36 }}>{s.icon}</span><span style={{ fontSize: 24, fontWeight: 950, color: isActive ? '#fff' : '#8da2c0' }}>{s.title}</span>{isActive && <CheckCircle2 size={32} color={guide.color} style={{ marginLeft: 'auto' }} />}</div>
+                    <p style={{ fontSize: 19, color: isActive ? '#e8f0fe' : '#4a6080', lineHeight: 1.7 }}>{s.desc}</p>
+                    {isActive && s.duration > 0 && (<StepTimer seconds={s.duration} label={`${s.duration >= 60 ? Math.floor(s.duration / 60) + '분' : s.duration + '초'} 타이머`} color={guide.color} />)}
                     {isActive && s.hasCPRTimer && <CPRMetronome />}
                   </div>
                 </div>
               )
             })}
           </div>
-
-          {/* 완료 상태 */}
-          {activeStep === guide.steps.length - 1 && (
-            <div style={{
-              margin: '8px 32px 32px',
-              padding: '18px 22px', borderRadius: 18,
-              background: 'rgba(38,222,129,0.08)',
-              border: '1.5px solid rgba(38,222,129,0.25)',
-              display: 'flex', alignItems: 'center', gap: 14
-            }}>
-              <CheckCircle2 size={24} color="#26de81" />
-              <div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: '#26de81', marginBottom: 3 }}>모든 단계 완료</div>
-                <div style={{ fontSize: 13, color: '#8da2c0' }}>처치 완료 후 원격 의료진에게 결과를 보고하세요.</div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

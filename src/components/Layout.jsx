@@ -1,4 +1,5 @@
 import { Wifi, WifiOff, Brain, LogOut } from 'lucide-react'
+import logoImg from '../assets/logo_new.png'
 
 const NAV = [
   { id: 'main',      label: '메인' },
@@ -14,29 +15,24 @@ export default function Layout({ activePage, onNavigate, auth, onLogout }) {
 
   return (
     <header style={{
-      height: 46,
+      height: 72,
       background: 'var(--navy-950)',
       borderBottom: '1px solid var(--border)',
       display: 'flex',
       alignItems: 'center',
-      padding: '0 20px',
+      padding: '0 32px',
       gap: 0,
       flexShrink: 0,
       zIndex: 50,
     }}>
       {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginRight: 24, flexShrink: 0 }}>
-        <div style={{
-          width: 26, height: 26, borderRadius: 7,
-          background: 'linear-gradient(135deg, var(--teal-400), var(--teal-500))',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 13,
-        }}>⚓</div>
-        <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>MDTS</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginRight: 48, flexShrink: 0 }}>
+        <img src={logoImg} alt="Logo" style={{ width: 40, height: 40, objectFit: 'contain' }} />
+        <span style={{ fontSize: 24, fontWeight: 950, color: 'var(--text-primary)', letterSpacing: '-0.8px' }}>MDTS</span>
       </div>
 
       {/* Nav tabs */}
-      <nav style={{ display: 'flex', gap: 2, flex: 1 }}>
+      <nav style={{ display: 'flex', gap: 8, flex: 1, height: '100%' }}>
         {NAV.map(({ id, label, badge, isAI }) => {
           const active = activePage === id
           return (
@@ -44,29 +40,30 @@ export default function Layout({ activePage, onNavigate, auth, onLogout }) {
               key={id}
               onClick={() => onNavigate(id)}
               style={{
-                padding: '6px 16px',
-                borderRadius: 6, border: 'none', cursor: 'pointer',
-                background: active ? 'rgba(13,217,197,0.12)' : 'transparent',
+                padding: '0 32px',
+                height: '100%',
+                border: 'none', cursor: 'pointer',
+                background: active ? 'rgba(13,217,197,0.1)' : 'transparent',
                 color: active ? 'var(--teal-400)' : 'var(--text-secondary)',
-                fontSize: 13, fontWeight: active ? 600 : 400,
+                fontSize: 28, fontWeight: active ? 950 : 500,
                 transition: 'all 0.15s',
                 position: 'relative',
-                display: 'flex', alignItems: 'center', gap: 4,
+                display: 'flex', alignItems: 'center', gap: 10,
               }}
             >
-              {isAI && <Brain size={12} />}
+              {isAI && <Brain size={24} />}
               {label}
               {active && (
                 <div style={{
-                  position: 'absolute', bottom: -1, left: '20%', right: '20%',
-                  height: 2, background: 'var(--teal-400)', borderRadius: 1,
+                  position: 'absolute', bottom: 0, left: 0, right: 0,
+                  height: 4, background: 'var(--teal-400)',
                 }} />
               )}
               {badge && (
                 <span style={{
-                  marginLeft: 3, background: 'var(--red-400)',
-                  color: '#fff', fontSize: 9, fontWeight: 700,
-                  padding: '1px 5px', borderRadius: 8, verticalAlign: 'middle',
+                  marginLeft: 6, background: 'var(--red-400)',
+                  color: '#fff', fontSize: 14, fontWeight: 900,
+                  padding: '2px 9px', borderRadius: 12,
                 }}>{badge}</span>
               )}
             </button>

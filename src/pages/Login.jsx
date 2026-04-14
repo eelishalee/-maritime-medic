@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Database, Settings, Ship } from 'lucide-react'
-import logoImg from '../assets/logo.png'
+import logoImg from '../assets/logo_new.png'
 
 export default function Login({ onLogin }) {
   const [loginData, setLoginData] = useState({ serial: 'SN-0001', device: 'MED-01', ship: 'KOREA STAR' })

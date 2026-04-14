@@ -37,8 +37,8 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
   height: 100vh;
-  /* 모든 텍스트 크기를 30% 확대 */
-  font-size: 21px; 
+  /* 모든 텍스트 크기를 추가로 20% 확대 (총 약 50% 이상 확대됨) */
+  font-size: 25px; 
 }
 
 #root {
@@ -49,7 +49,7 @@ body {
 
 /* 기존 작은 글씨들도 상대적으로 확대되도록 설정 */
 div, span, button, input {
-  font-size: 1.3rem; 
+  font-size: 1.56rem; 
 }
 
 /* Scrollbar */
