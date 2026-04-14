@@ -7,7 +7,8 @@ import EmergencyGuide from './EmergencyGuide.jsx'
 export default function DashboardView({ 
   activePatient, activeTab, hr, spo2, rr, bp, bt, chat, prompt, setPrompt, 
   handlePromptAnalysis, startEmergencyAction, activeEmergencyGuide, 
-  setActiveEmergencyGuide, activeStep, setActiveStep, handleTraumaAnalysis 
+  setActiveEmergencyGuide, activeStep, setActiveStep, handleTraumaAnalysis,
+  isScanning, setIsScanning, scanResult, confirmTraumaResult 
 }) {
   return (
     <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '420px 1fr 440px', overflow: 'hidden' }}>
@@ -105,7 +106,89 @@ export default function DashboardView({
       </aside>
 
       {/* [Center] Vitals, Timeline, Chat */}
-      <section style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <section style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
+        
+        {/* AI Trauma Scanner HUD Overlay */}
+        {isScanning && (
+          <div style={{ 
+            position: 'absolute', inset: 0, zIndex: 100, 
+            background: 'rgba(2, 6, 23, 0.85)', backdropFilter: 'blur(8px)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
+          }}>
+            {/* Scanner Frame */}
+            <div style={{ 
+              position: 'relative', width: 500, height: 380, 
+              border: '1px solid rgba(56, 189, 248, 0.2)',
+              background: 'rgba(56, 189, 248, 0.03)',
+              overflow: 'hidden'
+            }}>
+              {/* Corner Accents */}
+              <div style={{ position: 'absolute', top: 20, left: 20, width: 40, height: 40, borderTop: '4px solid #38bdf8', borderLeft: '4px solid #38bdf8' }} />
+              <div style={{ position: 'absolute', top: 20, right: 20, width: 40, height: 40, borderTop: '4px solid #38bdf8', borderRight: '4px solid #38bdf8' }} />
+              <div style={{ position: 'absolute', bottom: 20, left: 20, width: 40, height: 40, borderBottom: '4px solid #38bdf8', borderLeft: '4px solid #38bdf8' }} />
+              <div style={{ position: 'absolute', bottom: 20, right: 20, width: 40, height: 40, borderBottom: '4px solid #38bdf8', borderRight: '4px solid #38bdf8' }} />
+
+              {/* Scanning Line */}
+              <div style={{ 
+                position: 'absolute', left: 0, right: 0, height: 4, 
+                background: 'linear-gradient(180deg, transparent, #38bdf8, transparent)',
+                boxShadow: '0 0 20px #38bdf8',
+                animation: 'scanMove 2.5s ease-in-out infinite'
+              }} />
+
+              {/* HUD Data Overlay */}
+              <div style={{ position: 'absolute', top: 40, left: 80, fontFamily: 'monospace', fontSize: 12, color: '#38bdf8', opacity: 0.8 }}>
+                <div>DEPTH_SENSING: ACTIVE</div>
+                <div>TISSUE_TYPE: RECOGNIZING...</div>
+                <div>BLOOD_OXY: MONITORING</div>
+              </div>
+              
+              <div style={{ position: 'absolute', bottom: 40, right: 80, fontFamily: 'monospace', fontSize: 12, color: '#38bdf8', opacity: 0.8, textAlign: 'right' }}>
+                <div>AI_MODEL: MDTS_TRAUMA_V2</div>
+                <div>CONFIDENCE: 94.2%</div>
+                <div>LATENCY: 12ms</div>
+              </div>
+
+              {/* Center Reticle */}
+              <div style={{ 
+                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                width: 80, height: 80, border: '1px dashed rgba(56, 189, 248, 0.5)', borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <div style={{ width: 10, height: 10, background: '#f43f5e', borderRadius: '50%', animation: 'pulse 1s infinite' }} />
+              </div>
+            </div>
+
+            {/* Status Text or Results */}
+            <div style={{ marginTop: 32, textAlign: 'center', minHeight: 100 }}>
+              {!scanResult ? (
+                <>
+                  <div style={{ fontSize: 24, fontWeight: 900, color: '#38bdf8', letterSpacing: 2, marginBottom: 8 }}>AI 조직 정밀 분석 중...</div>
+                  <div style={{ fontSize: 14, color: 'rgba(56, 189, 248, 0.6)', fontWeight: 700 }}>환부를 조준 프레임 안에 유지하십시오</div>
+                </>
+              ) : (
+                <div className="fade-in">
+                  <div style={{ fontSize: 22, fontWeight: 900, color: '#2dd4bf', marginBottom: 12 }}>분석 완료 : {scanResult.analysis.split(' 감지')[0].split(' 확인')[0]}</div>
+                  <button 
+                    onClick={confirmTraumaResult}
+                    style={{ 
+                      padding: '14px 40px', borderRadius: 14, 
+                      background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)',
+                      color: '#000', fontWeight: 900, fontSize: 18, border: 'none',
+                      cursor: 'pointer', boxShadow: '0 8px 25px rgba(56, 189, 248, 0.4)',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    {scanResult.action.label} 바로가기
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         <div style={{ padding: '14px 45px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#080b12' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
             <DashboardVital label="심박수" value={hr} unit="bpm" color="#fb7185" live />
@@ -313,6 +396,15 @@ export default function DashboardView({
         @keyframes lightFlow {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
+        }
+        @keyframes scanMove {
+          0% { top: 0%; opacity: 0.2; }
+          50% { opacity: 1; }
+          100% { top: 100%; opacity: 0.2; }
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.2); opacity: 0.5; }
         }
         .emergency-action-btn:hover { background: #e11d48 !important; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3); }
         .emergency-action-btn:active { transform: scale(0.97); }

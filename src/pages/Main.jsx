@@ -12,7 +12,7 @@ import DashboardView from './Main/components/DashboardView.jsx'
 import CrewView from './Main/components/CrewView.jsx'
 import SettingsView from './Main/components/SettingsView.jsx'
 
-export default function Main() {
+function Main() {
   const [view, setView] = useState('login')
   const [isOnline, setIsOnline] = useState(true)
   const [crewList, setCrewList] = useState(INITIAL_CREW || [])
@@ -38,6 +38,8 @@ export default function Main() {
   const [prompt, setPrompt] = useState('')
   const [activeEmergencyGuide, setActiveEmergencyGuide] = useState('CARDIAC')
   const [activeStep, setActiveStep] = useState(1)
+  const [isScanning, setIsScanning] = useState(false)
+  const [scanResult, setScanResult] = useState(null)
 
   // Realtime Simulation
   useEffect(() => {
@@ -73,35 +75,47 @@ export default function Main() {
   }
 
   const handleTraumaAnalysis = () => {
+    setIsScanning(true)
+    setScanResult(null)
+    
     const scenarios = [
       {
         analysis: '우측 전완부 약 5cm 길이의 심부 열상 감지',
-        suggestion: '즉시 압박 지혈 및 식염수 세척 권고. KMCC 원격 봉합 지도 준비 요망'
+        suggestion: '즉시 압박 지혈 및 식염수 세척 권고. KMCC 원격 봉합 지도 준비 요망',
+        action: { label: '중증 외상/출혈 가이드', type: 'TRAUMA' }
       },
       {
         analysis: '좌측 하퇴부 변형 및 부종 기반 폐쇄성 골절 의심',
-        suggestion: '부목 고정 및 환부 거상 실시. 진통제 투여 고려 및 정밀 영상 판독 요청'
+        suggestion: '부목 고정 및 환부 거상 실시. 진통제 투여 고려 및 정밀 영상 판독 요청',
+        action: { label: '중증 외상/출혈 가이드', type: 'TRAUMA' }
       },
       {
         analysis: '상복부 수포 형성 동반한 광범위 2도 화상 확인',
-        suggestion: '흐르는 미온수로 20분간 냉각 실시. 화상 거즈 도포 및 수분 공급 집중 관리 권고'
+        suggestion: '흐르는 미온수로 20분간 냉각 실시. 화상 거즈 도포 및 수분 공급 집중 관리 권고',
+        action: { label: '중증 외상/출혈 가이드', type: 'TRAUMA' }
       }
     ]
 
     const selected = scenarios[Math.floor(Math.random() * scenarios.length)]
     
-    // 1단계 : 분석 시작 로그
-    const loadingChat = [...chat, { role: 'ai', text: '외상 이미지 캡처 완료. 분석 엔진 가동 중...' }]
-    setChat(loadingChat)
-
-    // 2단계 : 1.5초 후 분석 결과 출력
+    // 3초 후 애니메이션 중단하고 결과 노출
     setTimeout(() => {
-      setChat([
-        ...loadingChat,
-        { role: 'ai', text: `분석 결과 : ${selected.analysis}` },
-        { role: 'ai', text: `처치 가이드 : ${selected.suggestion}`, action: { label: '중증 외상/출혈 가이드', type: 'TRAUMA' } }
-      ])
-    }, 1500)
+      setScanResult(selected)
+    }, 3000)
+  }
+
+  const confirmTraumaResult = () => {
+    if (!scanResult) return
+    
+    setChat([
+      ...chat,
+      { role: 'ai', text: `[외상 분석 완료] ${scanResult.analysis}` },
+      { role: 'ai', text: `처치 가이드 : ${scanResult.suggestion}`, action: scanResult.action }
+    ])
+    
+    setIsScanning(false)
+    setScanResult(null)
+    startEmergencyAction(scanResult.action.type)
   }
 
   const startEmergencyAction = (type) => {
@@ -154,6 +168,10 @@ export default function Main() {
             activeStep={activeStep}
             setActiveStep={setActiveStep}
             handleTraumaAnalysis={handleTraumaAnalysis}
+            isScanning={isScanning}
+            setIsScanning={setIsScanning}
+            scanResult={scanResult}
+            confirmTraumaResult={confirmTraumaResult}
           />
         )}
         {view === 'crew' && (
@@ -182,3 +200,5 @@ export default function Main() {
     </div>
   )
 }
+
+export default Main
