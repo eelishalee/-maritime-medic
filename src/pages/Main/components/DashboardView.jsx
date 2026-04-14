@@ -261,6 +261,34 @@ export default function DashboardView({
                 boxShadow: m.role === 'ai' ? '0 4px 20px rgba(56, 189, 248, 0.05)' : 'none'
               }}>
                 {m.text}
+                
+                {m.action && (
+                  <button 
+                    onClick={() => startEmergencyAction(m.action.type)}
+                    style={{
+                      marginTop: 12,
+                      width: '100%',
+                      padding: '10px',
+                      borderRadius: 12,
+                      background: 'rgba(56, 189, 248, 0.15)',
+                      border: '1px solid rgba(56, 189, 248, 0.3)',
+                      color: '#38bdf8',
+                      fontSize: 13,
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.background = 'rgba(56, 189, 248, 0.25)'}
+                    onMouseOut={(e) => e.currentTarget.style.background = 'rgba(56, 189, 248, 0.15)'}
+                  >
+                    <AlertTriangle size={14} />
+                    {m.action.label} 바로가기
+                  </button>
+                )}
               </div>
             </div>
           ))}

@@ -33,7 +33,7 @@ export default function Main() {
     { role: 'user', text: '환자 심박수 불안정 상태 분석 요청' },
     { role: 'ai', text: '분석 결과 : 최근 5분간 심박수 상승(82→104bpm) 및 산소포화도(98%) 정상 유지. 안색 및 흉부 통증 확인 요망' },
     { role: 'user', text: '가슴 압박 통증 호소 상황 발생' },
-    { role: 'ai', text: '위험 신호 감지 : 급성 심근경색(AMI) 가능성 85%. 즉시 응급 처치 실시 및 KMCC 긴급 지원 요청 권고' }
+    { role: 'ai', text: '위험 신호 감지 : 급성 심근경색(AMI) 가능성 85%. 즉시 응급 처치 실시 및 KMCC 긴급 지원 요청 권고', action: { label: '흉통/심정지 가이드', type: 'CARDIAC' } }
   ])
   const [prompt, setPrompt] = useState('')
   const [activeEmergencyGuide, setActiveEmergencyGuide] = useState('CARDIAC')
@@ -68,8 +68,40 @@ export default function Main() {
     setChat(newChat)
     setPrompt('')
     setTimeout(() => {
-      setChat([...newChat, { role: 'ai', text: '분석 결과 : 바이탈 정상 범위 내 유지 중입니다.' }])
+      setChat([...newChat, { role: 'ai', text: '분석 결과 : 바이탈 정상 범위 내 유지 중. 특이 사항 없음' }])
     }, 1000)
+  }
+
+  const handleTraumaAnalysis = () => {
+    const scenarios = [
+      {
+        analysis: '우측 전완부 약 5cm 길이의 심부 열상 감지',
+        suggestion: '즉시 압박 지혈 및 식염수 세척 권고. KMCC 원격 봉합 지도 준비 요망'
+      },
+      {
+        analysis: '좌측 하퇴부 변형 및 부종 기반 폐쇄성 골절 의심',
+        suggestion: '부목 고정 및 환부 거상 실시. 진통제 투여 고려 및 정밀 영상 판독 요청'
+      },
+      {
+        analysis: '상복부 수포 형성 동반한 광범위 2도 화상 확인',
+        suggestion: '흐르는 미온수로 20분간 냉각 실시. 화상 거즈 도포 및 수분 공급 집중 관리 권고'
+      }
+    ]
+
+    const selected = scenarios[Math.floor(Math.random() * scenarios.length)]
+    
+    // 1단계 : 분석 시작 로그
+    const loadingChat = [...chat, { role: 'ai', text: '외상 이미지 캡처 완료. 분석 엔진 가동 중...' }]
+    setChat(loadingChat)
+
+    // 2단계 : 1.5초 후 분석 결과 출력
+    setTimeout(() => {
+      setChat([
+        ...loadingChat,
+        { role: 'ai', text: `분석 결과 : ${selected.analysis}` },
+        { role: 'ai', text: `처치 가이드 : ${selected.suggestion}`, action: { label: '중증 외상/출혈 가이드', type: 'TRAUMA' } }
+      ])
+    }, 1500)
   }
 
   const startEmergencyAction = (type) => {
@@ -121,7 +153,7 @@ export default function Main() {
             setActiveEmergencyGuide={setActiveEmergencyGuide}
             activeStep={activeStep}
             setActiveStep={setActiveStep}
-            handleTraumaAnalysis={() => {}}
+            handleTraumaAnalysis={handleTraumaAnalysis}
           />
         )}
         {view === 'crew' && (
