@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Anchor, Lock, Monitor, Ship } from 'lucide-react'
-import MaritimeBackground from '../components/MaritimeBackground'
 
 export default function Login({ onLogin }) {
   const [form, setForm] = useState({ serialNo: '', deviceNo: '', shipNo: '' })
@@ -25,21 +24,36 @@ export default function Login({ onLogin }) {
   return (
     <div style={{
       width: '100vw', height: '100vh',
-      background: 'transparent',
+      background: 'var(--navy-950)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       flexDirection: 'column', gap: 0,
       position: 'relative', overflow: 'hidden',
     }}>
-      <MaritimeBackground />
+      {/* Background grid */}
+      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.04 }}>
+        {Array.from({ length: 20 }).map((_, i) => (
+          <line key={`h${i}`} x1="0" y1={`${i * 5}%`} x2="100%" y2={`${i * 5}%`} stroke="#0dd9c5" strokeWidth="0.5" />
+        ))}
+        {Array.from({ length: 30 }).map((_, i) => (
+          <line key={`v${i}`} x1={`${i * 4}%`} y1="0" x2={`${i * 4}%`} y2="100%" stroke="#0dd9c5" strokeWidth="0.5" />
+        ))}
+      </svg>
+      {/* Glow */}
+      <div style={{
+        position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%, -50%)',
+        width: 600, height: 400,
+        background: 'radial-gradient(ellipse, rgba(13,217,197,0.08) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
 
       {/* Card */}
       <div style={{
-        background: 'rgba(3,13,28,0.88)',
-        border: '1px solid rgba(13,217,197,0.25)',
+        background: 'rgba(15,32,64,0.92)',
+        border: '1px solid rgba(13,217,197,0.2)',
         borderRadius: 20, padding: '40px 44px',
-        width: 420, position: 'relative', zIndex: 1,
-        backdropFilter: 'blur(20px)',
-        boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 40px rgba(13,217,197,0.08)',
+        width: 420, position: 'relative',
+        backdropFilter: 'blur(16px)',
+        boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
       }} className="fade-in">
         {/* Logo */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 32 }}>

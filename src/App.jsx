@@ -2,65 +2,47 @@ import { useState } from 'react'
 import Login from './pages/Login'
 import Layout from './components/Layout'
 import Main from './pages/Main'
-import PatientChart from './pages/PatientChart'
 import CrewManagement from './pages/CrewManagement'
 import Emergency from './pages/Emergency'
+import AIAnalysis from './pages/AIAnalysis'
 import Settings from './pages/Settings'
-import CameraModal from './components/CameraModal'
-import MaritimeBackground from './components/MaritimeBackground'
-
-const PAGES = {
-  main: Main,
-  chart: PatientChart,
-  crew: CrewManagement,
-  emergency: Emergency,
-  settings: Settings,
-}
+import Patients from './pages/Patients'
 
 export default function App() {
-  const [auth, setAuth] = useState(null) // { serialNo, deviceNo, shipNo }
-  const [activePage, setActivePage] = useState('main')
-  const [showCamera, setShowCamera] = useState(false)
-  const PageComponent = PAGES[activePage] || Main
+  const [auth, setAuth] = useState(true)
+  const [page, setPage] = useState('main')
 
-  if (!auth) {
-    return <Login onLogin={setAuth} />
-  }
+  const [activePatient, setActivePatient] = useState({
+    id: 'S2026-026', name: '김선원', age: 55, role: '기관장', blood: 'A+',
+    dob: '1971-08-22', height: 174, weight: 76,
+    chronic: '고혈압, 고지혈증',
+    allergies: '아스피린 (민감)',
+    lastMed: '암로디핀 (08:00)',
+    location: '기관실 제2엔진 인근 데크',
+    hr: 96, bp: '158/95', temp: 37.6, spo2: 94,
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200'
+  })
+
+  if (!auth) return <Login onLogin={() => setAuth(true)} />
 
   return (
-    <div style={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', background: 'transparent', overflow: 'hidden', position: 'relative' }}>
-      <MaritimeBackground />
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       <Layout
-        activePage={activePage}
-        onNavigate={setActivePage}
-        auth={auth}
+        activePage={page}
+        onNavigate={setPage}
+        auth={{ shipNo: 'MV KOREA STAR', deviceNo: 'MED-001' }}
       />
-      <main style={{ flex: 1, overflowY: 'auto', position: 'relative' }}>
-        <PageComponent key={activePage} />
-      </main>
-
-      {/* Floating camera button */}
-      <button
-        onClick={() => setShowCamera(true)}
-        style={{
-          position: 'fixed', bottom: 28, right: 28,
-          width: 52, height: 52, borderRadius: '50%',
-          background: 'linear-gradient(135deg, var(--teal-400), var(--teal-500))',
-          border: 'none', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 20px rgba(13,217,197,0.4)',
-          zIndex: 100, fontSize: 22,
-          transition: 'transform 0.2s, box-shadow 0.2s',
-        }}
-        title="외상 촬영 — AI 분석"
-        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 6px 28px rgba(13,217,197,0.6)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(13,217,197,0.4)' }}
-      >
-        📷
-      </button>
-
-      {showCamera && <CameraModal onClose={() => setShowCamera(false)} />}
+      <div style={{ flex: 1, overflow: 'hidden' }}>
+        {page === 'main'      && <Main patient={activePatient} />}
+        {page === 'patients'  && (
+          <Patients onSelectPatient={p => { setActivePatient(p); setPage('main') }} />
+        )}
+        {page === 'crew'      && (
+          <CrewManagement onSelectPatient={p => { setActivePatient(p); setPage('main') }} />
+        )}
+        {page === 'emergency' && <Emergency patient={activePatient} />}
+        {page === 'ai'        && <AIAnalysis patient={activePatient} />}
+        {page === 'settings'  && <Settings />}
       </div>
     </div>
   )
