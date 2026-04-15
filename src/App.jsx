@@ -26,7 +26,7 @@ export default function App() {
   if (!auth) return <Login onLogin={setAuth} />
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', overflow: 'hidden' }}>
       <Layout
         activePage={page}
         onNavigate={setPage}

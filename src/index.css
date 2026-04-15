@@ -52,11 +52,30 @@ div, span, button, input {
   font-size: 1.56rem; 
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--navy-600); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--teal-500); }
+/* Scrollbar Customization */
+::-webkit-scrollbar { 
+  width: 10px; 
+  height: 10px; 
+}
+::-webkit-scrollbar-track { 
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb { 
+  background: rgba(13, 217, 197, 0.3); /* 테일 색상 반투명 */
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { 
+  background: rgba(13, 217, 197, 0.6); 
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(13, 217, 197, 0.3) transparent;
+}
 
 /* Animations */
 @keyframes pulse-dot {
