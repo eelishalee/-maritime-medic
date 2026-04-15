@@ -18,9 +18,9 @@ export default function App() {
     chronic: '고혈압, 고지혈증',
     allergies: '아스피린 (민감)',
     lastMed: '암로디핀 (08:00)',
-    location: '기관실 제2엔진 인근 데크',
+    location: '기관실 제2엔진',
     hr: 96, bp: '158/95', temp: 37.6, spo2: 94,
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200'
+    avatar: '/CE.jpeg'
   })
 
   if (!auth) return <Login onLogin={setAuth} />
@@ -34,7 +34,7 @@ export default function App() {
         onLogout={() => setAuth(null)}
       />
       <div style={{ flex: 1, overflow: 'hidden' }}>
-        {page === 'main'      && <Main patient={activePatient} />}
+        {page === 'main'      && <Main patient={activePatient} onNavigate={setPage} />}
         {page === 'patients'  && (
           <Patients onSelectPatient={p => { setActivePatient(p); setPage('main') }} />
         )}

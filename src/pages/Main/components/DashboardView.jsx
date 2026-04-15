@@ -1,101 +1,337 @@
-import { Activity, History, Droplets, Upload, AlertTriangle, Camera, Mic, User } from 'lucide-react'
+import { Activity, History, Droplets, Upload, AlertTriangle, Camera, Mic, User, Pill, AlertCircle, MapPin, Phone, Anchor, Weight, Ruler, HeartPulse, Paperclip, ArrowUp, Sparkles } from 'lucide-react'
 import logoImg from '../../../assets/logo.png'
 import MdtsLogo from '../../../components/MdtsLogo.jsx'
 import { DashboardVital, InfoItem, TimelineItem } from '../../../components/ui'
 import EmergencyGuide from './EmergencyGuide.jsx'
 
-export default function DashboardView({ 
-  activePatient, activeTab, hr, spo2, rr, bp, bt, chat, prompt, setPrompt, 
-  handlePromptAnalysis, startEmergencyAction, activeEmergencyGuide, 
+export default function DashboardView({
+  activePatient, activeTab, hr, spo2, rr, bp, bt, chat, prompt, setPrompt,
+  handlePromptAnalysis, startEmergencyAction, activeEmergencyGuide,
   setActiveEmergencyGuide, activeStep, setActiveStep, handleTraumaAnalysis,
-  isScanning, setIsScanning, scanResult, confirmTraumaResult 
+  isScanning, setIsScanning, scanResult, confirmTraumaResult, onBackToDashboard
 }) {
   return (
-    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '420px 1fr 440px', overflow: 'hidden' }}>
-      
-      {/* [Left] Patient Info Panel */}
-      <aside style={{ borderRight: '1px solid rgba(255,255,255,0.05)', background: '#05070a', display: 'flex', flexDirection: 'column', overflow: 'hidden', height: '100%' }}>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '28px' }}>
-          
-          <div style={{ background: 'rgba(56,189,248,0.05)', border: '1px solid rgba(56,189,248,0.1)', borderRadius: 24, padding: '24px 24px 20px 24px', marginBottom: 30 }}>
-            <div style={{ display: 'flex', gap: 24, marginBottom: 24 }}>
-              <div style={{ width: 110, height: 110, borderRadius: 27, background: '#fff', border: '2px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', boxShadow: '0 0 24px rgba(56,189,248,0.2)' }}>
-                {activePatient?.id?.includes('100') ? (
-                  <img src="photo.jpeg" alt="Captain" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5px' }} />
-                ) : (
-                  <User size={68} color="#38bdf8" />
-                )}
+    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '420px 1fr 440px', overflow: 'hidden', height: '100%', position: 'relative' }}>
+
+      {/* 전체화면 스캔 오버레이 */}
+      {isScanning && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 500,
+          background: 'rgba(1,4,14,0.97)', backdropFilter: 'blur(20px)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 36,
+        }}>
+          {!scanResult ? (
+            <>
+              {/* 헤더 */}
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 11, letterSpacing: 4, color: '#38bdf8', fontWeight: 800, marginBottom: 10, opacity: 0.6 }}>MDTS CAM · AI TRAUMA SCAN</div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#e2e8f0' }}>환부 촬영 분석 중</div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ fontSize: 37, fontWeight: 950, marginBottom: 4, letterSpacing: '-0.6px' }}>{activePatient?.name}</div>
-                <div style={{ fontSize: 23, color: '#38bdf8', fontWeight: 800, marginBottom: 2 }}>{activePatient?.role}</div>
-                <div style={{ fontSize: 18, color: '#475569', fontWeight: 700 }}>ID : {activePatient?.id}</div>
+
+              {/* 원형 레이더 스캔 */}
+              <div style={{ position: 'relative', width: 320, height: 320 }}>
+
+                {/* 동심원 */}
+                {[1, 0.72, 0.44].map((scale, i) => (
+                  <div key={i} style={{
+                    position: 'absolute',
+                    width: 320 * scale, height: 320 * scale,
+                    top: '50%', left: '50%',
+                    transform: 'translate(-50%,-50%)',
+                    borderRadius: '50%',
+                    border: `1px solid rgba(56,189,248,${0.12 + i * 0.06})`,
+                  }} />
+                ))}
+
+                {/* 외곽 링 (밝은 테두리) */}
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '50%',
+                  border: '2px solid rgba(56,189,248,0.5)',
+                  boxShadow: '0 0 24px rgba(56,189,248,0.2), inset 0 0 24px rgba(56,189,248,0.05)',
+                }} />
+
+                {/* 십자선 */}
+                <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1, background: 'rgba(56,189,248,0.15)', transform: 'translateY(-50%)' }} />
+                <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 1, background: 'rgba(56,189,248,0.15)', transform: 'translateX(-50%)' }} />
+
+                {/* 레이더 스윕 — 회전하는 코닉 그라디언트 */}
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '50%',
+                  background: 'conic-gradient(from 0deg, transparent 0%, transparent 70%, rgba(56,189,248,0.06) 80%, rgba(56,189,248,0.35) 95%, rgba(125,211,252,0.5) 100%)',
+                  animation: 'spin 2s linear infinite',
+                }} />
+
+                {/* 스윕 선 끝의 빛 */}
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '50%',
+                  background: 'conic-gradient(from 0deg, transparent 96%, rgba(125,211,252,0.9) 98%, transparent 100%)',
+                  animation: 'spin 2s linear infinite',
+                  filter: 'blur(1px)',
+                }} />
+
+                {/* 중앙 점 */}
+                <div style={{
+                  position: 'absolute', top: '50%', left: '50%',
+                  transform: 'translate(-50%,-50%)',
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: '#38bdf8',
+                  boxShadow: '0 0 12px 4px rgba(56,189,248,0.7)',
+                }} />
+
+                {/* 랜덤 스캔 핑 포인트 */}
+                {[
+                  { top: '28%', left: '38%', delay: '0.3s' },
+                  { top: '55%', left: '62%', delay: '0.9s' },
+                  { top: '68%', left: '35%', delay: '1.5s' },
+                ].map((pos, i) => (
+                  <div key={i} style={{
+                    position: 'absolute', ...pos,
+                    width: 5, height: 5, borderRadius: '50%',
+                    background: '#38bdf8',
+                    boxShadow: '0 0 8px 3px rgba(56,189,248,0.5)',
+                    animation: `pulse 1.8s ${pos.delay} ease-in-out infinite`,
+                  }} />
+                ))}
+              </div>
+
+              {/* 진행 도트 */}
+              <div style={{ display: 'flex', gap: 10 }}>
+                {[0, 0.3, 0.6].map((d, i) => (
+                  <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#38bdf8', opacity: 0.5, animation: `pulse 1.2s ${d}s ease-in-out infinite` }} />
+                ))}
+              </div>
+            </>
+          ) : (
+            /* 분석 완료 */
+            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>
+
+              {/* 완료 원형 링 애니메이션 */}
+              <div style={{ position: 'relative', width: 120, height: 120 }}>
+                {/* 퍼지는 링 */}
+                <div style={{
+                  position: 'absolute', inset: -16, borderRadius: '50%',
+                  border: '1.5px solid rgba(244,63,94,0.3)',
+                  animation: 'pulse 1.5s ease-in-out infinite',
+                }} />
+                <div style={{
+                  position: 'absolute', inset: -6, borderRadius: '50%',
+                  border: '1.5px solid rgba(244,63,94,0.5)',
+                  animation: 'pulse 1.5s 0.3s ease-in-out infinite',
+                }} />
+                <div style={{
+                  width: '100%', height: '100%', borderRadius: '50%',
+                  background: 'rgba(244,63,94,0.08)',
+                  border: '2px solid #f43f5e',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 0 40px rgba(244,63,94,0.4)',
+                }}>
+                  <AlertTriangle size={40} color="#f43f5e" />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: 11, letterSpacing: 2, color: '#f43f5e', fontWeight: 800, marginBottom: 12 }}>분석 완료 · 신뢰도 {scanResult.confidence}%</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', marginBottom: 12, lineHeight: 1.4 }}>{scanResult.analysis}</div>
+                <div style={{ fontSize: 14, color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#38bdf8', animation: 'pulse 1s infinite' }} />
+                  응급 처치 페이지로 이동합니다...
+                </div>
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-              <InfoItem label="나이/성별" value={`${activePatient?.age || 0}세 / 남`} size="xl_ultra" />
-              <InfoItem label="혈액형" value={activePatient?.blood} size="xl_ultra" />
-              <div style={{ gridColumn: 'span 2' }}>
-                <div style={{ fontSize: 17, color: '#64748b', marginBottom: 8, fontWeight: 700 }}>과거력 (Past History)</div>
-                <div style={{ fontSize: 21, fontWeight: 800, color: '#e2e8f0', lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>{activePatient?.history}</div>
-              </div>
+          )}
+        </div>
+      )}
+
+      {/* [Left] Patient Info Panel */}
+      <aside style={{ borderRight: '1px solid rgba(255,255,255,0.05)', background: '#05070a', display: 'flex', flexDirection: 'column', position: 'relative', minHeight: 0 }}>
+
+        {/* 고정: 프로필 카드 */}
+        <div style={{ flexShrink: 0, padding: '20px 24px 16px 24px', borderBottom: '1px solid rgba(56,189,248,0.1)', background: 'rgba(56,189,248,0.03)' }}>
+          <div style={{ display: 'flex', gap: 20, marginBottom: 16 }}>
+            <div style={{ width: 96, height: 96, borderRadius: 24, background: '#fff', border: '2px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', boxShadow: '0 0 24px rgba(56,189,248,0.2)', flexShrink: 0 }}>
+              {activePatient?.avatar ? (
+                <img src={activePatient.avatar} alt={activePatient.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
+              ) : (
+                <User size={56} color="#38bdf8" />
+              )}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ fontSize: 30, fontWeight: 950, marginBottom: 3, letterSpacing: '-0.5px' }}>{activePatient?.name}</div>
+              <div style={{ fontSize: 20, color: '#38bdf8', fontWeight: 800, marginBottom: 2 }}>{activePatient?.role}</div>
+              <div style={{ fontSize: 15, color: '#475569', fontWeight: 700 }}>ID : {activePatient?.id}</div>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <InfoItem label="나이/성별" value={`${activePatient?.age || 0}세 / 남`} size="xl_ultra" />
+            <InfoItem label="혈액형" value={activePatient?.blood} size="xl_ultra" />
+            {activePatient?.chronic && (
+              <div style={{ gridColumn: 'span 2', fontSize: 13, color: '#64748b', fontWeight: 600 }}>
+                <span style={{ color: '#475569' }}>과거력 </span>
+                <span style={{ color: '#94a3b8', fontWeight: 700 }}>{activePatient.chronic}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 스크롤: 나머지 데이터 (하단 버튼 높이만큼 padding 확보) */}
+        <div style={{ flex: 1, overflowY: 'scroll', minHeight: 0, padding: '20px 24px 100px 24px', scrollbarWidth: 'thin', scrollbarColor: 'rgba(56,189,248,0.3) transparent' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+
+            {/* 신체 정보 */}
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: '#38bdf8', fontSize: 24, fontWeight: 800, marginBottom: 16 }}><History size={26}/> 최근 진료 이력</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 12 }}><Ruler size={20}/> 신체 정보</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {[
-                  { date: '2026.03.12', title: '정기 건강검진', status: '정상' },
-                  { date: '2026.01.05', title: '가벼운 감기 증상', status: '처방완료' }
+                  { label: '신장', value: `${activePatient?.height || '-'}cm` },
+                  { label: '체중', value: `${activePatient?.weight || '-'}kg` },
+                ].map((item, i) => (
+                  <div key={i} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 12, padding: '12px 14px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 13, color: '#64748b', marginBottom: 4, fontWeight: 600 }}>{item.label}</div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: '#e2e8f0' }}>{item.value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 알레르기 / 주의사항 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#f43f5e', fontSize: 18, fontWeight: 800, marginBottom: 12 }}><AlertCircle size={20}/> 알레르기 / 주의사항</div>
+              <div style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {(activePatient?.allergies || '없음').split(',').map((a, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f43f5e', flexShrink: 0 }} />
+                    <span style={{ fontSize: 16, fontWeight: 700, color: '#fda4af' }}>{a.trim()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 복용 중인 약물 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#fb923c', fontSize: 18, fontWeight: 800, marginBottom: 12 }}><Pill size={20}/> 복용 중인 약물</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {[
+                  { name: '암로디핀 10mg', timing: '매일 08:00', purpose: '혈압 조절' },
+                  { name: '아토르바스타틴 20mg', timing: '매일 21:00', purpose: '고지혈증' },
+                  { name: '클로피도그렐 75mg', timing: '매일 08:00', purpose: '항혈소판' },
+                ].map((drug, i) => (
+                  <div key={i} style={{ background: 'rgba(251,146,60,0.05)', border: '1px solid rgba(251,146,60,0.15)', borderRadius: 12, padding: '12px 14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                      <span style={{ fontSize: 16, fontWeight: 800, color: '#fed7aa' }}>{drug.name}</span>
+                      <span style={{ fontSize: 13, color: '#fb923c', fontWeight: 700, background: 'rgba(251,146,60,0.1)', padding: '2px 8px', borderRadius: 6 }}>{drug.purpose}</span>
+                    </div>
+                    <div style={{ fontSize: 13, color: '#64748b' }}>{drug.timing}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 최근 진료 이력 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 12 }}><History size={20}/> 최근 진료 이력</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {[
+                  { date: '2026.04.15', title: '제2엔진 점검 중 추락 외상', type: '응급', color: '#f43f5e', active: true },
+                  { date: '2026.04.01', title: '월간 정기검진', type: '정기', color: '#fb923c' },
+                  { date: '2026.03.18', title: '손 찰과상 드레싱', type: '처치', color: '#2dd4bf' },
+                  { date: '2026.03.05', title: '월간 정기검진', type: '정기', color: '#fb923c' },
+                  { date: '2026.02.14', title: '심계항진 증상', type: '응급', color: '#f43f5e' },
                 ].map((item, idx) => (
-                  <div key={idx} style={{ background: 'rgba(255,255,255,0.02)', padding: '14px 18px', borderRadius: 14, border: '1px solid rgba(255,255,255,0.04)' }}>
-                    <div style={{ fontSize: 16, color: '#64748b', marginBottom: 4 }}>{item.date}</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ fontSize: 19, fontWeight: 700 }}>{item.title}</div>
-                      <div style={{ fontSize: 16, color: '#38bdf8', fontWeight: 700 }}>{item.status}</div>
+                  <div key={idx} style={{ background: item.active ? 'rgba(244,63,94,0.07)' : 'rgba(255,255,255,0.02)', padding: '12px 14px', borderRadius: 12, border: `1px solid ${item.active ? 'rgba(244,63,94,0.25)' : 'rgba(255,255,255,0.04)'}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: 13, color: item.active ? '#f43f5e' : '#475569', marginBottom: 3, fontWeight: item.active ? 700 : 400 }}>{item.date} {item.active && '· 처치 중'}</div>
+                      <div style={{ fontSize: 16, fontWeight: 700, color: item.active ? '#fff' : '#e2e8f0' }}>{item.title}</div>
+                    </div>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: item.color, background: `${item.color}18`, padding: '4px 10px', borderRadius: 8, whiteSpace: 'nowrap' }}>{item.type}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 투약/처치 로그 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 12 }}><Droplets size={20}/> 투약/처치 로그</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[
+                  { time: '10:15', action: '해경 헬기 후송 요청', note: '선내 처치 한계 — 긴급 기항 승인', flag: true },
+                  { time: '09:52', action: '생리식염수 500mL 투여', note: '저혈압(98/64) 대응 수액 처치' },
+                  { time: '09:22', action: '케토로락 30mg 근주', note: '외상성 통증 경감 목적' },
+                  { time: '09:20', action: '산소 15L/min 공급', note: '비재호흡 마스크 · SpO₂ 94→97%' },
+                  { time: '09:00', action: '암로디핀 10mg 복용 확인', note: '정시 복용 (기존 고혈압 약물)' },
+                ].map((log, idx) => (
+                  <div key={idx} style={{ borderLeft: `2px solid ${log.flag ? '#f43f5e' : 'rgba(56,189,248,0.3)'}`, paddingLeft: 14 }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: log.flag ? '#fda4af' : '#e2e8f0' }}>{log.time} — {log.action}</div>
+                    <div style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>{log.note}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 위치 및 승선 정보 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#2dd4bf', fontSize: 18, fontWeight: 800, marginBottom: 12 }}><MapPin size={20}/> 위치 및 승선 정보</div>
+              <div style={{ background: 'rgba(45,212,191,0.05)', border: '1px solid rgba(45,212,191,0.1)', borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[
+                  { label: '현재 위치', value: activePatient?.location || '기관실 제2엔진' },
+                  { label: '승선일', value: activePatient?.embark || '2024-01-10' },
+                  { label: '생년월일', value: activePatient?.dob || '1971-08-22' },
+                ].map((row, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>{row.label}</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#94a3b8' }}>{row.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 비상 연락처 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#a78bfa', fontSize: 18, fontWeight: 800, marginBottom: 12 }}><Phone size={20}/> 비상 연락처</div>
+              <div style={{ background: 'rgba(167,139,250,0.05)', border: '1px solid rgba(167,139,250,0.15)', borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[
+                  { label: '본인', value: activePatient?.contact || '010-1001-0026' },
+                  { label: '보호자', value: activePatient?.emergency || '양정희 010-2001-0026' },
+                ].map((row, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>{row.label}</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#c4b5fd' }}>{row.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 데이터 전송 상태 */}
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#2dd4bf', fontSize: 18, fontWeight: 800, marginBottom: 12 }}><Upload size={20}/> 데이터 전송 상태</div>
+              <div style={{ background: 'rgba(45,212,191,0.05)', padding: '14px 16px', borderRadius: 14, border: '1px solid rgba(45,212,191,0.1)', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[
+                  { label: '육상 의료 센터 (KMCC)', status: '연결됨', ok: true },
+                  { label: '위성 데이터 링크', status: '정상', ok: true },
+                  { label: '원격 의료 채널', status: '대기 중', ok: false },
+                ].map((row, i) => (
+                  <div key={i}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                      <span style={{ fontSize: 13, color: '#94a3b8' }}>{row.label}</span>
+                      <span style={{ fontSize: 13, color: row.ok ? '#2dd4bf' : '#fb923c', fontWeight: 800 }}>{row.status}</span>
+                    </div>
+                    <div style={{ height: 3, background: 'rgba(255,255,255,0.05)', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ width: row.ok ? '100%' : '45%', height: '100%', background: row.ok ? '#2dd4bf' : '#fb923c', transition: 'width 1s ease' }} />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: '#38bdf8', fontSize: 24, fontWeight: 800, marginBottom: 16 }}><Droplets size={26}/> 투약/처치 로그</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {[
-                  { time: '14:15', action: '아스피린 300mg 투여', note: '흉통 완화 목적' },
-                  { time: '14:08', action: '산소 공급 시작', note: '10L/min 유지' }
-                ].map((log, idx) => (
-                  <div key={idx} style={{ borderLeft: '2px solid rgba(56,189,248,0.3)', paddingLeft: 16, marginBottom: 4 }}>
-                    <div style={{ fontSize: 17, fontWeight: 800, color: '#e2e8f0' }}>{log.time} - {log.action}</div>
-                    <div style={{ fontSize: 16, color: '#64748b', marginTop: 2 }}>{log.note}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: '#2dd4bf', fontSize: 21, fontWeight: 800, marginBottom: 16 }}><Upload size={26}/> 데이터 전송 상태</div>
-              <div style={{ background: 'rgba(45,212,191,0.05)', padding: '16px', borderRadius: 16, border: '1px solid rgba(45,212,191,0.1)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span style={{ fontSize: 14, color: '#94a3b8' }}>육상 의료 센터 동기화</span>
-                  <span style={{ fontSize: 14, color: '#2dd4bf', fontWeight: 800 }}>연결됨</span>
-                </div>
-                <div style={{ height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: 2, overflow: 'hidden' }}>
-                  <div style={{ width: '100%', height: '100%', background: '#2dd4bf' }} />
-                </div>
-              </div>
-            </div>
           </div>
         </div>
-        <div style={{ padding: '20px 28px 24px 28px', borderTop: '1px solid rgba(255,255,255,0.05)', background: '#05070a' }}>
-          <button 
-            onClick={() => startEmergencyAction('CARDIAC')} 
-            className="emergency-action-btn" 
-            style={{ 
-              width: '100%', padding: '22px', borderRadius: 18, background: '#f43f5e', 
-              color: '#fff', border: 'none', fontWeight: 900, cursor: 'pointer', 
+        {/* 고정: 응급 처치 버튼 */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 24px 20px 24px', borderTop: '1px solid rgba(255,77,109,0.2)', background: 'linear-gradient(to top, #05070a 70%, transparent)' }}>
+          <button
+            onClick={() => startEmergencyAction('CARDIAC')}
+            className="emergency-action-btn"
+            style={{
+              width: '100%', padding: '20px', borderRadius: 16, background: '#f43f5e',
+              color: '#fff', border: 'none', fontWeight: 900, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, fontSize: 20,
               transition: 'all 0.2s ease'
             }}
@@ -107,95 +343,14 @@ export default function DashboardView({
 
       {/* [Center] Vitals, Timeline, Chat */}
       <section style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
-        
-        {/* AI Trauma Scanner HUD Overlay */}
-        {isScanning && (
-          <div style={{ 
-            position: 'absolute', inset: 0, zIndex: 100, 
-            background: 'rgba(2, 6, 23, 0.85)', backdropFilter: 'blur(8px)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
-          }}>
-            {/* Scanner Frame */}
-            <div style={{ 
-              position: 'relative', width: 500, height: 380, 
-              border: '1px solid rgba(56, 189, 248, 0.2)',
-              background: 'rgba(56, 189, 248, 0.03)',
-              overflow: 'hidden'
-            }}>
-              {/* Corner Accents */}
-              <div style={{ position: 'absolute', top: 20, left: 20, width: 40, height: 40, borderTop: '4px solid #38bdf8', borderLeft: '4px solid #38bdf8' }} />
-              <div style={{ position: 'absolute', top: 20, right: 20, width: 40, height: 40, borderTop: '4px solid #38bdf8', borderRight: '4px solid #38bdf8' }} />
-              <div style={{ position: 'absolute', bottom: 20, left: 20, width: 40, height: 40, borderBottom: '4px solid #38bdf8', borderLeft: '4px solid #38bdf8' }} />
-              <div style={{ position: 'absolute', bottom: 20, right: 20, width: 40, height: 40, borderBottom: '4px solid #38bdf8', borderRight: '4px solid #38bdf8' }} />
-
-              {/* Scanning Line */}
-              <div style={{ 
-                position: 'absolute', left: 0, right: 0, height: 4, 
-                background: 'linear-gradient(180deg, transparent, #38bdf8, transparent)',
-                boxShadow: '0 0 20px #38bdf8',
-                animation: 'scanMove 2.5s ease-in-out infinite'
-              }} />
-
-              {/* HUD Data Overlay */}
-              <div style={{ position: 'absolute', top: 40, left: 80, fontFamily: 'monospace', fontSize: 12, color: '#38bdf8', opacity: 0.8 }}>
-                <div>DEPTH_SENSING: ACTIVE</div>
-                <div>TISSUE_TYPE: RECOGNIZING...</div>
-                <div>BLOOD_OXY: MONITORING</div>
-              </div>
-              
-              <div style={{ position: 'absolute', bottom: 40, right: 80, fontFamily: 'monospace', fontSize: 12, color: '#38bdf8', opacity: 0.8, textAlign: 'right' }}>
-                <div>AI_MODEL: MDTS_TRAUMA_V2</div>
-                <div>CONFIDENCE: 94.2%</div>
-                <div>LATENCY: 12ms</div>
-              </div>
-
-              {/* Center Reticle */}
-              <div style={{ 
-                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                width: 80, height: 80, border: '1px dashed rgba(56, 189, 248, 0.5)', borderRadius: '50%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}>
-                <div style={{ width: 10, height: 10, background: '#f43f5e', borderRadius: '50%', animation: 'pulse 1s infinite' }} />
-              </div>
-            </div>
-
-            {/* Status Text or Results */}
-            <div style={{ marginTop: 32, textAlign: 'center', minHeight: 100 }}>
-              {!scanResult ? (
-                <>
-                  <div style={{ fontSize: 24, fontWeight: 900, color: '#38bdf8', letterSpacing: 2, marginBottom: 8 }}>AI 조직 정밀 분석 중...</div>
-                  <div style={{ fontSize: 14, color: 'rgba(56, 189, 248, 0.6)', fontWeight: 700 }}>환부를 조준 프레임 안에 유지하십시오</div>
-                </>
-              ) : (
-                <div className="fade-in">
-                  <div style={{ fontSize: 22, fontWeight: 900, color: '#2dd4bf', marginBottom: 12 }}>분석 완료 : {scanResult.analysis.split(' 감지')[0].split(' 확인')[0]}</div>
-                  <button 
-                    onClick={confirmTraumaResult}
-                    style={{ 
-                      padding: '14px 40px', borderRadius: 14, 
-                      background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)',
-                      color: '#000', fontWeight: 900, fontSize: 18, border: 'none',
-                      cursor: 'pointer', boxShadow: '0 8px 25px rgba(56, 189, 248, 0.4)',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                  >
-                    {scanResult.action.label} 바로가기
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         <div style={{ padding: '14px 45px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#080b12' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
-            <DashboardVital label="심박수" value={hr} unit="bpm" color="#fb7185" live />
-            <DashboardVital label="산소포화도" value={spo2} unit="%" color="#38bdf8" live />
-            <DashboardVital label="호흡수" value={rr} unit="/min" color="#2dd4bf" live />
-            <DashboardVital label="혈압 (입력)" value={bp} unit="mmHg" color="#e2e8f0" editable />
-            <DashboardVital label="체온 (입력)" value={bt} unit="°C" color="#fbbf24" editable />
+            <DashboardVital label="심박수" value={hr} unit="bpm" color="#ff3b5c" live />
+            <DashboardVital label="산소포화도" value={spo2} unit="%" color="#00aaff" live />
+            <DashboardVital label="호흡수" value={rr} unit="/min" color="#00d4aa" live />
+            <DashboardVital label="혈압 (입력)" value={bp} unit="mmHg" color="#c084fc" editable />
+            <DashboardVital label="체온 (입력)" value={bt} unit="°C" color="#ff6a00" editable />
           </div>
         </div>
 
@@ -203,109 +358,263 @@ export default function DashboardView({
           {activeTab === 'DASHBOARD' && (
             <div style={{ position: 'relative', paddingLeft: 45 }}>
               <div style={{ position: 'absolute', left: 8.5, top: 0, bottom: 0, width: 3, background: 'rgba(255,255,255,0.05)', borderRadius: 2 }} />
-              
-              <TimelineItem 
-                time="14:02" 
-                label="급성 흉부 통증 발생 및 최초 발견" 
-                detail="선교 내 이동 중 갑작스러운 심장 쪼임 호소하며 쓰러짐. 주변 인원에 의해 즉시 보고됨." 
+
+              <TimelineItem
+                time="09:12"
+                label="제2엔진 점검 중 추락 사고 발생"
+                detail="기관실 제2엔진 상부 점검 플랫폼에서 발판 이탈로 약 1.8m 추락. 인근 기관사가 즉시 발견, 선내 무선으로 의무실 신고."
               />
-              
-              <TimelineItem 
-                time="14:05" 
-                label="AI 분석 : 심근경색(STEMI) 고위험 판정" 
-                detail="ECG 실시간 데이터 및 증상 기반 엣지 AI 정밀 분석 완료. 즉각적인 응급 처치 필요 판정." 
-                highlight 
+
+              <TimelineItem
+                time="09:16"
+                label="현장 1차 평가 — 의식 있음, 좌측 흉부·어깨 통증 호소"
+                detail="의식 명료(GCS 15). 좌측 갈비뼈 부위 압통 및 좌측 어깨 변형 확인. 호흡 시 통증 심화. 자력 이동 불가."
               />
-              
-              <TimelineItem 
-                time="14:08" 
-                label="산소 공급 및 니트로글리세린 투여" 
-                detail="AI 가이드에 따라 설하정 1정 투여 완료. 비강 캐뉼라를 통한 4L/min 산소 공급 시작." 
+
+              <TimelineItem
+                time="09:20"
+                label="AI 분석 : 늑골 골절 및 좌측 쇄골 골절 의심 — 고위험 판정"
+                detail="외상 부위 촬영 이미지 기반 엣지 AI 분석 완료. 다발성 늑골 골절 및 쇄골 골절 가능성 91% 판정. 기흉 동반 여부 즉시 확인 권고."
+                highlight
               />
-              
-              <TimelineItem 
-                time="14:12" 
-                label="실시간 바이탈 변화 감시" 
-                detail="혈압 128/84 → 115/78 mmHg 하강 추세 확인. 지속적인 모니터링 및 기록 중." 
+
+              <TimelineItem
+                time="09:25"
+                label="산소 공급 및 흉부 고정 처치"
+                detail="비재호흡 마스크로 산소 15L/min 공급. 탄력 붕대로 흉부 보조 고정. 산소포화도 94% → 97% 회복 확인."
               />
-              
-              <TimelineItem 
-                time="14:15" 
-                label="육상 의료 센터(KMCC) 데이터 전송" 
-                detail="환자의 기저질환 정보 및 현재 AI 분석 리포트 육상 의료진에게 일괄 동기화 완료." 
+
+              <TimelineItem
+                time="09:31"
+                label="환자 의무실 이송 완료"
+                detail="척추 보드·경추 보호대 착용 후 들것으로 의무실 안전 이송. 이송 중 바이탈 지속 모니터링, 혈압 108/72 mmHg."
               />
-              
-              <TimelineItem 
-                time="14:18" 
-                label="응급 처치 2단계 프로토콜 진입" 
-                detail="AED(자동심장충격기) 배치 완료 및 주변 구역 확보. 추가 의료 요원 현장 도착." 
+
+              <TimelineItem
+                time="09:38"
+                label="육상 의료 센터(KMCC) 원격 진료 연결"
+                detail="외상 사진·바이탈·AI 분석 리포트 일괄 전송 완료. 흉부외과 전문의 원격 협진 개시. 기흉 배제 위한 호흡음 청진 지시."
+              />
+
+              <TimelineItem
+                time="09:52"
+                label="활력징후 불안정 — 쇼크 전단계 주의"
+                detail="혈압 98/64 mmHg, 심박수 112bpm. 수액(생리식염수) 500mL 투여 개시. 진통제(케토로락 30mg) 근주 완료."
+              />
+
+              <TimelineItem
+                time="10:15"
+                label="긴급 기항 요청 — 헬기 후송 승인"
+                detail="다발성 골절 및 혈압 불안정으로 선내 처치 한계 판단. 선장 보고 후 해경 헬기 후송 요청 승인. 현재 헬기 접근 중."
               />
             </div>
           )}
           {activeTab === 'GUIDE' && (
-            <EmergencyGuide 
-              activeEmergencyGuide={activeEmergencyGuide} 
-              setActiveEmergencyGuide={setActiveEmergencyGuide} 
-              activeStep={activeStep} 
-              setActiveStep={setActiveStep} 
-            />
+            <>
+              {/* 상단 네비 */}
+              <button
+                onClick={onBackToDashboard}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  marginBottom: 20, padding: '8px 18px', borderRadius: 10,
+                  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                  color: '#94a3b8', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = '#e2e8f0' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.color = '#94a3b8' }}
+              >
+                ← 메인 화면으로
+              </button>
+
+              {/* AI 분석 결과 + 환부 사진 */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+
+                {/* AI 분석 결과 카드 */}
+                <div style={{ background: 'rgba(244,63,94,0.05)', border: '1px solid rgba(244,63,94,0.2)', borderRadius: 18, padding: '20px 22px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f43f5e', boxShadow: '0 0 8px #f43f5e', animation: 'pulse 1.5s infinite' }} />
+                    <span style={{ fontSize: 13, fontWeight: 800, color: '#f43f5e', letterSpacing: 1 }}>AI 외상 분석 결과</span>
+                  </div>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 12, lineHeight: 1.4 }}>
+                    좌측 늑골 다발성 골절<br/>쇄골 골절 의심
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {[
+                      { label: '분석 신뢰도', value: '91%', color: '#f43f5e' },
+                      { label: '손상 부위', value: '좌측 흉부 · 어깨', color: '#fb923c' },
+                      { label: '중증도', value: '고위험 (Level 3)', color: '#f43f5e' },
+                      { label: '추정 기전', value: '고에너지 추락 외상', color: '#94a3b8' },
+                      { label: '합병증 위험', value: '기흉 동반 가능', color: '#fbbf24' },
+                    ].map((row, i) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                        <span style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>{row.label}</span>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: row.color }}>{row.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* 신뢰도 바 */}
+                  <div style={{ marginTop: 14 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 12, color: '#64748b' }}>분석 정확도</span>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: '#f43f5e' }}>91%</span>
+                    </div>
+                    <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ width: '91%', height: '100%', background: 'linear-gradient(90deg, #f43f5e, #fb923c)', borderRadius: 2 }} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 환부 사진 */}
+                <div style={{ background: 'rgba(15,20,40,0.8)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 18, overflow: 'hidden', position: 'relative', minHeight: 260 }}>
+                  <div style={{ position: 'absolute', top: 12, left: 14, fontSize: 12, fontWeight: 800, color: '#64748b', letterSpacing: 1 }}>환부 촬영 이미지</div>
+                  <div style={{ position: 'absolute', top: 10, right: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#2dd4bf', boxShadow: '0 0 6px #2dd4bf' }} />
+                    <span style={{ fontSize: 11, color: '#2dd4bf', fontWeight: 700 }}>AI 분석 완료</span>
+                  </div>
+
+                  {/* 스캔 이미지 영역 */}
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(8,14,30,0.9)' }}>
+                    {/* 격자 배경 */}
+                    <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+
+                    {/* 신체 실루엣 */}
+                    <svg width="110" height="180" viewBox="0 0 110 180" style={{ position: 'absolute' }}>
+                      {/* 몸통 */}
+                      <ellipse cx="55" cy="60" rx="30" ry="38" fill="none" stroke="rgba(56,189,248,0.15)" strokeWidth="1.5" />
+                      {/* 머리 */}
+                      <circle cx="55" cy="16" r="14" fill="none" stroke="rgba(56,189,248,0.15)" strokeWidth="1.5" />
+                      {/* 좌측 팔 */}
+                      <path d="M25 42 Q8 60 10 90" fill="none" stroke="rgba(56,189,248,0.15)" strokeWidth="1.5" />
+                      {/* 우측 팔 */}
+                      <path d="M85 42 Q102 60 100 90" fill="none" stroke="rgba(56,189,248,0.15)" strokeWidth="1.5" />
+                      {/* 다리 */}
+                      <path d="M40 98 Q36 130 34 160" fill="none" stroke="rgba(56,189,248,0.15)" strokeWidth="1.5" />
+                      <path d="M70 98 Q74 130 76 160" fill="none" stroke="rgba(56,189,248,0.15)" strokeWidth="1.5" />
+                      {/* 손상 부위 하이라이트 — 좌측 흉부 */}
+                      <ellipse cx="38" cy="52" rx="14" ry="16" fill="rgba(244,63,94,0.15)" stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="4 2" />
+                      <ellipse cx="38" cy="52" rx="8" ry="9" fill="rgba(244,63,94,0.25)" />
+                      {/* 손상 부위 — 좌측 어깨 */}
+                      <circle cx="24" cy="38" r="9" fill="rgba(251,146,60,0.15)" stroke="#fb923c" strokeWidth="1.5" strokeDasharray="3 2" />
+                      {/* 화살표 라벨선 */}
+                      <line x1="52" y1="52" x2="72" y2="44" stroke="#f43f5e" strokeWidth="1" strokeDasharray="3 2" opacity="0.7" />
+                      <line x1="24" y1="29" x2="40" y2="22" stroke="#fb923c" strokeWidth="1" strokeDasharray="3 2" opacity="0.7" />
+                    </svg>
+
+                    {/* 라벨 */}
+                    <div style={{ position: 'absolute', top: '28%', right: '8%', fontSize: 11, color: '#f43f5e', fontWeight: 700, textAlign: 'right' }}>늑골 골절<br/><span style={{ color: '#64748b', fontWeight: 500 }}>Level 3</span></div>
+                    <div style={{ position: 'absolute', top: '14%', right: '8%', fontSize: 11, color: '#fb923c', fontWeight: 700, textAlign: 'right' }}>쇄골 골절<br/><span style={{ color: '#64748b', fontWeight: 500 }}>의심</span></div>
+                  </div>
+
+                  {/* 하단 타임스탬프 */}
+                  <div style={{ position: 'absolute', bottom: 10, left: 14, right: 14, display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 11, color: '#475569', fontFamily: 'monospace' }}>촬영 09:18</span>
+                    <span style={{ fontSize: 11, color: '#475569', fontFamily: 'monospace' }}>MDTS-CAM v2</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 처치 가이드 */}
+              <EmergencyGuide
+                activeEmergencyGuide={activeEmergencyGuide}
+                setActiveEmergencyGuide={setActiveEmergencyGuide}
+                activeStep={activeStep}
+                setActiveStep={setActiveStep}
+              />
+            </>
           )}
         </div>
 
-        <div style={{ padding: '0 40px 42px 40px', background: 'transparent', position: 'relative' }}>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 16, 
-            background: 'rgba(10, 18, 35, 0.85)', 
-            borderRadius: 30, 
-            padding: '12px 14px 12px 24px', 
-            border: '1px solid rgba(56, 189, 248, 0.35)', 
-            backdropFilter: 'blur(32px)',
-            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 189, 248, 0.08)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}>
-            <button style={{ 
-              width: 44, height: 44, borderRadius: '50%', 
-              background: 'rgba(56, 189, 248, 0.1)', 
-              border: '1px solid rgba(56, 189, 248, 0.2)', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', transition: 'all 0.2s ease'
+        <div style={{ padding: '0 40px 36px 40px', position: 'relative' }}>
+          <div style={{ position: 'relative', borderRadius: 20 }}>
+
+            {/* 기본 스트로크 — 항상 보이는 테두리 */}
+            <div style={{
+              position: 'absolute', inset: -1.5, borderRadius: 20, zIndex: 0,
+              border: '1.5px solid rgba(56,189,248,0.25)',
+            }} />
+
+            {/* 섬광 — 좌→우로 흐르는 밝은 빛 */}
+            <div style={{
+              position: 'absolute', inset: -1.5, borderRadius: 20, zIndex: 0,
+              background: 'linear-gradient(90deg, transparent 0%, transparent 25%, #7dd3fc 45%, #fff 50%, #7dd3fc 55%, transparent 75%, transparent 100%)',
+              backgroundSize: '250% 100%',
+              animation: 'strokeFlow 10s linear infinite',
+              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+              maskComposite: 'exclude',
+              padding: 1.5,
+            }} />
+
+            {/* 섬광 글로우 */}
+            <div style={{
+              position: 'absolute', inset: -5, borderRadius: 23, zIndex: 0,
+              background: 'linear-gradient(90deg, transparent 20%, rgba(56,189,248,0.6) 50%, transparent 80%)',
+              backgroundSize: '250% 100%',
+              animation: 'strokeFlow 10s linear infinite',
+              opacity: 0.4, filter: 'blur(8px)',
+            }} />
+
+            <div style={{
+              position: 'relative', zIndex: 1,
+              background: 'rgba(6,12,28,0.98)',
+              borderRadius: 20,
+              padding: '16px 16px 12px 18px',
+              display: 'flex', flexDirection: 'column', gap: 14,
             }}>
-              <Mic size={22} color="#38bdf8" />
-            </button>
-            <input 
-              placeholder="환자 증상 또는 AI에게 명령어를 입력하세요..." 
-              value={prompt} 
-              onChange={e => setPrompt(e.target.value)} 
-              onKeyPress={e => e.key === 'Enter' && handlePromptAnalysis()} 
-              style={{ 
-                flex: 1, background: 'none', border: 'none', 
-                color: '#f1f5f9', fontSize: 19, fontWeight: 500, outline: 'none',
-                letterSpacing: '-0.3px'
-              }} 
-            />
-            <button 
-              onClick={handlePromptAnalysis} 
-              className="ai-analyze-btn"
-              style={{ 
-                padding: '12px 32px', 
-                borderRadius: 22, 
-                background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)', 
-                color: '#000', 
-                fontWeight: 900, 
-                fontSize: 18, 
-                border: 'none',
-                cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(56, 189, 248, 0.4)',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              AI 분석 요청
-            </button>
+              {/* 스파클 + 입력 */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <Sparkles size={18} color="#38bdf8" style={{ animation: 'spin 4s linear infinite', marginTop: 3, flexShrink: 0 }} />
+                <input
+                  placeholder="증상, 처치, 약물 등 AI에게 질의하세요..."
+                  value={prompt}
+                  onChange={e => setPrompt(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && handlePromptAnalysis()}
+                  style={{
+                    background: 'none', border: 'none', outline: 'none',
+                    color: '#e2e8f0', fontSize: 16, fontWeight: 400,
+                    lineHeight: 1.6, width: '100%', minHeight: 28,
+                  }}
+                />
+              </div>
+
+              {/* 하단 툴바 */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 30 }}>
+
+                {/* 마이크 버튼 */}
+                <button style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '7px 14px', borderRadius: 20, border: '1px solid rgba(56,189,248,0.2)',
+                  cursor: 'pointer', background: 'rgba(56,189,248,0.06)',
+                  transition: 'all 0.2s',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(56,189,248,0.14)'; e.currentTarget.style.borderColor = 'rgba(56,189,248,0.4)' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(56,189,248,0.06)'; e.currentTarget.style.borderColor = 'rgba(56,189,248,0.2)' }}
+                >
+                  <Mic size={18} color="#38bdf8" />
+                  <span style={{ fontSize: 13, color: '#38bdf8', fontWeight: 600 }}>음성 입력</span>
+                </button>
+
+                {/* 전송 버튼 */}
+                <button
+                  onClick={handlePromptAnalysis}
+                  className="ai-analyze-btn"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '8px 20px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                    background: prompt.trim()
+                      ? 'linear-gradient(135deg, #0ea5e9, #38bdf8, #00d4ff)'
+                      : 'rgba(255,255,255,0.06)',
+                    boxShadow: prompt.trim() ? '0 0 18px rgba(56,189,248,0.5), inset 0 1px 0 rgba(255,255,255,0.2)' : 'none',
+                    transition: 'all 0.25s ease',
+                  }}
+                >
+                  <ArrowUp size={16} color={prompt.trim() ? '#fff' : '#475569'} strokeWidth={2.5} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: prompt.trim() ? '#fff' : '#475569' }}>전송</span>
+                </button>
+              </div>
+            </div>
           </div>
-          {/* Subtle Glow Effect below the input */}
-          <div style={{ position: 'absolute', bottom: 30, left: '50%', transform: 'translateX(-50%)', width: '80%', height: 1, background: 'linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.2), transparent)', filter: 'blur(4px)' }} />
         </div>
       </section>
 
@@ -341,7 +650,8 @@ export default function DashboardView({
                 fontSize: 15, 
                 lineHeight: 1.6,
                 color: m.role === 'ai' ? '#e2e8f0' : '#cbd5e1',
-                boxShadow: m.role === 'ai' ? '0 4px 20px rgba(56, 189, 248, 0.05)' : 'none'
+                boxShadow: m.role === 'ai' ? '0 4px 20px rgba(56, 189, 248, 0.05)' : 'none',
+                whiteSpace: 'pre-line'
               }}>
                 {m.text}
                 
@@ -396,6 +706,18 @@ export default function DashboardView({
         @keyframes lightFlow {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
+        }
+        @keyframes borderFlow {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 300% 50%; }
+        }
+        @keyframes strokeFlow {
+          0%   { background-position: -100% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
         @keyframes scanMove {
           0% { top: 0%; opacity: 0.2; }

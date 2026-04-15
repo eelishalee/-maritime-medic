@@ -13,7 +13,12 @@ export function NavTab({ label, active, onClick }) {
 
 export function DashboardVital({ label, value, unit, color, editable, onEdit, live }) {
   return (
-    <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 16, padding: '14px 14px', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', position: 'relative' }}>
+    <div style={{
+      background: `linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))`,
+      borderRadius: 16, padding: '14px 14px',
+      border: `1px solid rgba(255,255,255,0.07)`,
+      textAlign: 'center', position: 'relative'
+    }}>
       {live && (
         <div style={{
           position: 'absolute', top: 12, right: 12,
@@ -22,14 +27,14 @@ export function DashboardVital({ label, value, unit, color, editable, onEdit, li
           animation: 'pulse-dot 1.4s ease-in-out infinite'
         }} />
       )}
-      <div style={{ fontSize: 18, fontWeight: 800, color: '#64748b', marginBottom: 8 }}>{label}</div>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 10 }}>
-        <span style={{ fontSize: 36, fontWeight: 950, color }}>{value}</span>
-        <span style={{ fontSize: 20, color: '#64748b', fontWeight: 500 }}>{unit}</span>
+      <div style={{ fontSize: 19, fontWeight: 700, color: '#94a3b8', marginBottom: 2, letterSpacing: '0.3px' }}>{label}</div>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 6 }}>
+        <span style={{ fontSize: 38, fontWeight: 950, color, letterSpacing: '-1px' }}>{value}</span>
+        <span style={{ fontSize: 16, color: `${color}99`, fontWeight: 600 }}>{unit}</span>
       </div>
       {editable && (
-        <button onClick={onEdit} style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}>
-          <Edit3 size={22} />
+        <button onClick={onEdit} style={{ position: 'absolute', top: 12, right: 12, background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}>
+          <Edit3 size={18} />
         </button>
       )}
     </div>

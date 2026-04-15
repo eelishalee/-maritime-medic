@@ -247,6 +247,8 @@ const GUIDES = {
 
 function getRecommendedTab(patient) {
   if (!patient) return null
+  const location = (patient.location || '').toLowerCase()
+  if (location.includes('기관') || location.includes('엔진')) return 'fracture'
   const chronic = (patient.chronic || '').toLowerCase()
   const hr = patient.hr || 0
   const temp = patient.temp || 0
