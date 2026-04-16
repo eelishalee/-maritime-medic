@@ -38,8 +38,19 @@ export default function CrewView({
               {filteredCrew?.map(c => (
                 <tr key={c.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: activePatient?.id === c.id ? 'rgba(56,189,248,0.04)' : 'transparent' }}>
                   <td style={{ padding: '28px 32px' }}>
-                    <div style={{ fontSize: 21, fontWeight: 900, marginBottom: 4 }}>{c.name}</div>
-                    <div style={{ fontSize: 15, color: '#475569' }}>{c.id}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <div style={{ width: 56, height: 56, borderRadius: 16, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {c.avatar ? (
+                          <img src={c.avatar} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ color: '#38bdf8', fontWeight: 900 }}>{c.name[0]}</div>
+                        )}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 21, fontWeight: 900, marginBottom: 4 }}>{c.name}</div>
+                        <div style={{ fontSize: 15, color: '#475569' }}>{c.id}</div>
+                      </div>
+                    </div>
                   </td>
                   <td style={{ padding: '28px 32px', fontSize: 19, fontWeight: 700, color: '#38bdf8' }}>{c.role}</td>
                   <td style={{ padding: '28px 32px' }}>

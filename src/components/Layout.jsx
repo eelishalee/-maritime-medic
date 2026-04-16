@@ -5,8 +5,7 @@ const NAV = [
   { id: 'main',      label: '메인' },
   { id: 'patients',  label: '환자 차트' },
   { id: 'crew',      label: '선원 관리' },
-  { id: 'emergency', label: '응급처치', badge: '1' },
-  { id: 'ai',        label: 'AI 분석', isAI: true },
+  { id: 'emergency', label: '정밀 판독 및 응급처치', badge: '1', isAI: true },
   { id: 'settings',  label: '설정' },
 ]
 
@@ -100,12 +99,12 @@ export default function Layout({ activePage, onNavigate, auth, onLogout }) {
               style={{
                 background: 'none', border: 'none', cursor: 'pointer',
                 color: 'var(--text-secondary)', display: 'flex', alignItems: 'center',
-                padding: '4px', borderRadius: 4, transition: '0.2s',
+                padding: '6px', borderRadius: 6, transition: '0.2s',
               }}
               onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,77,109,0.1)'}
               onMouseLeave={e => e.currentTarget.style.background = 'none'}
             >
-              <LogOut size={14} />
+              <LogOut size={20} />
             </button>
           </div>
         )}

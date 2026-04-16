@@ -19,7 +19,7 @@ export default function Main({ patient, onNavigate }) {
   const [chat, setChat] = useState([
     {
       role: 'ai',
-      text: `김선원 기관장 (55세, 고혈압·고지혈증) 환자 데이터가 로드되었습니다.\n\n⚠ 현재 사고 발생 중 — 기관실 제2엔진 추락 외상. 즉각 대응이 필요합니다.`
+      text: `김항해 기관장 (55세, 고혈압·고지혈증) 환자 데이터가 로드되었습니다.\n\n⚠ 현재 사고 발생 중 — 기관실 제2엔진 추락 외상. 즉각 대응이 필요합니다.`
     },
     {
       role: 'user',
@@ -78,6 +78,7 @@ export default function Main({ patient, onNavigate }) {
     setActiveEmergencyGuide(type)
     setActiveStep(1)
     setActiveTab('GUIDE')
+    onNavigate && onNavigate('emergency')
   }
 
   // ─── 외상 촬영 및 분석 ───
@@ -100,8 +101,8 @@ export default function Main({ patient, onNavigate }) {
 
   const confirmTraumaResult = () => {
     if (scanResult) {
-      startEmergencyAction(scanResult.action.type)
       setIsScanning(false)
+      onNavigate && onNavigate('emergency')
     }
   }
 

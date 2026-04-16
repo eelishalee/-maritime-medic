@@ -1,373 +1,192 @@
-import { useState, useEffect, useRef } from 'react'
-import { ShieldAlert, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft, Play, Pause, RotateCcw, Zap, Clock, Heart, Activity } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Brain, AlertTriangle, CheckCircle2, Heart, Droplets, Thermometer, Activity, Zap, Shield, ChevronRight, RotateCcw, ChevronLeft, Info, Pill, Clock, Cpu, HardDrive, Settings } from 'lucide-react'
+import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line, AreaChart, Area } from 'recharts'
 
-// ── 응급 유형 탭 ──
-const TABS = [
-  { id: 'cpr',      label: '심폐소생술',   icon: '🫀', color: '#ff4d6d',  urgency: 'critical' },
-  { id: 'cardiac',  label: '심근경색',     icon: '💓', color: '#ff4d6d',  urgency: 'critical' },
-  { id: 'bleed',    label: '지혈 처치',    icon: '🩸', color: '#ff9f43',  urgency: 'high' },
-  { id: 'shock',    label: '쇼크 대응',    icon: '⚡', color: '#a55eea',  urgency: 'high' },
-  { id: 'fracture', label: '골절 고정',    icon: '🦴', color: '#4fc3f7',  urgency: 'medium' },
-  { id: 'burn',     label: '화상 처치',    icon: '🔥', color: '#ff9f43',  urgency: 'medium' },
+// ── 데이터 정의 ──
+const TREND_DATA = [
+  { t: '09:00', hr: 92, bp: 142 }, { t: '09:05', hr: 98, bp: 148 }, { t: '09:10', hr: 105, bp: 152 }, { t: '09:15', hr: 112, bp: 155 }, { t: '09:20', hr: 118, bp: 158 }
 ]
 
-const GUIDES = {
-  cpr: {
-    title: '심폐소생술 (CPR) 표준 처치',
-    color: '#ff4d6d',
-    urgency: 'critical',
-    description: '의식과 호흡이 없는 경우 즉시 시행. 골든타임 4분 이내 시작 필수.',
-    steps: [
-      {
-        title: '의식 확인 및 도움 요청',
-        desc: '환자의 어깨를 두드리며 "괜찮으세요?"라고 묻고, 반응이 없으면 즉시 119 신고 및 AED 확보를 주변에 요청합니다.',
-        img: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=800',
-        duration: 15,
-        tip: '큰 소리로 "여기 사람 쓰러졌습니다! AED 가져오세요!"',
-        icon: '🔍',
-        animation: 'bounce',
-      },
-      {
-        title: '강력한 가슴 압박 30회',
-        desc: '흉골 아래쪽 1/2 지점에 깍지 낀 두 손을 대고, 분당 100~120회 속도로 5~6cm 깊이로 강하게 압박합니다.',
-        img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800',
-        duration: 20,
-        tip: '팔꿈치를 펴고 체중을 실어 압박. "하나, 둘, 셋..." 세어가며 시행',
-        icon: '💪',
-        animation: 'pulse',
-        hasCPRTimer: true,
-      },
-      {
-        title: '인공호흡 2회 실시',
-        desc: '기도를 확보(머리 뒤로 젖히기)한 상태에서 코를 막고 환자의 입에 숨을 1초 동안 불어넣기를 2회 실시합니다.',
-        img: 'https://images.unsplash.com/photo-1576091160550-2173dad99901?auto=format&fit=crop&q=80&w=800',
-        duration: 10,
-        tip: '가슴이 올라오는지 확인. 과호흡 금지.',
-        icon: '💨',
-        animation: 'breathe',
-      },
-      {
-        title: 'AED 부착 및 작동',
-        desc: 'AED 도착 즉시 전원 켜고 음성 안내에 따라 패드를 부착합니다. 분석 중 및 충격 시 모두 환자에게서 손을 뗍니다.',
-        img: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800',
-        duration: 30,
-        tip: '패드 1: 오른쪽 쇄골 아래 / 패드 2: 왼쪽 겨드랑이 아래',
-        icon: '⚡',
-        animation: 'flash',
-      },
-    ],
-  },
-  cardiac: {
-    title: '급성 심근경색 응급 처치',
-    color: '#ff4d6d',
-    urgency: 'critical',
-    description: '흉통, 호흡곤란, 식은땀 등 심근경색 의심 시 즉시 시행.',
-    steps: [
-      {
-        title: '환자 안정 및 활동 중단',
-        desc: '환자를 즉시 앉히거나 눕히고 모든 신체 활동을 중단시킵니다. 옷깃을 느슨하게 풀어줍니다.',
-        img: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=800',
-        duration: 60,
-        tip: '심장에 부담을 줄이려면 반좌위 자세(45도)가 적합합니다',
-        icon: '🛏',
-        animation: 'fadeIn',
-      },
-      {
-        title: '아스피린 투여 (알레르기 확인 필수)',
-        desc: '아스피린 알레르기가 없다면 아스피린 300mg을 씹어서 복용하게 합니다. 알레르기 있을 경우 투여하지 마세요.',
-        img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800',
-        duration: 120,
-        tip: '⚠ 현재 환자: 아스피린 알레르기 있음 — 투여 금지!',
-        tipColor: '#ff4d6d',
-        icon: '💊',
-        animation: 'shake',
-      },
-      {
-        title: '12유도 심전도 측정',
-        desc: '심전도 기기를 환자에게 연결하고 측정합니다. 결과를 즉시 원격의료팀에 전송합니다.',
-        img: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800',
-        duration: 180,
-        tip: '전극 부착 위치: 흉부 6곳 + 사지 4곳',
-        icon: '📊',
-        animation: 'pulse',
-      },
-      {
-        title: '원격 의료진 연결 및 보고',
-        desc: '위성통신으로 원격의료센터에 연결하고 바이탈 수치, 심전도, 증상 발현 시간을 보고합니다.',
-        img: 'https://images.unsplash.com/photo-1603398938378-e54ecb44638c?auto=format&fit=crop&q=80&w=800',
-        duration: 0,
-        tip: '골든타임: 증상 발생 후 90분 이내 혈관 재개통 필요',
-        icon: '📡',
-        animation: 'flash',
-      },
-    ],
-  },
-  bleed: {
-    title: '외상 및 대출혈 지혈',
-    color: '#ff9f43',
-    urgency: 'high',
-    description: '대량 출혈 시 수 분 내 쇼크 발생 가능. 신속한 지혈이 생명을 구합니다.',
-    steps: [
-      {
-        title: '직접 압박 지혈',
-        desc: '깨끗한 거즈를 상처에 대고 손바닥 전체로 강하게 압박합니다. 거즈가 젖어도 제거하지 말고 위에 덧댑니다.',
-        img: 'https://images.unsplash.com/photo-1603398938378-e54ecb44638c?auto=format&fit=crop&q=80&w=800',
-        duration: 600,
-        tip: '최소 10분 이상 압박 유지. 손을 떼면 출혈 재발.',
-        icon: '✋',
-        animation: 'pulse',
-      },
-      {
-        title: '지혈대(Tourniquet) 적용',
-        desc: '직접 압박으로 지혈되지 않는 팔다리 대출혈 시, 상처 5~7cm 위쪽에 지혈대를 단단히 조입니다.',
-        img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800',
-        duration: 300,
-        tip: '적용 시각을 기록하세요. 2시간 이상 유지 금지.',
-        icon: '⏱',
-        animation: 'shake',
-      },
-      {
-        title: '상처 부위 거상',
-        desc: '출혈 부위를 심장보다 높게 유지하여 혈압을 낮추고 출혈 속도를 늦춥니다.',
-        img: 'https://images.unsplash.com/photo-1583912267550-d44d4a3c5a71?auto=format&fit=crop&q=80&w=800',
-        duration: 0,
-        tip: '골절 의심 시 거상 전 부목 고정을 먼저 시행하세요.',
-        icon: '⬆',
-        animation: 'bounce',
-      },
-    ],
-  },
-  shock: {
-    title: '쇼크 예방 및 응급 처치',
-    color: '#a55eea',
-    urgency: 'high',
-    description: '피부 창백·냉습, 의식저하, 맥박 약화 시 쇼크를 의심합니다.',
-    steps: [
-      {
-        title: '환자 수평 유지',
-        desc: '환자를 편안하게 눕히고 다리를 심장보다 20~30cm 높게 들어올려 뇌로 가는 혈류를 증가시킵니다.',
-        img: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=800',
-        duration: 0,
-        tip: '의식 없으면 회복 자세(옆으로 눕히기)를 취합니다.',
-        icon: '🛏',
-        animation: 'fadeIn',
-      },
-      {
-        title: '보온 유지',
-        desc: '담요나 옷으로 환자를 덮어 체온 손실을 막고 저체온증을 예방합니다.',
-        img: 'https://images.unsplash.com/photo-1581594650039-362f30e7c06d?auto=format&fit=crop&q=80&w=800',
-        duration: 0,
-        tip: '차가운 바닥에 직접 눕히지 마세요.',
-        icon: '🌡',
-        animation: 'breathe',
-      },
-      {
-        title: '바이탈 지속 관찰',
-        desc: '의료진이 도착할 때까지 환자의 의식, 호흡, 맥박 상태를 1분 단위로 체크하고 기록합니다.',
-        img: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800',
-        duration: 0,
-        tip: '이상 변화 발생 시 즉시 원격의료팀에 보고합니다.',
-        icon: '📋',
-        animation: 'pulse',
-      },
-    ],
-  },
-  fracture: {
-    title: '골절 및 탈구 고정',
-    color: '#4fc3f7',
-    urgency: 'medium',
-    description: '골절 의심 시 함부로 움직이지 말고 즉시 고정합니다.',
-    steps: [
-      {
-        title: '손상 부위 부목 고정',
-        desc: '골절 부위의 위아래 관절이 움직이지 않도록 충분히 긴 부목을 대고 붕대로 고정합니다.',
-        img: 'https://images.unsplash.com/photo-1583912267550-d44d4a3c5a71?auto=format&fit=crop&q=80&w=800',
-        duration: 0,
-        tip: '부목이 없으면 판자, 우산 등 단단한 물건으로 대체.',
-        icon: '🔧',
-        animation: 'fadeIn',
-      },
-      {
-        title: '냉찜질 실시',
-        desc: '부기와 통증을 줄이기 위해 부목 고정 후 얼음주머니로 냉찜질을 시행합니다.',
-        img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800',
-        duration: 1200,
-        tip: '얼음을 직접 피부에 대지 마세요. 수건으로 감싸서 사용.',
-        icon: '🧊',
-        animation: 'breathe',
-      },
-      {
-        title: '말단 순환 확인',
-        desc: '고정 후 손톱/발톱을 눌러 혈액순환이 잘 되는지, 감각이 있는지 확인합니다.',
-        img: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800',
-        duration: 0,
-        tip: '손톱 눌렀다 놓으면 2초 내 혈색 회복되어야 정상.',
-        icon: '🩺',
-        animation: 'pulse',
-      },
-    ],
-  },
-  burn: {
-    title: '화상 긴급 냉각 및 보호',
-    color: '#ff9f43',
-    urgency: 'medium',
-    description: '즉각적인 냉각이 조직 손상 범위를 최소화합니다.',
-    steps: [
-      {
-        title: '흐르는 물에 냉각 15분',
-        desc: '화상 부위를 15~20°C의 흐르는 찬물에 15분 이상 충분히 노출시켜 열기를 식힙니다.',
-        img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800',
-        duration: 900,
-        tip: '얼음물은 사용 금지. 저체온증 유발 위험.',
-        icon: '💧',
-        animation: 'breathe',
-        hasCoolTimer: true,
-      },
-      {
-        title: '의복 및 장신구 제거',
-        desc: '피부가 붓기 전 반지, 시계 등을 신속히 제거하되 피부에 붙은 옷은 억지로 떼지 않습니다.',
-        img: 'https://images.unsplash.com/photo-1581056310664-3d4d74630aa9?auto=format&fit=crop&q=80&w=800',
-        duration: 0,
-        tip: '무리하게 당기면 피부가 함께 벗겨질 수 있습니다.',
-        icon: '💍',
-        animation: 'shake',
-      },
-      {
-        title: '멸균 드레싱 보호',
-        desc: '상처 부위를 깨끗한 거즈로 느슨하게 덮습니다. 물집은 절대로 터뜨리지 않습니다.',
-        img: 'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&q=80&w=800',
-        duration: 0,
-        tip: '연고나 치약 도포 금지. 감염 유발.',
-        icon: '🩹',
-        animation: 'fadeIn',
-      },
-    ],
-  },
-}
+const DIAGNOSES = [
+  { confidence: 94, title: '다발성 늑골 및 쇄골 골절', status: 'CRITICAL', color: '#ef4444', desc: '좌측 흉벽 전위 골절 확인. 폐 실질 손상에 따른 외상성 기흉 진행 가능성 높음. 즉시 고정 필요.' },
+  { confidence: 61, title: '외상성 기흉 (진행 중)', status: 'WARNING', color: '#fbbf24', desc: '호흡음 감소 및 산소포화도 저하 추이 관찰됨. 폐 허탈 방지 조치 요망.' }
+]
 
-function getRecommendedTab(patient) {
-  if (!patient) return null
-  const location = (patient.location || '').toLowerCase()
-  if (location.includes('기관') || location.includes('엔진')) return 'fracture'
-  const chronic = (patient.chronic || '').toLowerCase()
-  const hr = patient.hr || 0
-  const temp = patient.temp || 0
-  if (chronic.includes('고혈압') || hr > 90) return 'cardiac'
-  if (temp >= 39) return 'shock'
-  return null
-}
-
-function CPRMetronome() {
-  const [active, setActive] = useState(false)
-  const [beat, setBeat] = useState(false)
-  const [count, setCount] = useState(0)
-  const intervalRef = useRef(null)
-  const toggle = () => {
-    if (active) { clearInterval(intervalRef.current); setActive(false) } 
-    else {
-      setActive(true); let c = 0
-      intervalRef.current = setInterval(() => { setBeat(b => !b); c++; setCount(c) }, 500)
-    }
-  }
-  useEffect(() => () => clearInterval(intervalRef.current), [])
-  return (
-    <div style={{ padding: '18px 24px', borderRadius: 20, background: 'rgba(255,77,109,0.1)', border: `2px solid ${active ? '#ff4d6d' : 'rgba(255,77,109,0.3)'}`, display: 'flex', alignItems: 'center', gap: 18, marginTop: 20 }}>
-      <button onClick={toggle} style={{ width: 56, height: 56, borderRadius: 16, background: active ? '#ff4d6d' : 'rgba(255,77,109,0.2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: active ? '#fff' : '#ff4d6d', transition: 'all 0.2s' }}>{active ? <Pause size={28} /> : <Play size={28} />}</button>
-      <div><div style={{ fontSize: 16, color: '#ff4d6d', fontWeight: 900, marginBottom: 4 }}>CPR 메트로놈 (120 bpm)</div>{active ? <div style={{ fontSize: 14, color: '#8da2c0' }}>압박 횟수: <span style={{ color: '#fff', fontWeight: 900 }}>{count}</span></div> : <div style={{ fontSize: 14, color: '#4a6080' }}>시작하면 압박 리듬을 알려드립니다</div>}</div>
-      {active && <div style={{ marginLeft: 'auto', width: 24, height: 24, borderRadius: '50%', background: beat ? '#ff4d6d' : 'rgba(255,77,109,0.2)', transition: 'all 0.05s', boxShadow: beat ? '0 0 15px #ff4d6d' : 'none' }} />}
-    </div>
-  )
-}
-
-function StepTimer({ seconds, label, color }) {
-  const [remaining, setRemaining] = useState(seconds)
-  const [running, setRunning] = useState(false)
-  const intervalRef = useRef(null)
-  useEffect(() => { setRemaining(seconds); setRunning(false); clearInterval(intervalRef.current) }, [seconds])
-  const toggle = () => {
-    if (running) { clearInterval(intervalRef.current); setRunning(false) } 
-    else { setRunning(true); intervalRef.current = setInterval(() => { setRemaining(r => { if (r <= 1) { clearInterval(intervalRef.current); setRunning(false); return 0 }; return r - 1 }) }, 1000) }
-  }
-  const reset = () => { clearInterval(intervalRef.current); setRunning(false); setRemaining(seconds) }
-  useEffect(() => () => clearInterval(intervalRef.current), [])
-  const pct = ((seconds - remaining) / seconds) * 100
-  const mins = Math.floor(remaining / 60); const secs = remaining % 60
-  return (
-    <div style={{ padding: '18px 24px', borderRadius: 20, background: `${color}10`, border: `1.5px solid ${color}30`, marginTop: 20 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}><Clock size={20} color={color} /><span style={{ fontSize: 15, fontWeight: 800, color }}>{label}</span><span style={{ marginLeft: 'auto', fontSize: 28, fontWeight: 900, color, fontVariantNumeric: 'tabular-nums' }}>{mins}:{secs.toString().padStart(2,'0')}</span></div>
-      <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.06)', overflow: 'hidden', marginBottom: 16 }}><div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 3, transition: 'width 0.5s ease' }} /></div>
-      <div style={{ display: 'flex', gap: 10 }}><button onClick={toggle} style={{ flex: 1, padding: '12px', borderRadius: 12, background: running ? `${color}30` : `${color}20`, border: `1px solid ${color}40`, color, fontSize: 15, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>{running ? <><Pause size={16} /> 정지</> : <><Play size={16} /> 시작</>}</button><button onClick={reset} style={{ padding: '12px 20px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#4a6080', fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><RotateCcw size={16} /> 초기화</button></div>
-    </div>
-  )
-}
+const ACTION_STEPS = [
+  { title: '환부 노출 및 흉벽 고정', desc: '의복 제거 후 탄력 붕대로 흉벽을 고정합니다.', img: 'https://images.unsplash.com/photo-1583912267550-d44d4a3c5a71?auto=format&fit=crop&q=80&w=800', tip: '뼈 파편 직접 압박 금지' },
+  { title: '쇄골 부목(Splint) 적용', desc: '어깨 관절을 포함하여 부목 고정을 시행합니다.', img: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=800', tip: '말단 순환 상시 확인' },
+  { title: '산소 공급 (15L/min)', desc: '산소 마스크를 통해 고농도 산소를 공급합니다.', img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800', tip: '반좌위 자세(45도) 유지' },
+  { title: '긴급 약물(케토로락) 투여', desc: '통증 조절을 위한 약물 근주를 실시합니다.', img: 'https://images.unsplash.com/photo-1581056310664-3d4d74630aa9?auto=format&fit=crop&q=80&w=800', tip: '⚠ 아스피린 절대 금기' }
+]
 
 export default function Emergency({ patient }) {
-  const recommended = getRecommendedTab(patient)
-  const [activeTab, setActiveTab] = useState(recommended || 'cpr')
   const [activeStep, setActiveStep] = useState(0)
-  const [animDir, setAnimDir] = useState('right')
-  const guide = GUIDES[activeTab]; const step = guide.steps[activeStep]
-  const goTo = (i, dir = 'right') => { setAnimDir(dir); setActiveStep(i) }
-  const next = () => { if (activeStep < guide.steps.length - 1) goTo(activeStep + 1, 'right') }
-  const prev = () => { if (activeStep > 0) goTo(activeStep - 1, 'left') }
+  const [progress, setProgress] = useState(0)
+  const [isFinished, setIsFinished] = useState(false)
+
+  useEffect(() => {
+    let timer = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(timer)
+          setIsFinished(true)
+          return 100
+        }
+        return prev + 5
+      })
+    }, 30)
+    return () => clearInterval(timer)
+  }, [])
+
+  if (!isFinished) {
+    return (
+      <div style={{ height: 'calc(100vh - 72px)', background: '#0a0e1a', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: 14, color: '#38bdf8', letterSpacing: 4, marginBottom: 20, fontWeight: 800 }}>INITIALIZING MDTS SYSTEM...</div>
+        <div style={{ width: 300, height: 2, background: 'rgba(255,255,255,0.1)', borderRadius: 1 }}>
+          <div style={{ width: `${progress}%`, height: '100%', background: '#38bdf8', transition: '0.1s linear' }} />
+        </div>
+        <div style={{ marginTop: 12, fontSize: 12, color: '#64748b' }}>LOADING BIOMETRIC DATA... {progress}%</div>
+      </div>
+    )
+  }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 72px)', overflow: 'hidden', background: '#050d1a' }}>
-      <div style={{ display: 'flex', gap: 12, padding: '16px 32px', background: 'rgba(10,22,40,0.95)', borderBottom: '1.5px solid rgba(13,217,197,0.15)', overflowX: 'auto', flexShrink: 0 }}>
-        {recommended && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 12, background: 'rgba(255,77,109,0.12)', border: '1.5px solid rgba(255,77,109,0.35)', fontSize: 14, color: '#ff4d6d', fontWeight: 800, flexShrink: 0, animation: 'pulse-dot 2s infinite' }}><Zap size={16} /> 추천 대응</div>}
-        {TABS.map(t => (<button key={t.id} onClick={() => { setActiveTab(t.id); setActiveStep(0) }} style={{ padding: '12px 22px', borderRadius: 14, border: '2px solid', borderColor: activeTab === t.id ? t.color : 'rgba(255,255,255,0.06)', background: activeTab === t.id ? `${t.color}20` : 'rgba(255,255,255,0.02)', color: activeTab === t.id ? '#fff' : '#8da2c0', fontSize: 18, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, position: 'relative', transition: 'all 0.2s' }}><span style={{ fontSize: 24 }}>{t.icon}</span> {t.label}</button>))}
-      </div>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '650px 1fr', overflow: 'hidden' }}>
-        <div style={{ borderRight: '1.5px solid rgba(13,217,197,0.15)', display: 'flex', flexDirection: 'column', background: 'rgba(15,32,64,0.3)', overflow: 'hidden' }}>
-          <div style={{ padding: '24px 32px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-            <div style={{ display: 'flex', gap: 8, marginBottom: 14, alignItems: 'center' }}>{guide.steps.map((_, i) => (<button key={i} onClick={() => goTo(i, i > activeStep ? 'right' : 'left')} style={{ flex: 1, height: 8, borderRadius: 4, border: 'none', cursor: 'pointer', background: i === activeStep ? guide.color : i < activeStep ? `${guide.color}60` : 'rgba(255,255,255,0.08)', transition: 'background 0.3s' }} />))}<span style={{ marginLeft: 12, fontSize: 16, color: '#4a6080', fontWeight: 700 }}>{activeStep + 1}/{guide.steps.length}</span></div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><span style={{ fontSize: 14, padding: '4px 14px', borderRadius: 8, background: `${guide.color}20`, color: guide.color, fontWeight: 800 }}>STEP {activeStep + 1}</span><span style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>{step.title}</span></div>
+    <div style={{ flex: 1, height: 'calc(100vh - 72px)', background: '#0a0e1a', padding: '16px', display: 'flex', flexDirection: 'column', gap: 16, color: '#e2e8f0', fontFamily: 'monospace', overflow: 'hidden' }}>
+      
+      {/* HEADER SECTION */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: 10 }}>
+            MDTS <span style={{ color: '#f97316', fontSize: 14, fontWeight: 400 }}>EZ MODE</span>
           </div>
-          <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-            <img key={`${activeTab}-${activeStep}`} src={step.img} alt={step.title} style={{ width: '100%', height: '100%', objectFit: 'cover', animation: `imgSlide${animDir === 'right' ? 'In' : 'InLeft'} 0.4s ease both` }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(5,13,26,0.95) 0%, rgba(5,13,26,0.2) 50%, transparent 100%)' }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '40px' }}>
-              <div style={{ fontSize: 28, fontWeight: 950, color: '#fff', marginBottom: 12 }}>{step.title}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 24px', borderRadius: 16, background: `${step.tipColor || '#ff9f43'}18`, border: `1.5px solid ${step.tipColor || '#ff9f43'}35` }}><AlertTriangle size={24} color={step.tipColor || '#ff9f43'} /><span style={{ fontSize: 18, color: step.tipColor || '#ff9f43', fontWeight: 700 }}>{step.tip}</span></div>
+          <div style={{ fontSize: 13, color: '#64748b' }}>Version : MM-V2.40 (2026-04-16)</div>
+        </div>
+        
+        <div style={{ display: 'flex', gap: 16 }}>
+          <StatusBadge label="CPU TEMP" value="52.5 °C" color="#ef4444" />
+          <StatusBadge label="O2 LEVEL" value="92.0 %" color="#3b82f6" />
+          <StatusBadge label="VITAL VOLT" value="1.008 V" color="#fbbf24" />
+        </div>
+
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 32, fontWeight: 900, color: '#f97316', lineHeight: 1 }}>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</div>
+          <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{new Date().toLocaleDateString('ko-KR')}</div>
+        </div>
+      </div>
+
+      {/* MAIN GRID */}
+      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr 1fr 380px', gap: 12, flex: 1, minHeight: 0 }}>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <SectionTitle icon={<Cpu size={14}/>} title="선원 인적 정보" color="#f97316" />
+          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', padding: '16px', borderRadius: 4, flex: 1 }}>
+            <InfoRow label="NAME" value={patient?.name} color="#fff" />
+            <InfoRow label="ROLE" value={patient?.role} color="#fff" />
+            <InfoRow label="ID" value={patient?.id} color="#fff" />
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', margin: '12px 0' }} />
+            <div style={{ fontSize: 11, color: '#64748b', marginBottom: 10 }}>기저 질환</div>
+            <div style={{ fontSize: 13, color: '#fbbf24', lineHeight: 1.4 }}>{patient?.chronic}</div>
+            <div style={{ fontSize: 13, color: '#ef4444', fontWeight: 800, marginTop: 12 }}>⚠ 알레르기 : 아스피린</div>
+          </div>
+
+          <SectionTitle icon={<HardDrive size={14}/>} title="바이탈 정밀 추이" color="#f97316" />
+          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', padding: '8px', borderRadius: 4, height: 160 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={TREND_DATA}>
+                <XAxis dataKey="t" hide />
+                <YAxis hide domain={[60, 130]} />
+                <Area type="monotone" dataKey="hr" stroke="#ef4444" fill="rgba(239,68,68,0.1)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <SectionTitle icon={<Brain size={14}/>} title="AI 정밀 판독 결과" color="#f97316" />
+          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', padding: '16px', borderRadius: 4, flex: 1 }}>
+            {DIAGNOSES.map((d, i) => (
+              <div key={i} style={{ marginBottom: 20 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: d.color }}>{d.title}</span>
+                  <span style={{ fontSize: 11, color: '#fff' }}>{d.confidence}%</span>
+                </div>
+                <div style={{ height: 2, background: 'rgba(255,255,255,0.05)' }}>
+                  <div style={{ width: `${d.confidence}%`, height: '100%', background: d.color }} />
+                </div>
+              </div>
+            ))}
+            <div style={{ fontSize: 11, color: '#64748b', marginBottom: 8 }}>의학적 세부 소견</div>
+            <div style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.5, padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: 4 }}>
+              {DIAGNOSES[0].desc}
             </div>
           </div>
-          <div style={{ padding: '24px 32px', background: 'rgba(5,13,26,0.95)', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', gap: 16 }}>
-            <button onClick={prev} disabled={activeStep === 0} style={{ padding: '18px 28px', borderRadius: 18, background: activeStep === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: activeStep === 0 ? '#4a6080' : '#e8f0fe', fontSize: 18, fontWeight: 800, cursor: activeStep === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}><ChevronLeft size={24} /> 이전 단계</button>
-            <button onClick={next} disabled={activeStep === guide.steps.length - 1} style={{ flex: 1, padding: '18px', borderRadius: 18, background: activeStep === guide.steps.length - 1 ? 'rgba(255,255,255,0.03)' : guide.color, border: 'none', color: activeStep === guide.steps.length - 1 ? '#4a6080' : '#050d1a', fontSize: 20, fontWeight: 950, cursor: activeStep === guide.steps.length - 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>다음 단계 <ChevronRight size={24} /></button>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <SectionTitle icon={<Shield size={14}/>} title="정밀 해부학적 맵" color="#f97316" />
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 4, flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <img src="https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=80&w=1200" style={{ height: '90%', filter: 'grayscale(1) brightness(0.5)', opacity: 0.8 }} />
+            <div style={{ position: 'absolute', top: '22%', left: '40%', width: 12, height: 12, borderRadius: '50%', background: '#ef4444', boxShadow: '0 0 15px #ef4444', animation: 'blink 1s infinite' }} />
+            <div style={{ position: 'absolute', top: '46%', left: '45%', width: 16, height: 16, borderRadius: '50%', background: '#ef4444', boxShadow: '0 0 20px #ef4444', animation: 'blink 1.5s infinite' }} />
           </div>
         </div>
-        <div style={{ overflowY: 'auto', background: 'linear-gradient(135deg, #050d1a, #0a1628)', paddingBottom: 40 }}>
-          <div style={{ padding: '40px 48px 0' }}><div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 12 }}><ShieldAlert size={44} color={guide.color} /><span style={{ fontSize: 32, fontWeight: 950, color: '#fff' }}>{guide.title}</span></div><p style={{ fontSize: 19, color: '#8da2c0', lineHeight: 1.6, marginBottom: 40 }}>{guide.description}</p></div>
-          <div style={{ padding: '0 48px', position: 'relative' }}>
-            <div style={{ position: 'absolute', left: 96, top: 0, bottom: 0, width: 2, background: 'rgba(13,217,197,0.08)' }} />
-            {guide.steps.map((s, i) => {
-              const isActive = i === activeStep; const isDone = i < activeStep
-              return (
-                <div key={i} onClick={() => goTo(i, i > activeStep ? 'right' : 'left')} style={{ display: 'flex', gap: 40, marginBottom: 32, cursor: 'pointer' }}>
-                  <div style={{ width: 96, height: 96, borderRadius: '50%', flexShrink: 0, background: isActive ? guide.color : isDone ? `${guide.color}40` : '#0a1628', border: `5px solid ${isActive ? '#fff' : isDone ? guide.color : 'rgba(13,217,197,0.2)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2, fontSize: isDone ? 32 : 36, fontWeight: 950, color: isActive ? '#050d1a' : isDone ? guide.color : '#4a6080', boxShadow: isActive ? `0 0 40px ${guide.color}60` : 'none', transition: 'all 0.3s' }}>{isDone ? '✓' : i + 1}</div>
-                  <div style={{ flex: 1, background: isActive ? `${guide.color}12` : 'rgba(255,255,255,0.02)', border: `1.5px solid ${isActive ? guide.color : isDone ? `${guide.color}25` : 'rgba(255,255,255,0.06)'}`, borderRadius: 28, padding: '32px 40px', transition: 'all 0.3s', transform: isActive ? 'translateX(8px)' : 'none' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}><span style={{ fontSize: 36 }}>{s.icon}</span><span style={{ fontSize: 24, fontWeight: 950, color: isActive ? '#fff' : '#8da2c0' }}>{s.title}</span>{isActive && <CheckCircle2 size={32} color={guide.color} style={{ marginLeft: 'auto' }} />}</div>
-                    <p style={{ fontSize: 19, color: isActive ? '#e8f0fe' : '#4a6080', lineHeight: 1.7 }}>{s.desc}</p>
-                    {isActive && s.duration > 0 && (<StepTimer seconds={s.duration} label={`${s.duration >= 60 ? Math.floor(s.duration / 60) + '분' : s.duration + '초'} 타이머`} color={guide.color} />)}
-                    {isActive && s.hasCPRTimer && <CPRMetronome />}
-                  </div>
-                </div>
-              )
-            })}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <SectionTitle icon={<Settings size={14}/>} title="응급 처치 프로토콜" color="#f97316" />
+          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', padding: '16px', borderRadius: 4, flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ fontSize: 12, color: '#38bdf8', fontWeight: 800 }}>STEP {activeStep + 1} OF {ACTION_STEPS.length}</div>
+            <div style={{ borderRadius: 4, overflow: 'hidden', height: 140, background: '#fff' }}>
+              <img src={ACTION_STEPS[activeStep].img} style={{ width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+            </div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: '#fff' }}>{ACTION_STEPS[activeStep].title}</div>
+            <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.4 }}>{ACTION_STEPS[activeStep].desc}</div>
+            <div style={{ marginTop: 'auto', display: 'flex', gap: 8 }}>
+              <button onClick={() => setActiveStep(prev => Math.max(0, prev - 1))} style={{ flex: 1, height: 36, background: '#1e293b', border: '1px solid #334155', color: '#fff', fontSize: 12, cursor: 'pointer' }}>PREV</button>
+              <button onClick={() => setActiveStep(prev => Math.min(ACTION_STEPS.length - 1, prev + 1))} style={{ flex: 2, height: 36, background: '#f97316', border: 'none', color: '#fff', fontWeight: 900, fontSize: 12, cursor: 'pointer' }}>NEXT STEP</button>
+            </div>
           </div>
         </div>
+
       </div>
+
+      <div style={{ height: 40, display: 'flex', gap: 8 }}>
+        {['Scan', 'Bio-Link', 'Reports', 'Settings', 'Exit'].map((btn, i) => (
+          <button key={i} style={{ flex: 1, background: '#1e293b', border: '1px solid #334155', color: '#94a3b8', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+            <span style={{ color: '#fbbf24' }}>F{i+1}</span> {btn}
+          </button>
+        ))}
+      </div>
+
+      <style>{`
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+      `}</style>
     </div>
   )
 }
 
-function getIconAnimation(type) {
-  switch (type) {
-    case 'pulse':   return 'stepPulse 1s ease-in-out infinite'
-    case 'bounce':  return 'stepBounce 0.8s ease infinite'
-    case 'breathe': return 'stepBreathe 2s ease-in-out infinite'
-    case 'shake':   return 'stepShake 0.5s ease infinite'
-    case 'flash':   return 'stepFlash 0.6s ease infinite'
-    default:        return 'stepFadeIn 0.5s ease both'
-  }
+function StatusBadge({ label, value, color }) {
+  return (
+    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', padding: '4px 12px', borderRadius: 4, display: 'flex', gap: 12, alignItems: 'center' }}>
+      <div style={{ fontSize: 10, color: '#64748b', fontWeight: 800 }}>{label}</div>
+      <div style={{ fontSize: 14, color, fontWeight: 900 }}>{value}</div>
+    </div>
+  )
+}
+
+function SectionTitle({ icon, title, color }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0' }}>
+      <div style={{ color }}>{icon}</div>
+      <div style={{ fontSize: 12, fontWeight: 900, color, letterSpacing: 1 }}>{title.toUpperCase()}</div>
+    </div>
+  )
+}
+
+function InfoRow({ label, value, color }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 12 }}>
+      <span style={{ color: '#64748b' }}>{label}</span>
+      <span style={{ color, fontWeight: 700 }}>{value}</span>
+    </div>
+  )
 }

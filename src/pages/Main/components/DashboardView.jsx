@@ -156,8 +156,10 @@ export default function DashboardView({
               )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <div style={{ fontSize: 30, fontWeight: 950, marginBottom: 3, letterSpacing: '-0.5px' }}>{activePatient?.name}</div>
-              <div style={{ fontSize: 20, color: '#38bdf8', fontWeight: 800, marginBottom: 2 }}>{activePatient?.role}</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 4 }}>
+                <div style={{ fontSize: 30, fontWeight: 950, letterSpacing: '-0.5px' }}>{activePatient?.name}</div>
+                <div style={{ fontSize: 18, color: '#38bdf8', fontWeight: 800 }}>{activePatient?.role}</div>
+              </div>
               <div style={{ fontSize: 15, color: '#475569', fontWeight: 700 }}>ID : {activePatient?.id}</div>
             </div>
           </div>
