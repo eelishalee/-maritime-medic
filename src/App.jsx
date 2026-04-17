@@ -24,12 +24,16 @@ export default function App() {
     avatar: '/CE.jpeg'
   })
 
+  const [emergencyData, setEmergencyData] = useState(null)
+
   // 페이지 전환 로직
   const handleNavigate = (newPage, data = null) => {
     if (newPage === 'emergency') {
       setCapturedImage(data?.image || null)
+      setEmergencyData(data)
     } else {
       setCapturedImage(null)
+      setEmergencyData(null)
     }
     setPage(newPage)
   }
@@ -50,7 +54,10 @@ export default function App() {
           <CrewManagement onSelectPatient={p => { setActivePatient(p); handleNavigate('main') }} />
         )}
         {page === 'emergency' && (
-          <Emergency patient={activePatient} />
+          <Emergency 
+            patient={activePatient} 
+            initialAction={emergencyData?.traumaType || emergencyData?.type} 
+          />
         )}
         {page === 'chart'     && (
           <PatientChart patient={activePatient} />

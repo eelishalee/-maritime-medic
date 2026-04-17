@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Brain, Heart, Zap, Shield, Cpu, AlertCircle, Wind, Clock, Video, Pill, History, User, Info, Activity, Scissors, Plus, Thermometer, Mic, X, ChevronRight, HeartPulse, ChevronLeft, CheckCircle2, AlertTriangle, ArrowDown, FileText, Ruler, Droplets, MapPin, Phone, Upload, Camera, Edit3 } from 'lucide-react'
+import { CardiacIllustration, TraumaIllustration, UnconsciousIllustration, RespiratoryIllustration } from '../components/EmergencyIllustrations'
 
 const ACTION_GUIDES = {
   '심폐소생술': {
@@ -8,10 +9,10 @@ const ACTION_GUIDES = {
     hasMetronome: true,
     image: '/assets/CPR1.jpeg',
     steps: [
-      { title: '의식 및 호흡 동시 확인', desc: '어깨를 두드리며 말을 걸고 가슴의 움직임(호흡)을 관찰하십시오.', tip: '의식과 호흡이 모두 없을 때만 시행합니다.' },
-      { title: '도움 및 AED 요청', desc: '주변 사람을 지목하여 신고를 부탁하고 AED를 가져오게 하십시오.' },
-      { title: '가슴 압박 시행', desc: '가슴 중앙을 5cm 깊이로 강하고 빠르게 압박하십시오.', tip: '팔꿈치를 펴고 체중을 실어 수직으로 압박' },
-      { title: 'AED 전원 켜기', desc: '도착한 AED의 전원을 켜고 기계의 음성 지시에 따르십시오.' }
+      { title: '의식 및 호흡 동시 확인', desc: '어깨를 두드리며 말을 걸고 가슴의 움직임(호흡)을 관찰하십시오.', tip: '의식과 호흡이 모두 없을 때만 시행합니다.', stepImage: '/assets/CPR1.jpeg' },
+      { title: '도움 및 AED 요청', desc: '주변 사람을 지목하여 신고를 부탁하고 AED를 가져오게 하십시오.', stepImage: '/assets/CPR2.jpeg' },
+      { title: '가슴 압박 시행', desc: '가슴 중앙을 5cm 깊이로 강하고 빠르게 압박하십시오.', tip: '팔꿈치를 펴고 체중을 실어 수직으로 압박', stepImage: '/assets/CPR3.jpeg' },
+      { title: 'AED 전원 켜기', desc: '도착한 AED의 전원을 켜고 기계의 음성 지시에 따르십시오.', stepImage: '/assets/CPR4.jpeg' }
     ],
     dos: ['의식과 가슴 움직임을 10초간 확인하세요', '1초당 2번 속도로 강하게 압박하세요'],
     donts: ['맥박을 잡으려고 시간을 허비하지 마세요', '의식이 있는 환자에게 압박을 하지 마세요'],
@@ -22,9 +23,9 @@ const ACTION_GUIDES = {
     title: '출혈 부위 직접 압박',
     protocol: 'SOP-BLD-02',
     steps: [
-      { title: '상처 부위 확인', desc: '정확한 출혈 지점을 확인하기 위해 옷을 걷어내십시오.' },
-      { title: '직접 압박', desc: '멸균 거즈나 깨끗한 천으로 출혈 부위를 손바닥 전체로 누르십시오.' },
-      { title: '지혈대 적용', desc: '대량 출혈이 멈추지 않을 때만 상단 5cm 지점에 지혈대를 조이십시오.' }
+      { title: '상처 부위 확인', desc: '정확한 출혈 지점을 확인하기 위해 옷을 걷어내십시오.', stepImage: '/assets/Trauma1.jpeg' },
+      { title: '직접 압박', desc: '멸균 거즈나 깨끗한 천으로 출혈 부위를 손바닥 전체로 누르십시오.', stepImage: '/assets/Trauma2.jpeg' },
+      { title: '지혈대 적용', desc: '대량 출혈이 멈추지 않을 때만 상단 5cm 지점에 지혈대를 조이십시오.', stepImage: '/assets/Trauma3.jpeg' }
     ],
     dos: ['심장보다 높은 위치로 환부를 올리세요', '압박 붕대를 감은 뒤에도 계속 관찰하세요'],
     donts: ['상처에 박힌 칼이나 유리 조각을 뽑지 마세요', '상처에 가루약이나 된장 등을 바르지 마세요'],
@@ -35,9 +36,9 @@ const ACTION_GUIDES = {
     title: '기도 유지 및 호흡 보조',
     protocol: 'SOP-AIR-03',
     steps: [
-      { title: '기도 개방', desc: '머리를 뒤로 젖히고 턱을 들어 올려 기도를 확보하십시오.' },
-      { title: '이물질 제거', desc: '입안에 이물질이 있다면 즉시 제거하십시오.' },
-      { title: '산소 공급', desc: '산소 마스크를 밀착시키고 유량을 15L로 조절하십시오.' }
+      { title: '기도 개방', desc: '머리를 뒤로 젖히고 턱을 들어 올려 기도를 확보하십시오.', stepImage: '/assets/Unconscious1.jpeg' },
+      { title: '이물질 제거', desc: '입안에 이물질이 있다면 즉시 제거하십시오.', stepImage: '/assets/Unconscious2.jpeg' },
+      { title: '산소 공급', desc: '산소 마스크를 밀착시키고 유량을 15L로 조절하십시오.', stepImage: '/assets/Unconscious3.jpeg' }
     ],
     dos: ['환자를 옆으로 눕히는 회복 자세를 취하세요', '구토 시 즉시 몸을 옆으로 돌리세요'],
     donts: ['경추 손상이 의심되면 머리를 과하게 젖히지 마세요', '의식이 없는 환자에게 물을 먹이지 마세요'],
@@ -48,9 +49,9 @@ const ACTION_GUIDES = {
     title: '골절 부위 고정 및 보호',
     protocol: 'SOP-FRC-04',
     steps: [
-      { title: '안정화', desc: '환자가 통증을 가장 적게 느끼는 자세로 유지시키십시오.' },
-      { title: '부목 적용', desc: '나무판자나 종이박스를 이용해 관절 위아래를 고정하십시오.' },
-      { title: '순환 체크', desc: '고정 후 손발 끝을 눌러 혈액이 잘 통하는지 확인하십시오.' }
+      { title: '안정화', desc: '환자가 통증을 가장 적게 느끼는 자세로 유지시키십시오.', stepImage: '/assets/Fracture1.jpeg' },
+      { title: '부목 적용', desc: '나무판자나 종이박스를 이용해 관절 위아래를 고정하십시오.', stepImage: '/assets/Fracture2.jpeg' },
+      { title: '순환 체크', desc: '고정 후 손발 끝을 눌러 혈액이 잘 통하는지 확인하십시오.', stepImage: '/assets/Fracture3.jpeg' }
     ],
     dos: ['빈 공간에 옷이나 수건을 채워 흔들림을 방지하세요', '개방된 상처가 있다면 먼저 덮으세요'],
     donts: ['부러진 뼈를 억지로 맞추려 하지 마세요', '환자를 일으켜 세우거나 걷게 하지 마세요'],
@@ -61,9 +62,9 @@ const ACTION_GUIDES = {
     title: '익수자 구조 및 체온 관리',
     protocol: 'SOP-HYP-05',
     steps: [
-      { title: '젖은 의복 제거', desc: '따뜻한 곳으로 옮기고 젖은 옷을 가위로 잘라 제거하십시오.' },
-      { title: '점진적 가온', desc: '담요로 전신을 감싸고 겨드랑이, 사타구니에 온팩을 대십시오.' },
-      { title: '건조 및 단열', desc: '몸을 마른 수건으로 닦고 차가운 바닥으로부터 단열시키십시오.' }
+      { title: '젖은 의복 제거', desc: '따뜻한 곳으로 옮기고 젖은 옷을 가위로 잘라 제거하십시오.', stepImage: '/assets/Hypothermia1.jpeg' },
+      { title: '점진적 가온', desc: '담요로 전신을 감싸고 겨드랑이, 사타구니에 온팩을 대십시오.', stepImage: '/assets/Hypothermia2.jpeg' },
+      { title: '건조 및 단열', desc: '몸을 마른 수건으로 닦고 차가운 바닥으로부터 단열시키십시오.', stepImage: '/assets/Hypothermia3.jpeg' }
     ],
     dos: ['의식이 있다면 따뜻하고 달콤한 음료를 주십시오', '실내 온도를 25도 이상으로 유지하세요'],
     donts: ['팔다리를 심하게 주무르지 마세요 (심장에 무리)', '뜨거운 물에 환자를 직접 담그지 마세요'],
@@ -74,8 +75,8 @@ const ACTION_GUIDES = {
     title: '환부 세척 및 감염 방지',
     protocol: 'SOP-WND-06',
     steps: [
-      { title: '식염수 세척', desc: '멸균 식염수나 흐르는 물로 이물질을 충분히 씻어내십시오.' },
-      { title: '거즈 드레싱', desc: '연고 없이 멸균 거즈로 덮고 반창고로 고정하십시오.' }
+      { title: '식염수 세척', desc: '멸균 식염수나 흐르는 물로 이물질을 충분히 씻어내십시오.', stepImage: '/assets/Wound1.jpeg' },
+      { title: '거즈 드레싱', desc: '연고 없이 멸균 거즈로 덮고 반창고로 고정하십시오.', stepImage: '/assets/Wound2.jpeg' }
     ],
     dos: ['처치 전 반드시 위생 장갑을 착용하세요', '상처 주변 피부 위주로 소독하세요'],
     donts: ['얼음을 환부에 직접 대지 마세요 (동상 위험)', '물집을 억지로 터뜨리지 마세요'],
@@ -84,11 +85,32 @@ const ACTION_GUIDES = {
   }
 }
 
-export default function Emergency({ patient }) {
+export default function Emergency({ patient, initialAction }) {
   const [triageStep, setTriageStep] = useState('CHECK') 
   const [activeAction, setActiveAction] = useState(null)
   const [completedSteps, setCompletedSteps] = useState([])
   const [sessionLogs, setSessionLogs] = useState([])
+  const [hoveredStepIndex, setHoveredStepIndex] = useState(null)
+
+  // 초기 액션 매핑 및 설정
+  useEffect(() => {
+    if (initialAction) {
+      const mapping = {
+        'CARDIAC': '심폐소생술',
+        'TRAUMA': '지혈/압박',
+        'UNCONSCIOUS': '기도 확보',
+        'RESPIRATORY': '기도 확보' // 호흡곤란도 일단 기도확보로 매핑하거나 적절한 항목 선택
+      }
+      const targetAction = mapping[initialAction] || initialAction
+      if (ACTION_GUIDES[targetAction]) {
+        setActiveAction(targetAction)
+        setTriageStep('GUIDE')
+        const now = new Date().toLocaleTimeString('ko-KR', { hour12: false })
+        setSessionLogs([{ time: now, text: `외부 시스템으로부터 [${targetAction}] 프로토콜 수신`, type: 'INFO' }])
+      }
+    }
+  }, [initialAction])
+
   const [showPhotoAlert, setShowPhotoAlert] = useState(false)
   const [bpm, setBpm] = useState(110)
   const [beat, setBeat] = useState(false)
@@ -167,30 +189,86 @@ export default function Emergency({ patient }) {
     )
   }
 
+  // 선택된 대응 항목의 데이터
+  const currentActionData = activeAction ? ACTION_GUIDES[activeAction] : null
+  
+  // 현재 진행해야 할 단계(미완료된 첫 번째 단계)
+  const nextStepIndex = currentActionData?.steps.findIndex((_, i) => !completedSteps.includes(i))
+  
+  // 표시할 단계 결정 (호버 중인 단계가 있으면 우선, 없으면 진행 예정 단계)
+  const activeDisplayIndex = hoveredStepIndex !== null ? hoveredStepIndex : (nextStepIndex !== -1 ? nextStepIndex : currentActionData?.steps.length - 1)
+  const stepNum = activeDisplayIndex + 1
+
+  // 이미지 파일이 있는지 확인
+  const stepImage = (currentActionData && activeDisplayIndex !== -1 && currentActionData.steps[activeDisplayIndex]?.stepImage) 
+    ? currentActionData.steps[activeDisplayIndex].stepImage 
+    : currentActionData?.image
+
+  // 일러스트 렌더러
+  const renderIllustration = () => {
+    if (activeAction === '심폐소생술') return <CardiacIllustration step={stepNum} />
+    if (activeAction === '지혈/압박' || activeAction === '골절 / 탈구') return <TraumaIllustration step={stepNum} />
+    if (activeAction === '기도 확보') return <UnconsciousIllustration step={stepNum} />
+    return <RespiratoryIllustration step={stepNum} />
+  }
+
   return (
     <div style={{ height: 'calc(100vh - 72px)', width: '100%', background: '#020617', color: '#fff', fontFamily: '"Pretendard", sans-serif', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at center, transparent 0%, #020617 98%)' }} />
 
       <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '480px 1fr 440px', gridTemplateRows: '1fr 120px', gap: '30px', padding: '24px', height: '100%', boxSizing: 'border-box' }}>
         
-        {/* [1열 - LEFT] 시각적 처치 가이드 이미지 */}
+        {/* [1열 - LEFT] 시각적 처치 가이드 */}
         <section style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {activeAction && ACTION_GUIDES[activeAction].image ? (
+          {activeAction ? (
             <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: 32, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}>
-                <div style={{ fontSize: 13, color: '#38bdf8', fontWeight: 900, letterSpacing: 1.5, marginBottom: 4 }}>VISUAL REFERENCE</div>
-                <div style={{ fontSize: 18, fontWeight: 950 }}>처치 동작 시각 가이드</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: 13, color: '#38bdf8', fontWeight: 900, letterSpacing: 1.5, marginBottom: 4 }}>VISUAL REFERENCE</div>
+                    <div style={{ fontSize: 18, fontWeight: 950 }}>처치 동작 시각 가이드</div>
+                  </div>
+                  
+                  {activeAction === '심폐소생술' ? (
+                    <div style={{ 
+                      background: 'rgba(239,68,68,0.15)', 
+                      borderRadius: 16, 
+                      padding: '8px 16px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: 12, 
+                      border: `1px solid ${beat ? '#ef4444' : 'rgba(239,68,68,0.3)'}`, 
+                      transition: '0.1s' 
+                    }}>
+                      <Heart size={18} fill={beat ? '#ef4444' : 'none'} color="#ef4444" style={{ animation: beat ? 'pulse 0.2s' : 'none' }} />
+                      <div style={{ fontSize: 13, fontWeight: 900, color: '#ef4444', whiteSpace: 'nowrap' }}>110 BPM 박자 가이드</div>
+                    </div>
+                  ) : hoveredStepIndex !== null && (
+                    <div style={{ background: 'rgba(56,189,248,0.1)', color: '#38bdf8', padding: '4px 12px', borderRadius: 10, fontSize: 12, fontWeight: 800 }}>미리보기 중</div>
+                  )}
+                </div>
               </div>
-              <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#000' }}>
-                <img 
-                  src={ACTION_GUIDES[activeAction].image} 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.9 }} 
-                  alt="처치 가이드"
-                />
+              <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {stepImage ? (
+                  <img 
+                    key={stepImage} 
+                    src={stepImage} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.9 }} 
+                    alt="처치 가이드"
+                  />
+                ) : (
+                  <div style={{ width: '80%', height: '80%' }}>
+                    {renderIllustration()}
+                  </div>
+                )}
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '30px 24px', background: 'linear-gradient(to top, rgba(2,6,23,0.9), transparent)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#0dd9c5' }}>
                     <Info size={18} />
-                    <span style={{ fontSize: 15, fontWeight: 800 }}>이미지의 정확한 압박 위치를 확인하십시오.</span>
+                    <span style={{ fontSize: 15, fontWeight: 800 }}>
+                      {activeDisplayIndex !== -1 && currentActionData.steps[activeDisplayIndex]
+                        ? `${hoveredStepIndex !== null ? '[확인 중]' : '현재 단계'} : ${currentActionData.steps[activeDisplayIndex].title}`
+                        : '모든 처치 단계를 완료하였습니다.'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -241,21 +319,30 @@ export default function Emergency({ patient }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {ACTION_GUIDES[activeAction].steps.map((step, i) => {
                   const isFirstPending = i === 0 && !completedSteps.includes(i);
+                  const isHovered = hoveredStepIndex === i;
+                  const isCompleted = completedSteps.includes(i);
+                  
                   return (
-                    <div key={i} onClick={() => handleStepToggle(i)} style={{ 
-                      display: 'flex', gap: 20, padding: 24, borderRadius: 24, cursor: 'pointer', 
-                      background: completedSteps.includes(i) ? 'rgba(56,189,248,0.1)' : 'rgba(255,255,255,0.03)', 
-                      border: `2px solid ${completedSteps.includes(i) ? '#38bdf8' : isFirstPending ? '#38bdf8' : 'rgba(255,255,255,0.06)'}`, 
-                      transition: '0.2s', position: 'relative',
-                      animation: isFirstPending ? 'step-guide-pulse 2s infinite' : 'none',
-                      boxShadow: isFirstPending ? '0 0 20px rgba(56,189,248,0.2)' : 'none'
-                    }}>
-                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: completedSteps.includes(i) ? '#38bdf8' : isFirstPending ? '#38bdf8' : 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 950, color: (completedSteps.includes(i) || isFirstPending) ? '#000' : '#fff', fontSize: 18 }}>
-                        {completedSteps.includes(i) ? <CheckCircle2 size={20}/> : i+1}
+                    <div 
+                      key={i} 
+                      onClick={() => handleStepToggle(i)} 
+                      onMouseEnter={() => setHoveredStepIndex(i)}
+                      onMouseLeave={() => setHoveredStepIndex(null)}
+                      style={{ 
+                        display: 'flex', gap: 20, padding: 24, borderRadius: 24, cursor: 'pointer', 
+                        background: isCompleted ? 'rgba(56,189,248,0.1)' : isHovered ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)', 
+                        border: `2px solid ${isCompleted ? '#38bdf8' : (isFirstPending || isHovered) ? '#38bdf8' : 'rgba(255,255,255,0.06)'}`, 
+                        transition: '0.2s', position: 'relative',
+                        animation: (isFirstPending && !isHovered) ? 'step-guide-pulse 2s infinite' : 'none',
+                        boxShadow: (isFirstPending || isHovered) ? '0 0 20px rgba(56,189,248,0.2)' : 'none',
+                        transform: isHovered ? 'translateX(5px)' : 'none'
+                      }}>
+                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: isCompleted ? '#38bdf8' : (isFirstPending || isHovered) ? '#38bdf8' : 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 950, color: (isCompleted || isFirstPending || isHovered) ? '#000' : '#fff', fontSize: 18 }}>
+                        {isCompleted ? <CheckCircle2 size={20}/> : i+1}
                       </div>
                       <div>
-                        <div style={{ fontSize: 22, fontWeight: 950, marginBottom: 6, color: (completedSteps.includes(i) || isFirstPending) ? '#fff' : '#94a3b8' }}>{step.title}</div>
-                        <div style={{ fontSize: 16, color: completedSteps.includes(i) ? '#fff' : '#64748b', fontWeight: 600, lineHeight: 1.5 }}>{step.desc}</div>
+                        <div style={{ fontSize: 22, fontWeight: 950, marginBottom: 6, color: (isCompleted || isFirstPending || isHovered) ? '#fff' : '#94a3b8' }}>{step.title}</div>
+                        <div style={{ fontSize: 16, color: (isCompleted || isHovered) ? '#fff' : '#64748b', fontWeight: 600, lineHeight: 1.5 }}>{step.desc}</div>
                       </div>
                     </div>
                   )

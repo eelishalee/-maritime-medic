@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Timer } from 'lucide-react'
 import { StepItem, SymptomTab } from '../../../components/ui'
+import { CardiacIllustration, TraumaIllustration, UnconsciousIllustration, RespiratoryIllustration } from '../../../components/EmergencyIllustrations'
 
 export default function EmergencyGuide({ activeEmergencyGuide, setActiveEmergencyGuide, activeStep, setActiveStep }) {
   const GUIDES = {
@@ -60,28 +61,11 @@ export default function EmergencyGuide({ activeEmergencyGuide, setActiveEmergenc
   const { color, bg, border, label } = illus
 
   const Anim3D = () => {
-    const S = { width: 240, height: 260 }
-    const vb = "0 0 240 260"
-    if (activeEmergencyGuide === 'CARDIAC' && activeStep === 1) return (
-      <svg viewBox={vb} {...S}>
-        <defs>
-          <linearGradient id="skC1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#fde8c8"/><stop offset="60%" stopColor="#f0b07a"/><stop offset="100%" stopColor="#c47d45"/></linearGradient>
-          <linearGradient id="scC1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#4db8d4"/><stop offset="100%" stopColor="#1e6a8a"/></linearGradient>
-          <linearGradient id="glC1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#60a5fa"/><stop offset="100%" stopColor="#1d4ed8"/></linearGradient>
-          <filter id="shC1"><feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#000" floodOpacity="0.35"/></filter>
-        </defs>
-        <ellipse cx="120" cy="248" rx="80" ry="8" fill="rgba(0,0,0,0.18)"/>
-        <path d="M28 160 Q28 142 50 140 L200 140 Q220 140 220 158 Q220 176 200 178 L50 178 Q28 178 28 160Z" fill="url(#skC1)" filter="url(#shC1)"/>
-        <circle cx="210" cy="158" r="22" fill="url(#skC1)" filter="url(#shC1)"/>
-        <path d="M194 144 Q210 136 226 144" fill="#3d2b1f"/>
-        <circle cx="205" cy="160" r="2.5" fill="#1e1e2e"/><circle cx="217" cy="160" r="2.5" fill="#1e1e2e"/>
-        <path d="M75 52 Q75 36 110 32 Q145 36 145 52 L148 138 Q148 148 110 150 Q72 148 72 138Z" fill="url(#scC1)" filter="url(#shC1)"/>
-        <circle cx="110" cy="20" r="20" fill="url(#skC1)" filter="url(#shC1)"/>
-        <path d="M93 10 Q110 2 127 10" fill="#3d2b1f"/>
-        <path d="M75 90 Q52 100 38 128 Q42 140 55 136 Q66 112 82 104Z" fill="url(#glC1)" filter="url(#shC1)"/>
-        <circle cx="36" cy="132" r="20" fill="none" stroke="#38bdf8" strokeWidth="1.5" opacity="0.6" style={{animation:'pingRing 1.8s infinite'}}/>
-      </svg>
-    )
+    const props = { step: activeStep }
+    if (activeEmergencyGuide === 'CARDIAC') return <CardiacIllustration {...props} />
+    if (activeEmergencyGuide === 'TRAUMA') return <TraumaIllustration {...props} />
+    if (activeEmergencyGuide === 'UNCONSCIOUS') return <UnconsciousIllustration {...props} />
+    if (activeEmergencyGuide === 'RESPIRATORY') return <RespiratoryIllustration {...props} />
     return <div style={{width:240, height:260, background:'rgba(255,255,255,0.03)', borderRadius:20}} />
   }
 

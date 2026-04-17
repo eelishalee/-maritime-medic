@@ -78,7 +78,7 @@ export default function Main({ patient, onNavigate }) {
     setActiveEmergencyGuide(type)
     setActiveStep(1)
     setActiveTab('GUIDE')
-    onNavigate && onNavigate('emergency')
+    onNavigate && onNavigate('emergency', { type })
   }
 
   // ─── 외상 촬영 및 분석 (즉시 전환으로 최적화)
