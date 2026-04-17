@@ -229,21 +229,7 @@ export default function Emergency({ patient, initialAction }) {
                     <div style={{ fontSize: 18, fontWeight: 950 }}>처치 동작 시각 가이드</div>
                   </div>
                   
-                  {activeAction === '심폐소생술' ? (
-                    <div style={{ 
-                      background: 'rgba(239,68,68,0.15)', 
-                      borderRadius: 16, 
-                      padding: '8px 16px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 12, 
-                      border: `1px solid ${beat ? '#ef4444' : 'rgba(239,68,68,0.3)'}`, 
-                      transition: '0.1s' 
-                    }}>
-                      <Heart size={18} fill={beat ? '#ef4444' : 'none'} color="#ef4444" style={{ animation: beat ? 'pulse 0.2s' : 'none' }} />
-                      <div style={{ fontSize: 13, fontWeight: 900, color: '#ef4444', whiteSpace: 'nowrap' }}>110 BPM 박자 가이드</div>
-                    </div>
-                  ) : hoveredStepIndex !== null && (
+                  {hoveredStepIndex !== null && activeAction !== '심폐소생술' && (
                     <div style={{ background: 'rgba(56,189,248,0.1)', color: '#38bdf8', padding: '4px 12px', borderRadius: 10, fontSize: 12, fontWeight: 800 }}>미리보기 중</div>
                   )}
                 </div>
@@ -261,15 +247,37 @@ export default function Emergency({ patient, initialAction }) {
                     {renderIllustration()}
                   </div>
                 )}
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '30px 24px', background: 'linear-gradient(to top, rgba(2,6,23,0.9), transparent)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#0dd9c5' }}>
-                    <Info size={18} />
-                    <span style={{ fontSize: 15, fontWeight: 800 }}>
-                      {activeDisplayIndex !== -1 && currentActionData.steps[activeDisplayIndex]
-                        ? `${hoveredStepIndex !== null ? '[확인 중]' : '현재 단계'} : ${currentActionData.steps[activeDisplayIndex].title}`
-                        : '모든 처치 단계를 완료하였습니다.'}
-                    </span>
+
+                {/* BPM 상단 가이드 (원형 아이콘 + 한 줄 문구) - 3단계부터 표시 */}
+                {activeAction === '심폐소생술' && stepNum >= 3 && (
+                  <div style={{ 
+                    position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+                    background: beat ? '#ef4444' : '#b91c1c', 
+                    borderRadius: '0 0 24px 24px', 
+                    padding: '10px 28px',
+                    display: 'flex', alignItems: 'center', gap: 14,
+                    boxShadow: beat ? '0 0 35px rgba(239,68,68,0.7)' : '0 8px 20px rgba(0,0,0,0.4)',
+                    transition: '0.1s', zIndex: 20,
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderTop: 'none',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    <div style={{ 
+                      width: 32, height: 32, borderRadius: '50%', 
+                      background: 'rgba(255,255,255,0.2)', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      animation: beat ? 'pulse 0.2s' : 'none'
+                    }}>
+                      <Heart size={18} fill="#fff" color="#fff" />
+                    </div>
+                    <div style={{ fontSize: 18, fontWeight: 950, color: '#fff', letterSpacing: -0.5, textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                      박자에 맞춰 가슴을 힘껏 누르세요
+                    </div>
                   </div>
+                )}
+
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '30px 24px', background: 'linear-gradient(to top, rgba(2,6,23,0.9), transparent)' }}>
+                  {/* 단계 문구 제거됨 */}
                 </div>
               </div>
             </div>
@@ -294,16 +302,6 @@ export default function Emergency({ patient, initialAction }) {
                 </div>
                 <button onClick={() => {setActiveAction(null); setCompletedSteps([])}} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#64748b', cursor: 'pointer', padding: 12, borderRadius: '50%' }}><X/></button>
               </div>
-
-              {activeAction === '심폐소생술' && (
-                <div style={{ background: 'rgba(239,68,68,0.1)', borderRadius: 20, padding: '16px 24px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 20, border: `2px solid ${beat ? '#ef4444' : 'transparent'}`, transition: '0.1s' }}>
-                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: beat ? '#ef4444' : 'rgba(239,68,68,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Heart size={24} fill={beat ? '#fff' : 'none'} color="#fff" /></div>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 900, color: '#ef4444' }}>압박 박자 가이드 (110 BPM)</div>
-                    <div style={{ fontSize: 20, fontWeight: 950 }}>심장 아이콘이 깜빡일 때 가슴을 누르세요</div>
-                  </div>
-                </div>
-              )}
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 32 }}>
                 <div style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 20, padding: 20 }}>
