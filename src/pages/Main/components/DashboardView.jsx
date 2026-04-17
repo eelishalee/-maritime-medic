@@ -101,44 +101,7 @@ export default function DashboardView({
                 ))}
               </div>
             </>
-          ) : (
-            /* 분석 완료 */
-            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>
-
-              {/* 완료 원형 링 애니메이션 */}
-              <div style={{ position: 'relative', width: 120, height: 120 }}>
-                {/* 퍼지는 링 */}
-                <div style={{
-                  position: 'absolute', inset: -16, borderRadius: '50%',
-                  border: '1.5px solid rgba(244,63,94,0.3)',
-                  animation: 'pulse 1.5s ease-in-out infinite',
-                }} />
-                <div style={{
-                  position: 'absolute', inset: -6, borderRadius: '50%',
-                  border: '1.5px solid rgba(244,63,94,0.5)',
-                  animation: 'pulse 1.5s 0.3s ease-in-out infinite',
-                }} />
-                <div style={{
-                  width: '100%', height: '100%', borderRadius: '50%',
-                  background: 'rgba(244,63,94,0.08)',
-                  border: '2px solid #f43f5e',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 0 40px rgba(244,63,94,0.4)',
-                }}>
-                  <AlertTriangle size={40} color="#f43f5e" />
-                </div>
-              </div>
-
-              <div>
-                <div style={{ fontSize: 11, letterSpacing: 2, color: '#f43f5e', fontWeight: 800, marginBottom: 12 }}>분석 완료 · 신뢰도 {scanResult.confidence}%</div>
-                <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', marginBottom: 12, lineHeight: 1.4 }}>{scanResult.analysis}</div>
-                <div style={{ fontSize: 14, color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#38bdf8', animation: 'pulse 1s infinite' }} />
-                  응급 처치 페이지로 이동합니다...
-                </div>
-              </div>
-            </div>
-          )}
+          ) : null}
         </div>
       )}
 
@@ -287,7 +250,7 @@ export default function DashboardView({
             </div>
 
             {/* 비상 연락처 */}
-            <div>
+            <div style={{ marginBottom: 40 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#a78bfa', fontSize: 18, fontWeight: 800, marginBottom: 12 }}><Phone size={20}/> 비상 연락처</div>
               <div style={{ background: 'rgba(167,139,250,0.05)', border: '1px solid rgba(167,139,250,0.15)', borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[
@@ -302,34 +265,12 @@ export default function DashboardView({
               </div>
             </div>
 
-            {/* 데이터 전송 상태 */}
-            <div style={{ marginBottom: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#2dd4bf', fontSize: 18, fontWeight: 800, marginBottom: 12 }}><Upload size={20}/> 데이터 전송 상태</div>
-              <div style={{ background: 'rgba(45,212,191,0.05)', padding: '14px 16px', borderRadius: 14, border: '1px solid rgba(45,212,191,0.1)', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {[
-                  { label: '육상 의료 센터 (KMCC)', status: '연결됨', ok: true },
-                  { label: '위성 데이터 링크', status: '정상', ok: true },
-                  { label: '원격 의료 채널', status: '대기 중', ok: false },
-                ].map((row, i) => (
-                  <div key={i}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                      <span style={{ fontSize: 13, color: '#94a3b8' }}>{row.label}</span>
-                      <span style={{ fontSize: 13, color: row.ok ? '#2dd4bf' : '#fb923c', fontWeight: 800 }}>{row.status}</span>
-                    </div>
-                    <div style={{ height: 3, background: 'rgba(255,255,255,0.05)', borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ width: row.ok ? '100%' : '45%', height: '100%', background: row.ok ? '#2dd4bf' : '#fb923c', transition: 'width 1s ease' }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
           </div>
         </div>
         {/* 고정: 응급 처치 버튼 */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 24px 20px 24px', borderTop: '1px solid rgba(255,77,109,0.2)', background: 'linear-gradient(to top, #05070a 70%, transparent)' }}>
           <button
-            onClick={() => startEmergencyAction('CARDIAC')}
+            onClick={() => startEmergencyAction('TRAUMA')}
             className="emergency-action-btn"
             style={{
               width: '100%', padding: '20px', borderRadius: 16, background: '#f43f5e',

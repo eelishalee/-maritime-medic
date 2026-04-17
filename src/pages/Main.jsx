@@ -85,6 +85,10 @@ export default function Main({ patient, onNavigate }) {
   const handleTraumaAnalysis = () => {
     setIsScanning(true)
     setScanResult(null)
+    
+    // 외상 부위 사진 시뮬레이션
+    const simulatedImage = '/CE.jpeg' 
+
     setTimeout(() => {
       const result = {
         analysis: '좌측 늑골 다발성 골절 및 쇄골 골절 의심',
@@ -92,10 +96,12 @@ export default function Main({ patient, onNavigate }) {
         action: { type: 'TRAUMA', label: '중증 외상 가이드' }
       }
       setScanResult(result)
+      
+      // 즉시 응급 처치 페이지로 이동 (중간 확인 영역 생략)
       setTimeout(() => {
         setIsScanning(false)
-        onNavigate && onNavigate('emergency')
-      }, 1800)
+        onNavigate && onNavigate('emergency', { image: simulatedImage })
+      }, 800)
     }, 2500)
   }
 

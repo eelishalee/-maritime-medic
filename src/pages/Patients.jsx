@@ -152,7 +152,7 @@ export default function Patients() {
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                      <span style={{ fontSize: 20, fontWeight: 800 }}>{p.name}</span>
+                      <span style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>{p.name}</span>
                       <span style={{ fontSize: 13, padding: '3px 10px', borderRadius: 8, background: RISK_BG[p.risk], color: RISK_COLOR[p.risk], fontWeight: 900 }}>{p.risk.toUpperCase()}</span>
                     </div>
                     <div style={{ fontSize: 14, color: '#64748b', fontWeight: 600 }}>{p.age}세 · {p.role}</div>
