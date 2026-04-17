@@ -35,7 +35,7 @@ export default function Main({ patient, onNavigate }) {
     },
     {
       role: 'ai',
-      text: `💊 투약 주의사항\n\n• 아스피린 — 절대 금기 (알레르기 등록)\n• 케토로락 30mg 근주 — 09:22 투여 완료\n• 모르핀 계열 — 흉부 손상 시 호흡 억제 위험, 신중 투여 요\n\n권고: 추가 진통 필요 시 원격의료팀 지시 후 시행.`
+      text: `💊 응급 처치 및 투약 내역\n\n• 아스피린 — 절대 금기 (알레르기 등록)\n• 아세트아미노펜 500mg — 09:22 복용 완료\n• 통증 부위 냉찜질 및 환부 드레싱 시행\n\n권고: 통증 지속 시 상비약 추가 복용 여부를 원격의료팀 지시 후 시행.`
     },
     {
       role: 'user',
@@ -81,28 +81,18 @@ export default function Main({ patient, onNavigate }) {
     onNavigate && onNavigate('emergency')
   }
 
-  // ─── 외상 촬영 및 분석 ───
+  // ─── 외상 촬영 및 분석 (즉시 전환으로 최적화)
   const handleTraumaAnalysis = () => {
     setIsScanning(true)
-    setScanResult(null)
     
-    // 외상 부위 사진 시뮬레이션
-    const simulatedImage = '/CE.jpeg' 
-
+    // 분석 프로세스 시각화 후 즉시 이동 (0.8초)
     setTimeout(() => {
-      const result = {
-        analysis: '좌측 늑골 다발성 골절 및 쇄골 골절 의심',
-        confidence: 91,
-        action: { type: 'TRAUMA', label: '중증 외상 가이드' }
-      }
-      setScanResult(result)
-      
-      // 즉시 응급 처치 페이지로 이동 (중간 확인 영역 생략)
-      setTimeout(() => {
-        setIsScanning(false)
-        onNavigate && onNavigate('emergency', { image: simulatedImage })
-      }, 800)
-    }, 2500)
+      setIsScanning(false)
+      onNavigate && onNavigate('emergency', { 
+        traumaType: 'TRAUMA',
+        analysis: '다발성 늑골 골절 및 기흉 의심' 
+      })
+    }, 800)
   }
 
   const confirmTraumaResult = () => {

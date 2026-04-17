@@ -150,6 +150,33 @@ export function SettingCard({ icon, title, desc, children }) {
   )
 }
 
+export function IdPhoto({ name, gender = 'M', size = 52 }) {
+  const bgColors = ['#e2e8f0', '#cbd5e1', '#d1d5db', '#bfdbfe']
+  const bgColor = bgColors[name.length % bgColors.length]
+  
+  return (
+    <div style={{ 
+      width: size, height: size, borderRadius: '12%', overflow: 'hidden', 
+      background: bgColor, border: '1.5px solid rgba(255,255,255,0.1)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
+    }}>
+      <svg viewBox="0 0 100 100" style={{ width: '90%', height: '90%', marginTop: '10%' }}>
+        {/* 머리 실루엣 (한국인 스타일의 단정한 헤어) */}
+        <path d="M30 40 Q50 15 70 40 L75 55 Q75 65 50 65 Q25 65 25 55 Z" fill="#1a1a1a" />
+        {/* 얼굴 */}
+        <path d="M35 45 Q50 35 65 45 L65 65 Q50 80 35 65 Z" fill="#ffdbac" />
+        {/* 목 */}
+        <path d="M45 65 L55 65 L55 75 L45 75 Z" fill="#f1c27d" />
+        {/* 정장/셔츠 카라 */}
+        <path d="M20 85 Q50 70 80 85 L85 100 L15 100 Z" fill="#2d3748" />
+        <path d="M45 75 L50 85 L55 75 Z" fill="#fff" /> {/* 와이셔츠 깃 */}
+      </svg>
+      {/* 증명사진 광택 효과 */}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%)' }} />
+    </div>
+  )
+}
+
 export function ModalField({ label, value, onChange, placeholder, readOnly }) {
   return (
     <div>

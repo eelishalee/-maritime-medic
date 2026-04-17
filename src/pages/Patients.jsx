@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Search, Heart, Thermometer, Activity, ChevronRight, Phone, FileText, User, AlertCircle, Clock, ShieldCheck } from 'lucide-react'
-import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, AreaChart, Area } from 'recharts'
+import { Search, Heart, Thermometer, Activity, ChevronRight, Phone, FileText, User, AlertCircle, Clock, ShieldCheck, Weight, Ruler, HeartPulse, Wind } from 'lucide-react'
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, AreaChart, Area } from 'recharts'
 
 const PATIENTS = [
   {
@@ -44,60 +44,10 @@ const PATIENTS = [
     trend: [ { d: '월', hr: 70 }, { d: '화', hr: 72 }, { d: '수', hr: 75 }, { d: '목', hr: 110 }, { d: '금', hr: 105 }, { d: '토', hr: 105 }, { d: '일', hr: 105 } ],
     radar: [ { sub: '심박', val: 40 }, { sub: '혈압', val: 80 }, { sub: '체온', val: 20 }, { sub: '산소', val: 50 }, { sub: 'BMI', val: 80 } ],
   },
-  {
-    id: 5, name: '정항구', age: 50, role: '조리장 (Chief Cook)', blood: 'O-', risk: 'medium',
-    bp: '142/90', hr: 82, temp: 36.8, spo2: 96, weight: 85, height: 168,
-    conditions: ['당뇨 관리', '화상 흔적'],
-    history: [
-      { date: '2026-03-20', type: '정기', note: '공복 혈당 수치 조절 필요' },
-    ],
-    trend: [ { d: '월', hr: 80 }, { d: '화', hr: 82 }, { d: '수', hr: 85 }, { d: '목', hr: 82 }, { d: '금', hr: 84 }, { d: '토', hr: 82 }, { d: '일', hr: 82 } ],
-    radar: [ { sub: '심박', val: 70 }, { sub: '혈압', val: 50 }, { sub: '체온', val: 90 }, { sub: '산소', val: 92 }, { sub: 'BMI', val: 30 } ],
-  },
-  {
-    id: 6, name: '한나침', age: 35, role: '통신사 (Radio Officer)', blood: 'A-', risk: 'low',
-    bp: '120/80', hr: 70, temp: 36.6, spo2: 98, weight: 65, height: 170,
-    conditions: ['정상', '안구 건조'],
-    history: [
-      { date: '2026-02-28', type: '일반', note: 'VHF 장비 작업 중 시력 보호 장구 착용 권고' },
-    ],
-    trend: [ { d: '월', hr: 68 }, { d: '화', hr: 70 }, { d: '수', hr: 72 }, { d: '목', hr: 70 }, { d: '금', hr: 70 }, { d: '토', hr: 70 }, { d: '일', hr: 70 } ],
-    radar: [ { sub: '심박', val: 95 }, { sub: '혈압', val: 90 }, { sub: '체온', val: 96 }, { sub: '산소', val: 98 }, { sub: 'BMI', val: 90 } ],
-  },
-  {
-    id: 7, name: '고닻별', age: 41, role: '갑판장 (Boatswain)', blood: 'B+', risk: 'medium',
-    bp: '130/85', hr: 75, temp: 36.7, spo2: 97, weight: 80, height: 177,
-    conditions: ['허리 디스크', '근육통'],
-    history: [
-      { date: '2026-04-05', type: '정형', note: '중량물 이동 작업 중 요부 염좌 발생' },
-    ],
-    trend: [ { d: '월', hr: 72 }, { d: '화', hr: 74 }, { d: '수', hr: 78 }, { d: '목', hr: 75 }, { d: '금', hr: 76 }, { d: '토', hr: 75 }, { d: '일', hr: 75 } ],
-    radar: [ { sub: '심박', val: 80 }, { sub: '혈압', val: 70 }, { sub: '체온', val: 92 }, { sub: '산소', val: 95 }, { sub: 'BMI', val: 60 } ],
-  },
-  {
-    id: 8, name: '윤등대', age: 27, role: '3등 기사 (3rd Engineer)', blood: 'O+', risk: 'low',
-    bp: '115/75', hr: 68, temp: 36.4, spo2: 99, weight: 72, height: 182,
-    conditions: ['정상'],
-    history: [
-      { date: '2026-01-10', type: '일반', note: '승선 전 신체검사 결과 전반적 양호' },
-    ],
-    trend: [ { d: '월', hr: 65 }, { d: '화', hr: 68 }, { d: '수', hr: 67 }, { d: '목', hr: 69 }, { d: '금', hr: 68 }, { d: '토', hr: 68 }, { d: '일', hr: 68 } ],
-    radar: [ { sub: '심박', val: 92 }, { sub: '혈압', val: 95 }, { sub: '체온', val: 96 }, { sub: '산소', val: 99 }, { sub: 'BMI', val: 88 } ],
-  },
-  {
-    id: 9, name: '심항해', age: 48, role: '일등기사 (1st Engineer)', blood: 'AB-', risk: 'medium',
-    bp: '138/88', hr: 85, temp: 37.0, spo2: 95, weight: 84, height: 175,
-    conditions: ['청력 저하', '고지혈증'],
-    history: [
-      { date: '2026-03-05', type: '검진', note: '엔진룸 소음으로 인한 초기 소음성 난청 의심' },
-    ],
-    trend: [ { d: '월', hr: 80 }, { d: '화', hr: 85 }, { d: '수', hr: 88 }, { d: '목', hr: 84 }, { d: '금', hr: 85 }, { d: '토', hr: 85 }, { d: '일', hr: 85 } ],
-    radar: [ { sub: '심박', val: 70 }, { sub: '혈압', val: 60 }, { sub: '체온', val: 85 }, { sub: '산소', val: 88 }, { sub: 'BMI', val: 50 } ],
-  },
 ]
 
-const RISK_COLOR = { low: '#26de81', medium: '#ff9f43', high: '#ff4d6d' }
-const RISK_BG = { low: 'rgba(38,222,129,0.1)', medium: 'rgba(255,159,67,0.1)', high: 'rgba(255,77,109,0.1)' }
+const RISK_COLOR = { low: '#26de81', medium: '#fb923c', high: '#ef4444' }
+const RISK_BG = { low: 'rgba(38,222,129,0.1)', medium: 'rgba(251,146,60,0.1)', high: 'rgba(239,68,68,0.1)' }
 
 export default function Patients() {
   const [selected, setSelected] = useState(PATIENTS[0])
@@ -108,26 +58,27 @@ export default function Patients() {
   )
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', height: 'calc(100vh - 72px)', background: '#020617', color: '#f1f5f9', overflow: 'hidden' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', height: 'calc(100vh - 72px)', background: '#020617', color: '#f1f5f9', overflow: 'hidden', fontFamily: '"Pretendard", sans-serif' }}>
       
       {/* ── 좌측 환자 리스트 영역 ── */}
-      <div style={{ borderRight: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', background: '#05070a' }}>
-        <div style={{ padding: '32px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <h1 style={{ fontSize: 28, fontWeight: 950, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Activity color="#0dd9c5" size={32} /> 선원 환자 차트
-          </h1>
+      <div style={{ borderRight: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', background: '#030816' }}>
+        <div style={{ padding: '24px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+            <Activity color="#0dd9c5" size={24} />
+            <h1 style={{ fontSize: 22, fontWeight: 950, margin: 0, letterSpacing: '-0.5px' }}>선원 환자 차트</h1>
+          </div>
           <div style={{ position: 'relative' }}>
-            <Search style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#475569' }} size={20} />
+            <Search style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#475569' }} size={16} />
             <input
-              placeholder="환자 이름 또는 직책 검색..."
+              placeholder="환자 검색..."
               value={query}
               onChange={e => setQuery(e.target.value)}
-              style={{ width: '100%', padding: '16px 16px 16px 52px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, color: '#fff', fontSize: 16, outline: 'none' }}
+              style={{ width: '100%', padding: '12px 12px 12px 42px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: '#fff', fontSize: 14, outline: 'none' }}
             />
           </div>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           {filtered.map(p => {
             const active = selected?.id === p.id
             return (
@@ -135,27 +86,27 @@ export default function Patients() {
                 key={p.id}
                 onClick={() => setSelected(p)}
                 style={{
-                  padding: '20px', borderRadius: 20, textAlign: 'left', cursor: 'pointer', transition: '0.2s',
-                  background: active ? 'rgba(13,217,197,0.08)' : 'rgba(255,255,255,0.02)',
+                  padding: '16px', borderRadius: 16, textAlign: 'left', cursor: 'pointer', transition: '0.2s',
+                  background: active ? 'rgba(13,217,197,0.08)' : 'rgba(255,255,255,0.01)',
                   border: `1.5px solid ${active ? '#0dd9c5' : 'transparent'}`,
-                  boxShadow: active ? '0 8px 24px rgba(13,217,197,0.1)' : 'none'
+                  boxShadow: active ? '0 4px 20px rgba(0,0,0,0.4)' : 'none'
                 }}
               >
-                <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                   <div style={{
-                    width: 54, height: 54, borderRadius: 18, flexShrink: 0,
+                    width: 44, height: 44, borderRadius: 12, flexShrink: 0,
                     background: `linear-gradient(135deg, ${RISK_COLOR[p.risk]}22, ${RISK_COLOR[p.risk]}11)`,
-                    border: `1px solid ${RISK_COLOR[p.risk]}44`,
+                    border: `1.5px solid ${RISK_COLOR[p.risk]}33`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center'
                   }}>
-                    <User color={RISK_COLOR[p.risk]} size={28} />
+                    <User color={RISK_COLOR[p.risk]} size={22} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                      <span style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>{p.name}</span>
-                      <span style={{ fontSize: 13, padding: '3px 10px', borderRadius: 8, background: RISK_BG[p.risk], color: RISK_COLOR[p.risk], fontWeight: 900 }}>{p.risk.toUpperCase()}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                      <span style={{ fontSize: 17, fontWeight: 800, color: active ? '#fff' : '#cbd5e1' }}>{p.name}</span>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: RISK_COLOR[p.risk], boxShadow: `0 0 10px ${RISK_COLOR[p.risk]}` }} />
                     </div>
-                    <div style={{ fontSize: 14, color: '#64748b', fontWeight: 600 }}>{p.age}세 · {p.role}</div>
+                    <div style={{ fontSize: 12, color: '#64748b', fontWeight: 700 }}>{p.role.split('(')[0]}</div>
                   </div>
                 </div>
               </button>
@@ -165,109 +116,136 @@ export default function Patients() {
       </div>
 
       {/* ── 우측 환자 상세 차트 영역 ── */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '40px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
         {selected && (
-          <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 32 }}>
+          <div style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
             
-            {/* 상단 헤더 프로필 */}
+            {/* 상단 슬림 프로필 헤더 */}
             <div style={{ 
               background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', 
-              borderRadius: 32, padding: '40px', display: 'flex', gap: 40, alignItems: 'center',
-              position: 'relative', overflow: 'hidden'
+              borderRadius: 24, padding: '24px 32px', display: 'flex', gap: 32, alignItems: 'center',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
             }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, width: 8, height: '100%', background: RISK_COLOR[selected.risk] }} />
-              <div style={{ width: 120, height: 120, borderRadius: 32, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <User size={64} color={RISK_COLOR[selected.risk]} />
+              <div style={{ width: 84, height: 84, borderRadius: 20, background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${RISK_COLOR[selected.risk]}44` }}>
+                <User size={42} color={RISK_COLOR[selected.risk]} />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 12 }}>
-                  <h2 style={{ fontSize: 42, fontWeight: 950, letterSpacing: '-1px' }}>{selected.name}</h2>
-                  <span style={{ fontSize: 16, padding: '6px 18px', borderRadius: 12, background: RISK_BG[selected.risk], color: RISK_COLOR[selected.risk], fontWeight: 900 }}>{selected.risk.toUpperCase()} LEVEL</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
+                  <h2 style={{ fontSize: 32, fontWeight: 950, margin: 0, letterSpacing: '-1px' }}>{selected.name}</h2>
+                  <span style={{ fontSize: 12, padding: '4px 12px', borderRadius: 8, background: RISK_BG[selected.risk], color: RISK_COLOR[selected.risk], fontWeight: 900, border: `1px solid ${RISK_COLOR[selected.risk]}33` }}>{selected.risk.toUpperCase()} SEVERITY</span>
                 </div>
-                <div style={{ display: 'flex', gap: 32, fontSize: 18, color: '#94a3b8', fontWeight: 600 }}>
-                  <span>직책 : {selected.role}</span>
-                  <span>나이 : {selected.age}세</span>
-                  <span>혈액형 : {selected.blood}</span>
-                </div>
-                <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
-                  {selected.conditions.map(c => (
-                    <div key={c} style={{ padding: '6px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', fontSize: 14, fontWeight: 700, color: '#e2e8f0' }}>#{c}</div>
-                  ))}
+                <div style={{ display: 'flex', gap: 20, fontSize: 14, color: '#94a3b8', fontWeight: 700 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Activity size={14} /> {selected.role}</div>
+                  <span>나이: {selected.age}세</span>
+                  <span style={{ color: '#ff4d6d' }}>혈액형: {selected.blood}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Weight size={14} /> {selected.weight}kg</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Ruler size={14} /> {selected.height}cm</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <button style={{ padding: '16px 32px', borderRadius: 16, background: '#0dd9c5', color: '#05070a', border: 'none', fontWeight: 900, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}><Phone size={18} /> 원격진료 연결</button>
-                <button style={{ padding: '16px 32px', borderRadius: 16, background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', fontWeight: 800, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}><FileText size={18} /> 진료 기록 추가</button>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <button style={{ height: 48, padding: '0 24px', borderRadius: 14, background: '#0dd9c5', color: '#020617', border: 'none', fontWeight: 950, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}><Phone size={18} /> 원격진료</button>
+                <button style={{ height: 48, padding: '0 24px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', fontWeight: 800, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}><FileText size={18} /> 기록 작성</button>
               </div>
             </div>
 
-            {/* 바이탈 & 분석 그리드 */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+            {/* 3컬럼 메인 그리드 */}
+            <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr 340px', gap: 20 }}>
               
-              {/* 실시간 바이탈 현황 */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 32, padding: 32 }}>
-                <h3 style={{ fontSize: 20, fontWeight: 900, marginBottom: 24, color: '#0dd9c5' }}>CURRENT VITAL STATUS</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <VitalCard label="혈압 (BP)" value={selected.bp} unit="mmHg" icon={<Activity size={18} />} color="#ff9f43" />
-                  <VitalCard label="심박수 (HR)" value={selected.hr} unit="bpm" icon={<Heart size={18} />} color="#ff4d6d" />
-                  <VitalCard label="체온 (BT)" value={selected.temp} unit="°C" icon={<Thermometer size={18} />} color="#4fc3f7" />
-                  <VitalCard label="산소포화도" value={selected.spo2} unit="%" icon={<ShieldCheck size={18} />} color="#26de81" />
+              {/* 1. 바이탈 수치 */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <VitalCard label="혈압" value={selected.bp} unit="mmHg" color="#fb923c" icon={<Activity size={16}/>} />
+                <VitalCard label="심박수" value={selected.hr} unit="bpm" color="#ef4444" icon={<HeartPulse size={16}/>} />
+                <VitalCard label="체온" value={selected.temp} unit="°C" color="#38bdf8" icon={<Thermometer size={16}/>} />
+                <VitalCard label="산소" value={selected.spo2} unit="%" color="#2dd4bf" icon={<Wind size={16}/>} />
+                <div style={{ gridColumn: 'span 2', marginTop: 8, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 16 }}>
+                  <div style={{ fontSize: 13, fontWeight: 900, color: '#4a6080', marginBottom: 12 }}>ACTIVE CONDITIONS</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {selected.conditions.map(c => (
+                      <div key={c} style={{ fontSize: 13, fontWeight: 800, color: '#fff', background: 'rgba(56,189,248,0.1)', padding: '6px 12px', borderRadius: 8 }}>{c}</div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* 건강 지수 레이더 차트 */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 32, padding: 32 }}>
-                <h3 style={{ fontSize: 20, fontWeight: 900, marginBottom: 24, color: '#0dd9c5' }}>HEALTH INDEX ANALYSIS</h3>
-                <div style={{ height: 260 }}>
+              {/* 2. 주간 심박 트렌드 */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: '24px', height: 400 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0dd9c5', marginBottom: 20 }}>WEEKLY VITAL TREND</h3>
+                <div style={{ height: 'calc(100% - 40px)' }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={selected.radar}>
-                      <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                      <PolarAngleAxis dataKey="sub" tick={{ fill: '#94a3b8', fontSize: 14, fontWeight: 600 }} />
-                      <Radar dataKey="val" stroke={RISK_COLOR[selected.risk]} fill={RISK_COLOR[selected.risk]} fillOpacity={0.2} strokeWidth={3} />
+                    <AreaChart data={selected.trend}>
+                      <defs>
+                        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={RISK_COLOR[selected.risk]} stopOpacity={0.2}/>
+                          <stop offset="95%" stopColor={RISK_COLOR[selected.risk]} stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="d" stroke="#1e293b" hide />
+                      <Tooltip contentStyle={{ background: '#0f172a', border: 'none', borderRadius: 12 }} />
+                      <Area type="monotone" dataKey="hr" stroke={RISK_COLOR[selected.risk]} strokeWidth={3} fill="url(#chartGradient)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* 3. 건강 지수 레이더 */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: '24px' }}>
+                <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0dd9c5', marginBottom: 10 }}>HEALTH RADAR</h3>
+                <div style={{ height: 300 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={selected.radar}>
+                      <PolarGrid stroke="rgba(255,255,255,0.05)" />
+                      <PolarAngleAxis dataKey="sub" tick={{ fill: '#4a6080', fontSize: 11 }} />
+                      <Radar dataKey="val" stroke={RISK_COLOR[selected.risk]} fill={RISK_COLOR[selected.risk]} fillOpacity={0.3} strokeWidth={2} />
                     </RadarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
             </div>
 
-            {/* 트렌드 & 히스토리 그리드 */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 32 }}>
-              
-              {/* 심박수 추이 차트 */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 32, padding: 32 }}>
-                <h3 style={{ fontSize: 20, fontWeight: 900, marginBottom: 24, color: '#0dd9c5' }}>HEART RATE TREND (WEEKLY)</h3>
-                <div style={{ height: 300 }}>
+            {/* AI 분석 섹션 */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.8fr', gap: 24 }}>
+              <div style={{ background: 'linear-gradient(135deg, rgba(13,217,197,0.05) 0%, rgba(0,168,150,0.02) 100%)', border: '1px solid rgba(13,217,197,0.15)', borderRadius: 28, padding: 28 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+                  <Brain size={20} color="#0dd9c5" />
+                  <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0dd9c5', margin: 0 }}>AI CLINICAL INTELLIGENCE</h3>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: 16, borderRadius: 16, borderLeft: '4px solid #ef4444' }}>
+                  <div style={{ fontSize: 13, color: '#ef4444', fontWeight: 900, marginBottom: 6 }}>CRITICAL INSIGHT</div>
+                  <p style={{ fontSize: 15, color: '#e2e8f0', margin: 0, lineHeight: 1.6, fontWeight: 700 }}>심혈관계 스트레스 징후가 포착되니 지속적 모니터링이 필요합니다.</p>
+                </div>
+              </div>
+
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 28, padding: 28 }}>
+                <h3 style={{ fontSize: 18, fontWeight: 900, color: '#fff', marginBottom: 20 }}>24H RISK PROJECTION</h3>
+                <div style={{ height: 180 }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={selected.trend}>
+                    <AreaChart data={[{ t: '현재', r: 30 }, { t: '+4h', r: 35 }, { t: '+8h', r: 55 }, { t: '+12h', r: 45 }, { t: '+16h', r: 60 }, { t: '+20h', r: 75 }, { t: '+24h', r: 65 }]}>
                       <defs>
-                        <linearGradient id="colorHr" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={RISK_COLOR[selected.risk]} stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor={RISK_COLOR[selected.risk]} stopOpacity={0}/>
+                        <linearGradient id="riskGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2}/>
+                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <XAxis dataKey="d" stroke="#475569" axisLine={false} tickLine={false} tick={{ fontSize: 14 }} dy={10} />
-                      <YAxis stroke="#475569" axisLine={false} tickLine={false} tick={{ fontSize: 14 }} domain={['dataMin - 5', 'dataMax + 5']} />
-                      <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16 }} />
-                      <Area type="monotone" dataKey="hr" stroke={RISK_COLOR[selected.risk]} strokeWidth={4} fillOpacity={1} fill="url(#colorHr)" />
+                      <Area type="step" dataKey="r" stroke="#ef4444" strokeWidth={3} fill="url(#riskGradient)" strokeDasharray="5 5" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               </div>
+            </div>
 
-              {/* 최근 진료 기록 */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 32, padding: 32, display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontSize: 20, fontWeight: 900, marginBottom: 24, color: '#0dd9c5' }}>MEDICAL HISTORY</h3>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto' }}>
-                  {selected.history.map((h, i) => (
-                    <div key={i} style={{ padding: '20px', borderRadius: 20, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                        <span style={{ fontSize: 16, fontWeight: 900, color: h.type === '응급' ? '#ff4d6d' : '#e2e8f0' }}>{h.type} 기록</span>
-                        <span style={{ fontSize: 13, color: '#64748b', display: 'flex', alignItems: 'center', gap: 6 }}><Clock size={14}/> {h.date}</span>
-                      </div>
-                      <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.6 }}>{h.note}</p>
+            {/* 히스토리 */}
+            <div style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 24, padding: 24 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 20 }}>MEDICAL TIMELINE</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: 16 }}>
+                {selected.history.map((h, i) => (
+                  <div key={i} style={{ padding: '16px 20px', borderRadius: 16, background: 'rgba(255,255,255,0.02)', display: 'flex', gap: 16 }}>
+                    <AlertCircle size={20} color={h.type === '응급' ? '#ef4444' : '#38bdf8'} />
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 900, color: '#fff' }}>[{h.type}] {h.date}</div>
+                      <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>{h.note}</p>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -280,14 +258,16 @@ export default function Patients() {
 
 function VitalCard({ label, value, unit, icon, color }) {
   return (
-    <div style={{ padding: '20px', borderRadius: 24, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#64748b', fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
+    <div style={{ padding: '16px', borderRadius: 16, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#4a6080', fontSize: 11, fontWeight: 900, marginBottom: 8 }}>
         <div style={{ color }}>{icon}</div> {label}
       </div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-        <span style={{ fontSize: 32, fontWeight: 950, color: '#fff' }}>{value}</span>
-        <span style={{ fontSize: 16, color: '#475569', fontWeight: 700 }}>{unit}</span>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+        <span style={{ fontSize: 22, fontWeight: 950 }}>{value}</span>
+        <span style={{ fontSize: 12, color: '#4a6080' }}>{unit}</span>
       </div>
     </div>
   )
 }
+
+function Brain({ size, color }) { return <Activity size={size} color={color} /> }
