@@ -21,7 +21,7 @@ export default function App() {
     lastMed: '리피토 (21:00)',
     location: '기관실 제2엔진',
     hr: 96, bp: '158/95', temp: 37.6, spo2: 94,
-    avatar: '/CE.jpeg'
+    avatar: 'CE.jpeg'
   })
 
   const [emergencyData, setEmergencyData] = useState(null)
@@ -47,6 +47,7 @@ export default function App() {
         onNavigate={handleNavigate}
         auth={{ shipNo: auth.ship || 'MV KOREA STAR', deviceNo: auth.device || 'MED-001' }}
         onLogout={() => setAuth(null)}
+        isOnline={page !== 'emergency'}
       />
       <div style={{ flex: 1, overflow: 'hidden' }}>
         {page === 'main'      && <Main patient={activePatient} onNavigate={handleNavigate} />}
@@ -57,6 +58,7 @@ export default function App() {
           <Emergency 
             patient={activePatient} 
             initialAction={emergencyData?.traumaType || emergencyData?.type} 
+            onNavigate={handleNavigate}
           />
         )}
         {page === 'chart'     && (

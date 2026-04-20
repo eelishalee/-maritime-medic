@@ -75,7 +75,9 @@ export default function Login({ onLogin }) {
               borderRadius: '26.5px', padding: '48px 44px', position: 'relative', zIndex: 2 
             }}>
               <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-                <img src={logoImg} alt="MDTS Logo" style={{ width: '86px', height: '86px', margin: '0 auto 16px', display: 'block', objectFit: 'contain' }} />
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                  <img src={logoImg} alt="MDTS Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
+                </div>
                 <h3 style={{ fontSize: '26px', fontWeight: '900', letterSpacing: '0.3px', marginBottom: '7px', color: '#fff' }}>MDTS</h3>
                 <p style={{ fontSize: '20.8px', color: 'rgba(0, 200, 180, 0.75)', fontWeight: '600' }}>
                   바다 위 어디서든, 멈추지 않는 의료 AI

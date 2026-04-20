@@ -1,6 +1,5 @@
 import { Activity, History, Droplets, Upload, AlertTriangle, Camera, Mic, User, Pill, AlertCircle, MapPin, Phone, Anchor, Weight, Ruler, HeartPulse, Paperclip, ArrowUp, Sparkles, CheckCircle2, Clock } from 'lucide-react'
 import logoImg from '../../../assets/logo.png'
-import MdtsLogo from '../../../components/MdtsLogo.jsx'
 import { DashboardVital, InfoItem, TimelineItem } from '../../../components/ui'
 import EmergencyGuide from './EmergencyGuide.jsx'
 
@@ -18,9 +17,12 @@ export default function DashboardView({
         <div style={{ position: 'absolute', inset: 0, zIndex: 500, background: 'rgba(1,4,14,0.97)', backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 36 }}>
           {!scanResult ? (
             <>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 11, letterSpacing: 4, color: '#38bdf8', fontWeight: 800, marginBottom: 10, opacity: 0.6 }}>MDTS CAM · AI TRAUMA SCAN</div>
-                <div style={{ fontSize: 24, fontWeight: 900, color: '#e2e8f0' }}>환부 촬영 분석 중</div>
+              <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+                <img src={logoImg} alt="logo" style={{ width: 60, height: 60, objectFit: 'contain' }} />
+                <div>
+                  <div style={{ fontSize: 11, letterSpacing: 4, color: '#38bdf8', fontWeight: 800, marginBottom: 10, opacity: 0.6 }}>MDTS CAM · AI TRAUMA SCAN</div>
+                  <div style={{ fontSize: 24, fontWeight: 900, color: '#e2e8f0' }}>환부 촬영 분석 중</div>
+                </div>
               </div>
               <div style={{ position: 'relative', width: 320, height: 320 }}>
                 <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid rgba(56,189,248,0.5)', boxShadow: '0 0 24px rgba(56,189,248,0.2)' }} />

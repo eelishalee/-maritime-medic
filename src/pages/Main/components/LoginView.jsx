@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Database, Settings, Ship } from 'lucide-react'
 import { LoginInput } from '../../../components/ui/index.jsx'
-import logoImg from '../../../assets/logo.png'
+import MdtsLogo from '../../../components/MdtsLogo.jsx'
 
 // 레이더 중심 (우측, 폼과 겹치지 않음)
 const RX = 1200, RY = 460
@@ -201,7 +201,9 @@ export default function LoginView({ onLogin, loginData, setLoginData, mousePos, 
             <div style={{ position:'absolute', top:'-50%', left:'-50%', width:'200%', height:'200%', background:'conic-gradient(transparent,transparent,transparent,#00e5cc)', animation:'borderRotate 4s linear infinite', transformOrigin:'center' }}/>
             <div style={{ background:'rgba(2,12,22,0.88)', backdropFilter:'blur(40px)', borderRadius:26.5, padding:'48px 44px', position:'relative', zIndex:2 }}>
               <div style={{ textAlign:'center', marginBottom:36 }}>
-                <img src={logoImg} alt="logo" style={{ width:86, height:86, margin:'0 auto 16px', display:'block', objectFit:'contain' }}/>
+                <div style={{ display:'flex', justifyContent:'center', marginBottom:20 }}>
+                  <MdtsLogo size={100} />
+                </div>
                 <div style={{ fontSize:26, fontWeight:900, letterSpacing:0.3, marginBottom:7 }}>MDTS</div>
                 <div style={{ fontSize:20.8, color:'rgba(0,200,180,0.75)' }}>바다 위 어디서든, 멈추지 않는 의료 AI</div>
               </div>

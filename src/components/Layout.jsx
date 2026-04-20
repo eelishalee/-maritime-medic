@@ -9,9 +9,7 @@ const NAV = [
   { id: 'settings',  label: '시스템 설정' },
 ]
 
-export default function Layout({ activePage, onNavigate, auth, onLogout }) {
-  const isOnline = true
-
+export default function Layout({ activePage, onNavigate, auth, onLogout, isOnline = true }) {
   return (
     <header style={{
       height: 72,
@@ -26,8 +24,8 @@ export default function Layout({ activePage, onNavigate, auth, onLogout }) {
     }}>
       {/* Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginRight: 48, flexShrink: 0 }}>
-        <img src={logoImg} alt="Logo" style={{ width: 40, height: 40, objectFit: 'contain' }} />
-        <span style={{ fontSize: 24, fontWeight: 950, color: 'var(--text-primary)', letterSpacing: '-0.8px' }}>MDTS</span>
+        <img src={logoImg} alt="Logo" style={{ width: 42, height: 42, objectFit: 'contain' }} />
+        <span style={{ fontSize: 24, fontWeight: 950, color: '#fff', letterSpacing: '-0.8px' }}>MDTS</span>
       </div>
 
       {/* Nav tabs */}
