@@ -186,13 +186,13 @@ export default function DashboardView({
           </div>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, padding: '16px 18px 80px 18px', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, padding: '12px 14px 70px 14px', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* 과거력 섹션 */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-              <History size={20}/> 과거력 (Past History)
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#38bdf8', fontSize: 13, fontWeight: 800, marginBottom: 8 }}>
+              <History size={14}/> 과거력 (Past History)
             </div>
-            <div style={{ fontSize: 19, fontWeight: 750, color: '#e2e8f0', lineHeight: 1.6, background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0', lineHeight: 1.6, background: 'rgba(255,255,255,0.03)', padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
               {activePatient?.history ? activePatient.history.split('\n').map((line, i) => (
                 <div key={i}>{line}</div>
               )) : '기록 없음'}
@@ -201,15 +201,15 @@ export default function DashboardView({
 
           {/* 최근 진료 이력 섹션 */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#00d2ff', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-              <RotateCcw size={20}/> 최근 진료 이력
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#00d2ff', fontSize: 13, fontWeight: 800, marginBottom: 8 }}>
+              <RotateCcw size={14}/> 최근 진료 이력
             </div>
-            <div style={{ background: 'rgba(0, 210, 255, 0.04)', borderRadius: 16, padding: '20px', border: '1px solid rgba(0, 210, 255, 0.15)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                <span style={{ fontSize: 17, fontWeight: 850, color: '#00d2ff' }}>{activePatient?.recentHistory?.date || '2026-03-15'}</span>
-                <span style={{ fontSize: 15, color: '#4a6080', fontWeight: 700 }}>{activePatient?.recentHistory?.title || '단순 감기'}</span>
+            <div style={{ background: 'rgba(0, 210, 255, 0.04)', borderRadius: 12, padding: '10px 12px', border: '1px solid rgba(0, 210, 255, 0.15)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span style={{ fontSize: 12, fontWeight: 800, color: '#00d2ff' }}>{activePatient?.recentHistory?.date || '2026-03-15'}</span>
+                <span style={{ fontSize: 12, color: '#4a6080', fontWeight: 700 }}>{activePatient?.recentHistory?.title || '단순 감기'}</span>
               </div>
-              <div style={{ fontSize: 16, color: '#8da2c0', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
+              <div style={{ fontSize: 12, color: '#8da2c0', lineHeight: 1.5, whiteSpace: 'pre-line' }}>
                 {activePatient?.recentHistory?.detail || '- 처방 : 타이레놀 500mg\n- 특이사황 : 알레르기 반응 없음'}
               </div>
             </div>
@@ -217,14 +217,14 @@ export default function DashboardView({
 
           {/* 알레르기 및 주의사항 */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#f43f5e', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-              <AlertCircle size={20}/> 알레르기 / 주의사항
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#f43f5e', fontSize: 13, fontWeight: 800, marginBottom: 8 }}>
+              <AlertCircle size={14}/> 알레르기 / 주의사항
             </div>
-            <div style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', borderRadius: 16, padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', borderRadius: 12, padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
               {(activePatient?.allergies || '페니실린 알레르기 있음').split(',').map((a, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f43f5e' }} />
-                  <span style={{ fontSize: 17, fontWeight: 750, color: '#fda4af' }}>{a.trim()}</span>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#f43f5e', flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#fda4af' }}>{a.trim()}</span>
                 </div>
               ))}
             </div>
@@ -232,15 +232,15 @@ export default function DashboardView({
 
           {/* 복용 약물 */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#fb923c', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-              <Pill size={20}/> 복용 중인 약물
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#fb923c', fontSize: 13, fontWeight: 800, marginBottom: 8 }}>
+              <Pill size={14}/> 복용 중인 약물
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[{ name: '혈압약 (암로디핀)', purpose: '고혈압' }, { name: '고지혈증약', purpose: '고지혈증' }].map((drug, i) => (
-                <div key={i} style={{ background: 'rgba(251,146,60,0.05)', border: '1px solid rgba(251,146,60,0.15)', borderRadius: 14, padding: '14px 18px' }}>
+                <div key={i} style={{ background: 'rgba(251,146,60,0.05)', border: '1px solid rgba(251,146,60,0.15)', borderRadius: 10, padding: '8px 12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 17, fontWeight: 850, color: '#fed7aa' }}>{drug.name}</span>
-                    <span style={{ fontSize: 14, color: '#fb923c', fontWeight: 800 }}>{drug.purpose}</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: '#fed7aa' }}>{drug.name}</span>
+                    <span style={{ fontSize: 11, color: '#fb923c', fontWeight: 800 }}>{drug.purpose}</span>
                   </div>
                 </div>
               ))}
@@ -249,47 +249,47 @@ export default function DashboardView({
 
           {/* 작업 위치 섹션 */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-              <MapPin size={20}/> 환자 작업 위치 (Work Location)
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#38bdf8', fontSize: 13, fontWeight: 800, marginBottom: 8 }}>
+              <MapPin size={14}/> 환자 작업 위치
             </div>
-            <div style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 16, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(56,189,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Anchor size={22} color="#38bdf8" />
+            <div style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 12, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(56,189,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Anchor size={16} color="#38bdf8" />
               </div>
               <div>
-                <div style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{activePatient?.workLocation || '제2엔진실 (Engine Room)'}</div>
-                <div style={{ fontSize: 14, color: '#4a6080', fontWeight: 700, marginTop: 2 }}>Main Deck · Sector B-2</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>{activePatient?.workLocation || '제2엔진실 (Engine Room)'}</div>
+                <div style={{ fontSize: 11, color: '#4a6080', fontWeight: 700, marginTop: 2 }}>Main Deck · Sector B-2</div>
               </div>
             </div>
           </div>
 
           {/* 비상 연락망 섹션 */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#26de81', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-              <Phone size={20}/> 비상 연락망 (Emergency Contact)
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#26de81', fontSize: 13, fontWeight: 800, marginBottom: 8 }}>
+              <Phone size={14}/> 비상 연락망
             </div>
-            <div style={{ background: 'rgba(38,222,129,0.06)', border: '1px solid rgba(38,222,129,0.2)', borderRadius: 16, padding: '18px 20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <span style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{activePatient?.emergencyContact?.name || '부산원격의료센터'}</span>
-                <span style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, background: 'rgba(38,222,129,0.15)', color: '#26de81', fontWeight: 800 }}>{activePatient?.emergencyContact?.relation || '전담의'}</span>
+            <div style={{ background: 'rgba(38,222,129,0.06)', border: '1px solid rgba(38,222,129,0.2)', borderRadius: 12, padding: '10px 12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>{activePatient?.emergencyContact?.name || '부산원격의료센터'}</span>
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, background: 'rgba(38,222,129,0.15)', color: '#26de81', fontWeight: 800 }}>{activePatient?.emergencyContact?.relation || '전담의'}</span>
               </div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: '#26de81', letterSpacing: '0.5px' }}>
+              <div style={{ fontSize: 15, fontWeight: 900, color: '#26de81', letterSpacing: '0.5px' }}>
                 {activePatient?.emergencyContact?.phone || '051-123-4567'}
               </div>
             </div>
           </div>
         </div>
         
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '20px 28px 24px 28px', borderTop: '1px solid rgba(255,77,109,0.2)', background: 'linear-gradient(to top, #05070a 85%, transparent)', zIndex: 10 }}>
-          <button onClick={() => startEmergencyAction('CPR')} style={{ width: '100%', height: 72, borderRadius: 20, background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, fontSize: 22, boxShadow: '0 8px 25px rgba(244, 63, 94, 0.3)' }}>
-            <AlertTriangle size={28} /> 응급 처치 액션 시작
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '12px 14px 14px 14px', borderTop: '1px solid rgba(255,77,109,0.2)', background: 'linear-gradient(to top, #05070a 85%, transparent)', zIndex: 10 }}>
+          <button onClick={() => startEmergencyAction('CPR')} style={{ width: '100%', height: 52, borderRadius: 14, background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontSize: 15, boxShadow: '0 6px 20px rgba(244, 63, 94, 0.3)' }}>
+            <AlertTriangle size={18} /> 응급 처치 액션 시작
           </button>
         </div>
       </aside>
 
       {/* [Center] Vitals & AI Assistant */}
       <section style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', borderRight: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ padding: '14px 45px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#080b12', position: 'relative' }}>
+        <div style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#080b12', position: 'relative' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
             <DashboardVital label="심박수" value={hr} unit="bpm" color="#f43f5e" live />
             <div onClick={toggleSpo2Status} style={{ cursor: 'pointer' }}>
@@ -374,11 +374,11 @@ export default function DashboardView({
                   {m.role === 'ai' ? <Sparkles size={14} color="#000" /> : <User size={14} color="#fff" />}
                 </div>
                 <div style={{ flex: 1, maxWidth: '92%' }}>
-                   <div style={{ 
-                     padding: '16px 22px', borderRadius: m.role === 'ai' ? '0 20px 20px 20px' : '20px 0 20px 20px', 
-                     background: m.role === 'ai' ? 'rgba(56, 189, 248, 0.05)' : 'rgba(255, 255, 255, 0.03)', 
-                     border: m.role === 'ai' ? '1px solid rgba(56, 189, 248, 0.2)' : '1px solid rgba(255, 255, 255, 0.1)', 
-                     fontSize: 22, fontWeight: 500, lineHeight: 1.5, color: '#e2e8f0' 
+                   <div style={{
+                     padding: '10px 14px', borderRadius: m.role === 'ai' ? '0 14px 14px 14px' : '14px 0 14px 14px',
+                     background: m.role === 'ai' ? 'rgba(56, 189, 248, 0.05)' : 'rgba(255, 255, 255, 0.03)',
+                     border: m.role === 'ai' ? '1px solid rgba(56, 189, 248, 0.2)' : '1px solid rgba(255, 255, 255, 0.1)',
+                     fontSize: 13, fontWeight: 500, lineHeight: 1.5, color: '#e2e8f0'
                    }}>
                      <AiMessageRenderer text={m.text} />
                    </div>
@@ -407,17 +407,17 @@ export default function DashboardView({
               alignItems: 'center', 
               gap: 12, 
               border: '1px solid rgba(56,189,248,0.2)',
-              height: 72, // 좌우 버튼 높이와 일치
+              height: 52,
               boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
             }}>
               <Sparkles size={22} color="#38bdf8" style={{ animation: 'spin 4s infinite linear', flexShrink: 0 }} />
               <input 
                 placeholder="환자 상태 또는 처치 방법에 대해 질문하세요..." 
                 value={prompt} onChange={e => setPrompt(e.target.value)} onKeyPress={e => e.key === 'Enter' && handlePromptAnalysis()}
-                style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: '#fff', fontSize: 18, fontWeight: 500 }} 
+                style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: '#fff', fontSize: 13, fontWeight: 500 }}
               />
-              <button onClick={handlePromptAnalysis} style={{ padding: '0 28px', height: '100%', borderRadius: '14px', border: 'none', background: '#38bdf8', color: '#000', fontWeight: 950, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
-                질문하기 <ArrowUp size={20} strokeWidth={3} />
+              <button onClick={handlePromptAnalysis} style={{ padding: '0 20px', height: '100%', borderRadius: '14px', border: 'none', background: '#38bdf8', color: '#000', fontWeight: 950, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}>
+                질문하기 <ArrowUp size={16} strokeWidth={3} />
               </button>
             </div>
           </div>
@@ -427,22 +427,22 @@ export default function DashboardView({
       {/* [Right] Timeline */}
       <aside style={{ display: 'flex', flexDirection: 'column', background: '#05070a', overflow: 'hidden', position: 'relative', borderLeft: '1px solid rgba(255,255,255,0.05)' }}>
         {/* 타임라인 헤더 (고정) */}
-        <div style={{ flexShrink: 0, padding: '32px 28px 20px 28px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-          <div style={{ fontSize: 20, fontWeight: 900, color: '#38bdf8', letterSpacing: '1.5px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Clock size={22}/> 상황 대응 타임라인
+        <div style={{ flexShrink: 0, padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+          <div style={{ fontSize: 14, fontWeight: 900, color: '#38bdf8', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Clock size={16}/> 상황 대응 타임라인
           </div>
         </div>
 
         {/* 타임라인 리스트 (스크롤 가능 영역) */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px 120px 28px', scrollbarWidth: 'none' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px 90px 14px', scrollbarWidth: 'none' }}>
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
             <div style={{ position: 'absolute', left: 7, top: 10, bottom: 10, width: 2, background: 'linear-gradient(to bottom, #f43f5e, #facc15, #38bdf8)' }} />
             <div style={{ position: 'relative', paddingLeft: 36, paddingBottom: 48 }}>
               <div style={{ position: 'absolute', left: 0, top: 4, width: 16, height: 16, borderRadius: '50%', background: '#f43f5e', border: '4px solid #05070a', boxShadow: '0 0 0 2px #f43f5e', zIndex: 2 }} />
-              <div style={{ background: 'rgba(244, 63, 94, 0.1)', borderRadius: 20, padding: '24px', border: '1px solid rgba(244, 63, 94, 0.3)' }}>
-                <div style={{ fontSize: 13, fontWeight: 900, color: '#f43f5e', marginBottom: 10 }}>09:12 · 사고 상황 요약</div>
-                <div style={{ fontSize: 19, fontWeight: 950, color: '#fff', marginBottom: 12 }}>엔진실 사다리에서 추락 (1.8m)</div>
-                <div style={{ fontSize: 17, color: '#fda4af', fontWeight: 750, lineHeight: 1.7 }}>
+              <div style={{ background: 'rgba(244, 63, 94, 0.1)', borderRadius: 12, padding: '12px', border: '1px solid rgba(244, 63, 94, 0.3)' }}>
+                <div style={{ fontSize: 11, fontWeight: 900, color: '#f43f5e', marginBottom: 6 }}>09:12 · 사고 상황 요약</div>
+                <div style={{ fontSize: 13, fontWeight: 950, color: '#fff', marginBottom: 8 }}>엔진실 사다리에서 추락 (1.8m)</div>
+                <div style={{ fontSize: 12, color: '#fda4af', fontWeight: 600, lineHeight: 1.6 }}>
                   • 왼쪽 어깨 뼈가 툭 튀어나오고 이상함<br />
                   • 가슴이 너무 아파서 숨쉬기 힘들다고 함<br />
                   • 머리에 상처가 있고 몸 여기저기 까짐
@@ -463,19 +463,19 @@ export default function DashboardView({
               { time: '11:15', title: '옆에서 계속 대기하며 상태 지켜보기', color: '#38bdf8' },
               { time: '11:30', title: '환자 의식 있는지 확인하고 기록 완료', color: '#38bdf8' }
             ].map((item, idx) => (
-              <div key={idx} style={{ position: 'relative', paddingLeft: 36, paddingBottom: 40 }}>
-                <div style={{ position: 'absolute', left: 0, top: 4, width: 16, height: 16, borderRadius: '50%', background: '#05070a', border: `3px solid ${item.color}`, zIndex: 2 }} />
-                <div style={{ fontSize: 18, fontWeight: 900, color: item.color }}>{item.time}</div>
-                <div style={{ fontSize: 22, fontWeight: 950, color: '#fff' }}>{item.title}</div>
+              <div key={idx} style={{ position: 'relative', paddingLeft: 24, paddingBottom: 20 }}>
+                <div style={{ position: 'absolute', left: 0, top: 4, width: 12, height: 12, borderRadius: '50%', background: '#05070a', border: `2px solid ${item.color}`, zIndex: 2 }} />
+                <div style={{ fontSize: 11, fontWeight: 900, color: item.color }}>{item.time}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{item.title}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* 외상 촬영 버튼 (하단 고정) */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '20px 28px 24px 28px', borderTop: '1px solid rgba(56,189,248,0.2)', background: 'linear-gradient(to top, #05070a 85%, transparent)', zIndex: 10 }}>
-          <button onClick={handleTraumaAnalysis} style={{ width: '100%', height: 72, borderRadius: 20, background: 'linear-gradient(135deg, #0ea5e9, #38bdf8)', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, fontSize: 22, boxShadow: '0 8px 25px rgba(56, 189, 248, 0.3)' }}>
-            <Camera size={28} /> 외상 촬영 및 AI 정밀 분석
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px 14px 14px 14px', borderTop: '1px solid rgba(56,189,248,0.2)', background: 'linear-gradient(to top, #05070a 85%, transparent)', zIndex: 10 }}>
+          <button onClick={handleTraumaAnalysis} style={{ width: '100%', height: 52, borderRadius: 14, background: 'linear-gradient(135deg, #0ea5e9, #38bdf8)', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontSize: 14, boxShadow: '0 6px 20px rgba(56, 189, 248, 0.3)' }}>
+            <Camera size={18} /> 외상 촬영 및 AI 정밀 분석
           </button>
         </div>
       </aside>
@@ -537,14 +537,14 @@ function AiMessageRenderer({ text }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ whiteSpace: 'pre-line', fontSize: 22 }}>{formattedText}</div>
+      <div style={{ whiteSpace: 'pre-line', fontSize: 13 }}>{formattedText}</div>
       {(confidence || evidence || guide) && (
         <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {confidence && (
             <div style={{ background: 'rgba(0,0,0,0.3)', padding: '14px 20px', borderRadius: 14, border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <span style={{ fontSize: 15, fontWeight: 800, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 8 }}><ShieldCheck size={18}/> AI 진단 신뢰도</span>
-                <span style={{ fontSize: 20, fontWeight: 950, color: '#38bdf8' }}>{confidence}</span>
+                <span style={{ fontSize: 14, fontWeight: 950, color: '#38bdf8' }}>{confidence}</span>
               </div>
               <div style={{ height: 6, background: 'rgba(255,255,255,0.05)', borderRadius: 3, overflow: 'hidden' }}>
                 <div style={{ width: confidence, height: '100%', background: 'linear-gradient(90deg, #0ea5e9, #38bdf8)', borderRadius: 3 }} />
@@ -554,7 +554,7 @@ function AiMessageRenderer({ text }) {
           {evidence && (
             <div style={{ background: 'rgba(56,189,248,0.08)', padding: '16px 20px', borderRadius: 14, border: '1px solid rgba(56,189,248,0.25)' }}>
               <div style={{ fontSize: 15, fontWeight: 900, color: '#38bdf8', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}><Info size={18}/> AI 분석 판단 근거</div>
-              <div style={{ fontSize: 18, color: '#fff', fontWeight: 600, lineHeight: 1.5 }}>{evidence}</div>
+              <div style={{ fontSize: 12, color: '#fff', fontWeight: 600, lineHeight: 1.5 }}>{evidence}</div>
             </div>
           )}
           {guide && (
