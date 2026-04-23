@@ -13,7 +13,7 @@ export default function Login({ onLogin }) {
 
   return (
     <div style={{
-      height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      height: '800px', width: '1280px', display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: 'radial-gradient(ellipse 100% 90% at 82% 52%, #041c2e 0%, #020e1c 55%, #010810 100%)',
       color: '#fff', fontFamily: 'Pretendard, sans-serif', overflow: 'hidden', position: 'relative'
     }}>

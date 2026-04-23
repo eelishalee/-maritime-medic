@@ -32,18 +32,36 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--navy-900);
+  background-color: #ffffff;
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
-  overflow: hidden;
-  height: 100vh;
   font-size: 16px;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+/* PC 미리보기 래퍼 : 400×250 px */
+#app-wrapper {
+  width: 400px;
+  height: 250px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* 내부 앱은 1280×800 그대로 유지 후 scale(0.3125) 적용 */
 #root {
-  width: 100%;
-  height: 100vh;
+  width: 1280px;
+  height: 800px;
+  overflow: hidden;
   display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: scale(0.3125);
+  transform-origin: top left;
 }
 
 /* Scrollbar Customization */
