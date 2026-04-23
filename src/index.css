@@ -31,7 +31,7 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
   background-color: var(--navy-900);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
@@ -48,7 +48,8 @@ body {
 }
 
 /* 기존 작은 글씨들도 상대적으로 확대되도록 설정 */
-div, span, button, input {
+div, span, button, input, select, textarea, table, td, th {
+  font-family: inherit;
   font-size: 1.56rem; 
 }
 
@@ -136,3 +137,19 @@ div, span, button, input {
 }
 
 .fade-in { animation: fadeInUp 0.35s ease both; }
+
+.cyber-bg {
+  background-image: 
+    linear-gradient(rgba(26, 26, 58, 0.15) 1px, transparent 1px),      
+    linear-gradient(90deg, rgba(26, 26, 58, 0.15) 1px, transparent 1px);
+  background-size: 40px 40px;  
+}
+
+.cyber-grid {
+  background-image: 
+    linear-gradient(rgba(26, 26, 58, 0.2) 1px, transparent 1px),       
+    linear-gradient(90deg, rgba(26, 26, 58, 0.2) 1px, transparent 1px);
+  background-size: 50px 50px;  
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }

@@ -2,24 +2,37 @@ import { useState } from 'react'
 import { 
   Activity, Heart, Thermometer, Droplets, Clock, AlertTriangle, 
   Stethoscope, ClipboardList, Pill, Camera, ChevronRight, CheckCircle2,
-  AlertCircle, Info, Search, User, ChevronDown
+  AlertCircle, Info, Search, User, ChevronDown, HeartPulse, Wind, Send, Save, Eye, ShieldCheck
 } from 'lucide-react'
+import React from 'react'
 
-// 선원 데이터 (isEmergency 속성 추가)
+const C = {
+  bg: '#020204',
+  panel: 'rgba(10, 10, 20, 0.85)',
+  panel2: 'rgba(15, 15, 35, 0.99)',
+  border: '#1a1a3a',
+  text: '#e0e6ed',
+  sub: '#4e5a6b',
+  dim: '#1a1a3a',
+  success: '#00ffaa',
+  warning: '#ffaa00',
+  danger: '#ff0055',
+  info: '#00d4ff',
+  purple: '#bc00ff',
+  cyan: '#00f7ff',
+}
+
 const ALL_CREW = [
   { id: 'S26-001', name: '이선장', age: 52, role: '선장', dept: '항해부', blood: 'O+', chronic: ['고혈압'], allergies: ['없음'], vitals: { bp: '138/85', hr: 78, temp: 36.5, spo2: 98 }, dob: '1974-05-12', height: 175, weight: 78, emergency_contact: '배우자 (010-1234-5678)', isEmergency: false },
   { id: 'S26-002', name: '김항해', age: 45, role: '1등 항해사', dept: '항해부', blood: 'A+', chronic: ['없음'], allergies: ['페니실린'], vitals: { bp: '120/80', hr: 72, temp: 36.6, spo2: 99 }, dob: '1981-11-20', height: 180, weight: 82, emergency_contact: '부친 (010-9876-5432)', isEmergency: false },
-  { id: 'S26-003', name: '박기관', age: 55, role: '기관장', dept: '기관부', blood: 'B+', chronic: ['고혈압', '고지혈증'], allergies: ['아스피린'], vitals: { bp: '158/95', hr: 92, temp: 37.8, spo2: 94 }, dob: '1971-08-05', height: 172, weight: 70, emergency_contact: '양정희 (010-8765-4321)', isEmergency: true },
+  { id: 'S26-003', name: '박기관', age: 55, role: '기관장', dept: '기관부', blood: 'B+', chronic: ['고혈압', '고지혈증'], allergies: ['아스피린'], vitals: { bp: '158/95', hr: 92, temp: 37.8, spo2: 94 }, dob: '1971-08-05', height: 172, weight: 70, emergency_contact: '양정희 (010-8765-4321)', isEmergency: true, avatar: '/CE.jpeg' },
   { id: 'S26-004', name: '최갑판', age: 41, role: '갑판장', dept: '항해부', blood: 'AB+', chronic: ['허리디스크'], allergies: ['없음'], vitals: { bp: '132/88', hr: 85, temp: 36.8, spo2: 97 }, dob: '1985-03-15', height: 178, weight: 75, emergency_contact: '배우자 (010-1122-3344)', isEmergency: false },
 ]
 
 export default function PatientChart({ patient: activePatientProp }) {
   const [selectedId, setSelectedId] = useState(activePatientProp?.id || 'S26-003')
   
-  // 선택된 환자 데이터 매칭
   const patientData = ALL_CREW.find(c => c.id === selectedId) || ALL_CREW[0]
-  
-  // 프롭스로 전달받은 환자와 현재 선택된 환자가 같으면 프롭스 데이터 우선 적용 (비상연락망 연동을 위해)
   const patient = (selectedId === activePatientProp?.id) 
     ? { 
         ...patientData, 
@@ -29,25 +42,27 @@ export default function PatientChart({ patient: activePatientProp }) {
       }
     : patientData;
 
+  const [painLevel, setPainLevel] = useState(7)
+
   return (
-    <div style={{ padding: '0', height: 'calc(100vh - 72px)', overflow: 'auto', background: '#020617', color: '#fff', fontFamily: '"Pretendard", sans-serif' }}>
+    <div className="cyber-bg" style={{ padding: '0', height: 'calc(100vh - 86px)', overflow: 'auto', background: C.bg, color: C.text, fontFamily: '"Pretendard", sans-serif', scrollbarWidth: 'none' }}>
       
-      {/* 상단 고정 헤더 : 환자 선택 셀렉터 및 요약 */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(7, 15, 30, 0.95)', backdropFilter: 'blur(15px)', borderBottom: `1px solid ${patient.isEmergency ? '#ff4d6d40' : 'rgba(13,217,197,0.2)'}`, padding: '20px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+      {/* 상단 고정 헤더 */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(5, 7, 10, 0.95)', backdropFilter: 'blur(15px)', borderBottom: `1px solid ${patient.isEmergency ? `${C.danger}44` : C.border}`, padding: '22px 46px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 34 }}>
           {/* 환자 선택 셀렉트 박스 */}
-          <div style={{ position: 'relative', minWidth: '320px' }}>
-            <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: patient.isEmergency ? '#ff4d6d' : '#0dd9c5', zIndex: 1 }}>
-              {patient.isEmergency ? <AlertTriangle size={20} /> : <Search size={20} />}
+          <div style={{ position: 'relative', minWidth: '430px' }}>
+            <div style={{ position: 'absolute', left: 22, top: '50%', transform: 'translateY(-50%)', color: patient.isEmergency ? C.danger : C.cyan, zIndex: 1 }}>
+              {patient.isEmergency ? <AlertTriangle size={28} /> : <Search size={28} />}
             </div>
             <select 
               value={selectedId}
               onChange={(e) => setSelectedId(e.target.value)}
               style={{ 
-                width: '100%', padding: '14px 40px 14px 50px', background: patient.isEmergency ? 'rgba(255,77,109,0.08)' : 'rgba(13,217,197,0.05)', 
-                border: `2px solid ${patient.isEmergency ? '#ff4d6d' : 'rgba(13,217,197,0.3)'}`, borderRadius: '16px', color: '#fff', 
-                fontSize: '20px', fontWeight: 900, outline: 'none', cursor: 'pointer', appearance: 'none',
-                boxShadow: patient.isEmergency ? '0 4px 20px rgba(255,77,109,0.2)' : '0 4px 15px rgba(0,0,0,0.2)',
+                width: '100%', padding: '18px 46px 18px 64px', background: patient.isEmergency ? `${C.danger}11` : `${C.cyan}0a`, 
+                border: `2px solid ${patient.isEmergency ? C.danger : C.cyan}66`, borderRadius: '20px', color: '#fff', 
+                fontSize: '25px', fontWeight: 950, outline: 'none', cursor: 'pointer', appearance: 'none',
+                boxShadow: patient.isEmergency ? `0 0 20px ${C.danger}33` : `0 0 15px ${C.cyan}11`,
                 transition: '0.3s'
               }}
             >
@@ -57,96 +72,115 @@ export default function PatientChart({ patient: activePatientProp }) {
                 </option>
               ))}
             </select>
-            <div style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', color: '#4a6080', pointerEvents: 'none' }}>
-              <ChevronDown size={20} />
+            <div style={{ position: 'absolute', right: 22, top: '50%', transform: 'translateY(-50%)', color: C.sub, pointerEvents: 'none' }}>
+              <ChevronDown size={28} />
             </div>
           </div>
 
-          <div style={{ width: 2, height: 40, background: 'rgba(255,255,255,0.1)' }} />
+          <div style={{ width: 2, height: 58, background: C.border }} />
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
             <div style={{ 
-              width: 50, height: 50, borderRadius: 15, 
-              background: patient.isEmergency ? 'rgba(255,77,109,0.15)' : 'rgba(13,217,197,0.1)', 
+              width: 72, height: 72, borderRadius: 22, 
+              background: patient.isEmergency ? `${C.danger}18` : `${C.cyan}11`, 
               display: 'flex', alignItems: 'center', justifyContent: 'center', 
-              fontSize: 22, fontWeight: 950, 
-              color: patient.isEmergency ? '#ff4d6d' : '#0dd9c5', 
-              border: `1px solid ${patient.isEmergency ? '#ff4d6d40' : 'rgba(13,217,197,0.2)'}`,
-              animation: patient.isEmergency ? 'pulse-red 2s infinite' : 'none'
+              fontSize: 32, fontWeight: 950, 
+              color: patient.isEmergency ? C.danger : C.cyan, 
+              border: `2px solid ${patient.isEmergency ? C.danger : C.cyan}44`,
+              boxShadow: patient.isEmergency ? `0 0 20px ${C.danger}33` : 'none',
+              animation: patient.isEmergency ? 'blink 2s infinite' : 'none'
             }}>
               {patient.name[0]}
             </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ fontSize: '24px', fontWeight: 950, color: '#fff' }}>{patient.name}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+                <div style={{ fontSize: '34px', fontWeight: 950, color: '#fff' }}>{patient.name}</div>
                 {patient.isEmergency && (
                   <span style={{ 
-                    background: '#ff4d6d', color: '#fff', padding: '2px 10px', borderRadius: '6px', 
-                    fontSize: '14px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 4,
-                    boxShadow: '0 0 15px rgba(255,77,109,0.4)'
+                    background: C.danger, color: '#fff', padding: '4px 14px', borderRadius: 9, 
+                    fontSize: '18px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 6,
+                    boxShadow: `0 0 15px ${C.danger}66`
                   }}>
-                    <AlertTriangle size={14} fill="currentColor" /> 위급 환자
+                    <AlertTriangle size={18} fill="currentColor" /> 위급 환자
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 15, color: '#94a3b8', marginTop: 2 }}>{patient.role} · {patient.age}세 · {patient.gender} · {patient.blood}형</div>
+              <div style={{ fontSize: 20, color: C.sub, fontWeight: 800, marginTop: 4 }}>{patient.role} · {patient.age}세 · {patient.gender} · {patient.blood}형</div>
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 15 }}>
-          <VitalCard label="혈압" value={patient.vitals.bp} unit="mmHg" icon={<Activity size={18}/>} color="#ff4d6d" alert />
-          <VitalCard label="심박" value={patient.vitals.hr} unit="bpm" icon={<Heart size={18}/>} color="#ff708d" />
-          <VitalCard label="체온" value={patient.vitals.temp} unit="°C" icon={<Thermometer size={18}/>} color="#fb923c" alert />
-          <VitalCard label="산소" value={patient.vitals.spo2} unit="%" icon={<Droplets size={18}/>} color="#38bdf8" alert />
+        <div style={{ display: 'flex', gap: 18 }}>
+          <VitalCard label="혈압" value={patient.vitals.bp} unit="mmHg" icon={<Activity size={22}/>} color={C.warning} alert />
+          <VitalCard label="심박" value={patient.vitals.hr} unit="bpm" icon={<HeartPulse size={22}/>} color={C.danger} />
+          <VitalCard label="체온" value={patient.vitals.temp} unit="°C" icon={<Thermometer size={22}/>} color="#f97316" alert />
+          <VitalCard label="산소" value={patient.vitals.spo2} unit="%" icon={<Wind size={22}/>} color={C.info} alert />
         </div>
       </div>
 
-      <div style={{ padding: '40px', display: 'grid', gridTemplateColumns: '350px 1fr', gap: 30 }}>
+      <div style={{ padding: '46px', display: 'grid', gridTemplateColumns: '460px 1fr', gap: 34 }}>
         
-        {/* 왼쪽 사이드바 : 환자 기본 의료 정보 (정적 정보) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <StaticInfoCard title="기본 인적사항" icon={<Info size={20}/>}>
+        {/* 왼쪽 사이드바 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          <StaticInfoCard title="기본 인적사항" icon={<Info size={28}/>}>
             <InfoRow label="생년월일" value={patient.dob} />
             <InfoRow label="신장/체중" value={`${patient.height}cm / ${patient.weight}kg`} />
             <InfoRow label="비상연락" value={patient.emergency_contact} />
           </StaticInfoCard>
 
-          <StaticInfoCard title="과거 병력 (기저질환)" icon={<Clock size={20}/>} color="#fb923c">
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
-              {patient.chronic.map(c => <Tag key={c} color="#fb923c">{c}</Tag>)}
+          <StaticInfoCard title="과거 병력 (기저질환)" icon={<Clock size={28}/>} color={C.warning}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 11, marginTop: 14 }}>
+              {patient.chronic.map(c => <Tag key={c} color={C.warning}>{c}</Tag>)}
             </div>
           </StaticInfoCard>
 
-          <StaticInfoCard title="알레르기 주의" icon={<AlertTriangle size={20}/>} color="#ff4d6d">
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
-              {patient.allergies.map(a => <Tag key={a} color="#ff4d6d">{a}</Tag>)}
+          <StaticInfoCard title="알레르기 주의" icon={<AlertTriangle size={28}/>} color={C.danger}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 11, marginTop: 14 }}>
+              {patient.allergies.map(a => <Tag key={a} color={C.danger}>{a}</Tag>)}
             </div>
           </StaticInfoCard>
+
+          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 34, padding: '34px', backdropFilter: 'blur(10px)' }}>
+            <div style={{ fontSize: 22, fontWeight: 900, color: C.info, marginBottom: 22, display: 'flex', alignItems: 'center', gap: 14 }}>
+              <ShieldCheck size={28} /> 최근 진료 요약
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '22px', borderRadius: 22, border: `1px solid ${C.border}` }}>
+              <div style={{ fontSize: 20, color: '#fff', fontWeight: 800, marginBottom: 9 }}>2026-03-15 (내과)</div>
+              <p style={{ fontSize: 18, color: C.sub, lineHeight: 1.5, margin: 0 }}>기관실 고온 작업 후 가벼운 현기증 호소. 충분한 휴식 권고함.</p>
+            </div>
+          </div>
         </div>
 
-        {/* 메인 차트 영역 : SOAP 기반 기록 (동적 정보) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+        {/* 메인 차트 영역 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 34 }}>
           
-          {/* S: 주관적 기록 (선원용 질문) */}
-          <ChartSection title="STEP 1. 환자 증상 파악 (Subjective)" sub="환자가 어디가 어떻게 아프다고 하나요?" icon={<Stethoscope size={24}/>}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          {/* S: 주관적 기록 */}
+          <ChartSection title="STEP 1. 환자 증상 파악 (Subjective)" sub="환자가 어디가 어떻게 아프다고 하나요?" icon={<Stethoscope size={34}/>}>
+            <div style={{ display: grid, gridTemplateColumns: '1fr 1fr', gap: 28 }}>
               <InputGroup label="발생 시각 및 장소" placeholder="예: 오전 10:30, 2번 데크 작업 중" />
               <InputGroup label="통증 부위" placeholder="예: 오른쪽 발목, 가슴 답답함 등" />
               <div style={{ gridColumn: 'span 2' }}>
-                <label style={{ fontSize: 15, color: '#94a3b8', fontWeight: 700, marginBottom: 10, display: 'block' }}>통증 강도 (0: 없음 ~ 10: 참을 수 없음)</label>
-                <div style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)', padding: '15px', borderRadius: 15, border: '1px solid rgba(255,255,255,0.05)' }}>
+                <label style={{ fontSize: 22, color: C.sub, fontWeight: 800, marginBottom: 14, display: 'block' }}>통증 강도 (0: 없음 ~ 10: 참을 수 없음)</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(255,255,255,0.03)', padding: '22px', borderRadius: 22, border: `1px solid ${C.border}` }}>
                   {[0,1,2,3,4,5,6,7,8,9,10].map(n => (
-                    <button key={n} style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: n > 7 ? '#ff4d6d' : n > 4 ? '#fb923c' : '#475569', color: '#fff', fontWeight: 900, cursor: 'pointer' }}>{n}</button>
+                    <button key={n} 
+                      onClick={() => setPainLevel(n)}
+                      style={{ 
+                        width: 52, height: 52, borderRadius: '50%', border: 'none', 
+                        background: painLevel === n ? (n > 7 ? C.danger : n > 4 ? C.warning : C.cyan) : C.dim, 
+                        color: painLevel === n ? '#000' : '#fff', fontWeight: 950, cursor: 'pointer',
+                        fontSize: 22, transition: '0.2s',
+                        boxShadow: painLevel === n ? `0 0 15px ${n > 7 ? C.danger : n > 4 ? C.warning : C.cyan}88` : 'none'
+                      }}>{n}</button>
                   ))}
                 </div>
               </div>
             </div>
           </ChartSection>
 
-          {/* O: 객관적 관찰 (눈으로 보이는 상태) */}
-          <ChartSection title="STEP 2. 눈으로 확인되는 상태 (Objective)" sub="관리자가 직접 확인한 사실을 선택해 주세요." icon={<ClipboardList size={24}/>}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 15 }}>
+          {/* O: 객관적 관찰 */}
+          <ChartSection title="STEP 2. 눈으로 확인되는 상태 (Objective)" sub="관리자가 직접 확인한 사실을 선택해 주세요." icon={<ClipboardList size={34}/>}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
               <CheckItem label="외부 출혈 있음" />
               <CheckItem label="심한 부종(부어오름)" />
               <CheckItem label="뼈 돌출/골절 의심" />
@@ -154,30 +188,33 @@ export default function PatientChart({ patient: activePatientProp }) {
               <CheckItem label="호흡 곤란" />
               <CheckItem label="안색 창백/청색증" />
             </div>
-            <button style={{ marginTop: 20, width: '100%', padding: '15px', borderRadius: 15, background: 'rgba(13,217,197,0.1)', border: '1px dashed #0dd9c5', color: '#0dd9c5', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-              <Camera size={20}/> 환부 사진 촬영 및 첨부
+            <button style={{ marginTop: 28, width: '100%', height: 82, borderRadius: 22, background: `${C.info}11`, border: `2px dashed ${C.info}44`, color: C.info, fontWeight: 950, fontSize: 25, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, cursor: 'pointer', transition: '0.2s' }}>
+              <Camera size={28}/> 환부 사진 촬영 및 AI 분석 첨부
             </button>
           </ChartSection>
 
           {/* A & P: 판단 및 조치 계획 */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 25 }}>
-            <ChartSection title="STEP 3. 의료 판단 (NEWS/MEWS)" sub="현재 환자의 상태 단계는 무엇인가요?" icon={<AlertCircle size={24}/>}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <StatusOption color="#10b981" label="정상 (Normal)" desc="정기적 모니터링" />
+          <div style={{ display: 'grid', gridTemplateColumns: '520px 1fr', gap: 34 }}>
+            <ChartSection title="STEP 3. 의료 판단" sub="현재 환자의 상태 단계는?" icon={<AlertCircle size={34}/>}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <StatusOption color={C.success} label="정상 (Normal)" desc="정기적 모니터링" />
                 <StatusOption color="#facc15" label="경미 (Mild)" desc="관찰 주기 단축" />
-                <StatusOption color="#fb923c" label="주의 (Caution)" desc="의료 처치 준비" active />
-                <StatusOption color="#ef4444" label="위험 (Danger)" desc="긴급 이송 및 회항" />
+                <StatusOption color={C.warning} label="주의 (Caution)" desc="의료 처치 준비" active />
+                <StatusOption color={C.danger} label="위험 (Danger)" desc="긴급 이송 및 회항" />
               </div>
             </ChartSection>
 
-            <ChartSection title="STEP 4. 조치 내역 및 계획" sub="어떤 도움을 주었나요?" icon={<Pill size={24}/>}>
+            <ChartSection title="STEP 4. 조치 내역 및 계획" sub="어떤 도움을 주었나요?" icon={<Pill size={34}/>}>
               <textarea 
                 placeholder="예: 상처 부위 소독 후 압박 붕대 실시. 타이레놀 1정 복용함. 1시간 뒤 다시 체크 예정."
-                style={{ width: '100%', minHeight: 120, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 15, padding: '15px', color: '#fff', fontSize: 16, outline: 'none', resize: 'none' }}
+                style={{ width: '100%', minHeight: 280, background: 'rgba(255,255,255,0.03)', border: `1px solid ${C.border}`, borderRadius: 22, padding: '22px', color: '#fff', fontSize: 25, outline: 'none', resize: 'none', fontWeight: 500, lineHeight: 1.5 }}
               />
-              <div style={{ marginTop: 15, display: 'flex', justifyContent: 'flex-end' }}>
-                <button style={{ padding: '12px 30px', borderRadius: 12, background: '#0dd9c5', color: '#020617', border: 'none', fontWeight: 900, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <CheckCircle2 size={20}/> 차트 저장 및 원격 보고
+              <div style={{ marginTop: 28, display: 'flex', justifyContent: 'flex-end', gap: 18 }}>
+                <button style={{ height: 82, padding: '0 46px', borderRadius: 22, background: 'rgba(255,255,255,0.05)', color: '#fff', border: `1px solid ${C.border}`, fontWeight: 900, fontSize: 25, cursor: 'pointer' }}>
+                  임시 저장
+                </button>
+                <button style={{ height: 82, padding: '0 46px', borderRadius: 22, background: C.cyan, color: '#000', border: 'none', fontWeight: 950, fontSize: 25, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14, boxShadow: `0 8px 25px ${C.cyan}44` }}>
+                  <Send size={28}/> 차트 저장 및 전송
                 </button>
               </div>
             </ChartSection>
@@ -191,21 +228,21 @@ export default function PatientChart({ patient: activePatientProp }) {
 
 function VitalCard({ label, value, unit, icon, color, alert }) {
   return (
-    <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${alert ? color : 'rgba(255,255,255,0.1)'}`, padding: '12px 20px', borderRadius: 16, minWidth: 120, textAlign: 'center' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#64748b', fontSize: 14, marginBottom: 5 }}>
+    <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${alert ? color : C.border}`, padding: '14px 25px', borderRadius: 20, minWidth: 158, textAlign: 'center', backdropFilter: 'blur(10px)', animation: alert ? 'blink 2s infinite' : 'none' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, color: C.sub, fontSize: 18, fontWeight: 800, marginBottom: 6, textTransform: 'uppercase' }}>
         <span style={{ color }}>{icon}</span> {label}
       </div>
-      <div style={{ fontSize: 20, fontWeight: 950, color: alert ? color : '#fff' }}>
-        {value}<span style={{ fontSize: 13, fontWeight: 500, color: '#475569', marginLeft: 3 }}>{unit}</span>
+      <div style={{ fontSize: 32, fontWeight: 950, color: alert ? color : '#fff', textShadow: alert ? `0 0 10px ${color}66` : 'none' }}>
+        {value}<span style={{ fontSize: 18, fontWeight: 700, color: C.sub, marginLeft: 4 }}>{unit}</span>
       </div>
     </div>
   )
 }
 
-function StaticInfoCard({ title, icon, children, color = '#0dd9c5' }) {
+function StaticInfoCard({ title, icon, children, color = C.cyan }) {
   return (
-    <div style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: '24px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 15, color, fontSize: 16, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>
+    <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 34, padding: '34px', backdropFilter: 'blur(10px)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22, color, fontSize: 22, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1.5px' }}>
         {icon} {title}
       </div>
       {children}
@@ -215,16 +252,16 @@ function StaticInfoCard({ title, icon, children, color = '#0dd9c5' }) {
 
 function InfoRow({ label, value }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-      <span style={{ color: '#64748b', fontSize: 15, fontWeight: 600 }}>{label}</span>
-      <span style={{ color: '#fff', fontSize: 15, fontWeight: 800 }}>{value}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 0', borderBottom: `1px solid ${C.border}` }}>
+      <span style={{ color: C.sub, fontSize: 20, fontWeight: 700 }}>{label}</span>
+      <span style={{ color: '#fff', fontSize: 20, fontWeight: 900 }}>{value}</span>
     </div>
   )
 }
 
 function Tag({ children, color }) {
   return (
-    <span style={{ padding: '4px 12px', borderRadius: 8, background: `${color}15`, color, border: `1px solid ${color}30`, fontSize: 14, fontWeight: 700 }}>
+    <span style={{ padding: '6px 18px', borderRadius: 11, background: `${color}18`, color, border: `1px solid ${color}44`, fontSize: 18, fontWeight: 800 }}>
       {children}
     </span>
   )
@@ -232,14 +269,14 @@ function Tag({ children, color }) {
 
 function ChartSection({ title, sub, icon, children }) {
   return (
-    <div style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: '30px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 15, marginBottom: 25 }}>
-        <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(13,217,197,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0dd9c5' }}>
+    <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 34, padding: '40px', backdropFilter: 'blur(10px)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 34 }}>
+        <div style={{ width: 68, height: 68, borderRadius: 20, background: `${C.cyan}11`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.cyan, border: `1px solid ${C.cyan}33`, boxShadow: `0 0 15px ${C.cyan}22` }}>
           {icon}
         </div>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 950, color: '#fff' }}>{title}</div>
-          <div style={{ fontSize: 15, color: '#64748b', marginTop: 2 }}>{sub}</div>
+          <div style={{ fontSize: 28, fontWeight: 950, color: '#fff', letterSpacing: '-0.7px' }}>{title}</div>
+          <div style={{ fontSize: 20, color: C.sub, marginTop: 4, fontWeight: 700 }}>{sub}</div>
         </div>
       </div>
       {children}
@@ -249,35 +286,38 @@ function ChartSection({ title, sub, icon, children }) {
 
 function InputGroup({ label, placeholder }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <label style={{ fontSize: 15, color: '#94a3b8', fontWeight: 700 }}>{label}</label>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <label style={{ fontSize: 20, color: C.sub, fontWeight: 800 }}>{label}</label>
       <input 
         type="text" 
         placeholder={placeholder} 
-        style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '14px 18px', color: '#fff', fontSize: 16, outline: 'none', boxSizing: 'border-box' }} 
+        style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: `1px solid ${C.border}`, borderRadius: 18, padding: '18px 22px', color: '#fff', fontSize: 22, outline: 'none', boxSizing: 'border-box', fontWeight: 700 }} 
       />
     </div>
   )
 }
 
 function CheckItem({ label }) {
+  const [checked, setChecked] = useState(false)
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 15, cursor: 'pointer' }}>
-      <div style={{ width: 22, height: 22, borderRadius: 6, border: '2px solid #475569' }} />
-      <span style={{ fontSize: 16, fontWeight: 700, color: '#cbd5e1' }}>{label}</span>
+    <div onClick={() => setChecked(!checked)} style={{ display: 'flex', alignItems: 'center', gap: 18, padding: '22px', background: checked ? `${C.cyan}11` : 'rgba(255,255,255,0.03)', border: `1px solid ${checked ? C.cyan : C.border}`, borderRadius: 22, cursor: 'pointer', transition: '0.2s', boxShadow: checked ? `0 0 15px ${C.cyan}22` : 'none' }}>
+      <div style={{ width: 28, height: 28, borderRadius: 8, border: `2.5px solid ${checked ? C.cyan : C.sub}`, background: checked ? C.cyan : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {checked && <CheckCircle2 size={18} color="#000" strokeWidth={3} />}
+      </div>
+      <span style={{ fontSize: 22, fontWeight: 800, color: checked ? '#fff' : C.sub }}>{label}</span>
     </div>
   )
 }
 
 function StatusOption({ color, label, desc, active }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 15, padding: '18px', background: active ? `${color}15` : 'rgba(255,255,255,0.02)', border: `2px solid ${active ? color : 'transparent'}`, borderRadius: 15, cursor: 'pointer', transition: '0.2s' }}>
-      <div style={{ width: 16, height: 16, borderRadius: '50%', background: color }} />
+    <div style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '25px', background: active ? `${color}18` : 'rgba(255,255,255,0.02)', border: `2px solid ${active ? color : 'transparent'}`, borderRadius: 22, cursor: 'pointer', transition: '0.2s', boxShadow: active ? `0 0 20px ${color}33` : 'none' }}>
+      <div style={{ width: 22, height: 22, borderRadius: '50%', background: color, boxShadow: `0 0 10px ${color}` }} />
       <div>
-        <div style={{ fontSize: 17, fontWeight: 900, color: active ? color : '#fff' }}>{label}</div>
-        <div style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>{desc}</div>
+        <div style={{ fontSize: 22, fontWeight: 950, color: active ? '#fff' : C.sub }}>{label}</div>
+        <div style={{ fontSize: 18, color: active ? '#cbd5e1' : C.dim, marginTop: 4, fontWeight: 700 }}>{desc}</div>
       </div>
-      {active && <CheckCircle2 size={20} style={{ marginLeft: 'auto', color }} />}
+      {active && <CheckCircle2 size={28} style={{ marginLeft: 'auto', color }} />}
     </div>
   )
 }
