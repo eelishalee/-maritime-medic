@@ -231,8 +231,16 @@ export default function CrewManagement({ onSelectPatient }) {
               <tr key={c.id} onClick={() => handleSelect(c)} style={{ cursor: 'pointer', transition: '0.2s' }} className="crew-card-row">
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px 0 0 20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ width: 56, height: 70, borderRadius: '12px', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', background: '#0a1628', boxShadow: '0 6px 12px rgba(0,0,0,0.3)' }}>
-                      <img src={c.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div style={{ width: 56, height: 70, borderRadius: '12px', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', background: '#0a1628', boxShadow: '0 6px 12px rgba(0,0,0,0.3)', position: 'relative' }}>
+                      <img 
+                        src={c.avatar} 
+                        onError={(e) => {
+                          e.target.onerror = null; 
+                          e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(c.name || 'User') + '&background=0ea5e9&color=fff&size=128';
+                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        alt={c.name}
+                      />
                     </div>
                     <div>
                       <div style={{ fontSize: '22px', fontWeight: 950, color: '#fff', marginBottom: 2 }}>{c.name}</div>

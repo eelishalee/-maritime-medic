@@ -58,7 +58,7 @@ export function DashboardVital({ label, value, unit, color, editable, onEdit, li
           <span style={{ 
             fontSize: 34, fontWeight: 950, color: color, letterSpacing: '-1px', whiteSpace: 'nowrap'
           }}>{value}</span>
-          <span style={{ fontSize: 15, color: color, fontWeight: 900, flexShrink: 0, opacity: 0.9 }}>{unit}</span>
+          <span style={{ fontSize: 15, color: color, fontWeight: 900, flexShrink: 0, opacity: 1 }}>{unit}</span>
         </div>
       ) : (
         <div style={{ padding: '4px 0', position: 'relative', zIndex: 1 }}>

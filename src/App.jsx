@@ -7,6 +7,7 @@ import Emergency from './pages/Emergency'
 import Patients from './pages/Patients'
 import PatientChart from './pages/PatientChart'
 import Settings from './pages/Settings'
+import ceAvatar from './assets/CE.jpeg'
 
 export default function App() {
   const [auth, setAuth] = useState(null)
@@ -37,7 +38,7 @@ export default function App() {
       detail: '처방 : 타이레놀 500mg\n특이사항 : 알레르기 반응 없음'
     },
     hr: 82, bp: '128/84', temp: 36.7, spo2: 98,
-    avatar: '/CE.jpeg'
+    avatar: ceAvatar
   })
 
   const [emergencyData, setEmergencyData] = useState(null)

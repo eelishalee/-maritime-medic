@@ -13,6 +13,10 @@ export default function DashboardView({
   const videoRef = useRef(null)
   const [stream, setStream] = useState(null)
 
+  // ─── 센서 상태 및 점검 안내 ───
+  const [spo2Status, setSpo2Status] = useState('normal') // 'normal' | 'error'
+  const [showSensorGuide, setShowSensorGuide] = useState(false)
+
   // ─── 편집 모달 상태 ───
   const [editTarget, setEditTarget] = useState(null) // 'bp' | 'bt' | null
   const [editValue, setEditValue] = useState('')
@@ -26,6 +30,16 @@ export default function DashboardView({
     if (editTarget === 'bp') setBp(editValue)
     if (editTarget === 'bt') setBt(editValue)
     setEditTarget(null)
+  }
+
+  const toggleSpo2Status = () => {
+    if (spo2Status === 'normal') {
+      setSpo2Status('error')
+      setShowSensorGuide(true)
+    } else {
+      setSpo2Status('normal')
+      setShowSensorGuide(false)
+    }
   }
 
   // 카메라 스트림 관리
@@ -56,6 +70,29 @@ export default function DashboardView({
 
   return (
     <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '420px 1fr 480px', overflow: 'hidden', height: '100%', position: 'relative', background: '#020408' }}>
+
+      {/* 센서 점검 안내 오버레이 */}
+      {showSensorGuide && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', animation: 'fadeIn 0.3s' }}>
+          <div style={{ width: 500, background: '#1e293b', border: '2px solid #fbbf24', borderRadius: 32, padding: 40, boxShadow: '0 30px 60px rgba(0,0,0,0.5)', textAlign: 'center' }}>
+            <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(251, 191, 36, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto' }}>
+              <AlertTriangle size={48} color="#fbbf24" />
+            </div>
+            <h2 style={{ fontSize: 28, fontWeight: 950, color: '#fbbf24', marginBottom: 16 }}>산소포화도 센서 점검 안내</h2>
+            <p style={{ fontSize: 18, color: '#e2e8f0', lineHeight: 1.6, marginBottom: 32, fontWeight: 700 }}>
+              환자의 손가락에 집게형 센서가 <br/>
+              정확히 밀착되어 있는지 확인해 주세요. <br/>
+              <span style={{ color: '#94a3b8', fontSize: 15 }}>(주변 광원을 차단하면 정확도가 향상됩니다)</span>
+            </p>
+            <button 
+              onClick={() => { setShowSensorGuide(false); setSpo2Status('normal'); }}
+              style={{ width: '100%', padding: '18px', borderRadius: 16, background: '#fbbf24', color: '#000', border: 'none', fontWeight: 950, fontSize: 18, cursor: 'pointer', transition: '0.2s' }}
+            >
+              확인 및 재시도
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* [개편] 이미지 기반 심플 외상 스캐너 오버레이 */}
       {isScanning && (
@@ -124,8 +161,16 @@ export default function DashboardView({
       <aside style={{ borderRight: '1px solid rgba(255,255,255,0.05)', background: '#05070a', display: 'flex', flexDirection: 'column', position: 'relative', minHeight: 0 }}>
         <div style={{ flexShrink: 0, padding: '24px 28px 20px 28px', borderBottom: '1px solid rgba(56,189,248,0.1)', background: 'rgba(56,189,248,0.03)' }}>
           <div style={{ display: 'flex', gap: 24, marginBottom: 24 }}>
-            <div style={{ width: 110, height: 110, borderRadius: 24, background: '#fff', border: '3px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
-              <img src={activePatient?.avatar || '/CE.jpeg'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{ width: 110, height: 110, borderRadius: 24, background: '#1e293b', border: '3px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
+              <img 
+                src={activePatient?.avatar || '/CE.jpeg'} 
+                onError={(e) => {
+                  e.target.onerror = null; 
+                  e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(activePatient?.name || 'User') + '&background=0ea5e9&color=fff&size=128';
+                }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                alt="Patient Profile"
+              />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 6 }}>
@@ -247,7 +292,16 @@ export default function DashboardView({
         <div style={{ padding: '14px 45px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#080b12', position: 'relative' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
             <DashboardVital label="심박수" value={hr} unit="bpm" color="#f43f5e" live />
-            <DashboardVital label="산소포화도" value={spo2} unit="%" color="#06b6d4" live isConnected={false} />
+            <div onClick={toggleSpo2Status} style={{ cursor: 'pointer' }}>
+              <DashboardVital 
+                label="산소포화도" 
+                value={spo2} 
+                unit="%" 
+                color="#38bdf8" 
+                live 
+                isConnected={spo2Status === 'normal'} 
+              />
+            </div>
             <DashboardVital label="호흡수" value={rr} unit="/min" color="#8b5cf6" live />
             <DashboardVital label="혈압 (입력)" value={bp} unit="mmHg" color="#eab308" editable onEdit={() => openEdit('bp', bp)} />
             <DashboardVital label="체온 (입력)" value={bt} unit="°C" color="#f97316" editable onEdit={() => openEdit('bt', bt)} />
@@ -397,17 +451,17 @@ export default function DashboardView({
             </div>
             {[
               { time: '09:18', title: '인터넷 끊김 - AI 자체 모드로 전환', color: '#f43f5e' },
-              { time: '09:20', title: 'MDTS 인공지능 진단 시작', color: '#facc15' },
-              { time: '09:25', title: '환자 의무실로 옮기고 우리끼리 응급처치', color: '#38bdf8' },
+              { time: '09:20', title: 'MDTS 인공지능 진단 시작', color: '#f43f5e' },
+              { time: '09:25', title: '환자 의무실로 옮기고 우리끼리 응급처치', color: '#fb923c' },
               { time: '09:30', title: 'AI 분석 결과 뼈가 부러진 것 같음', color: '#facc15' },
-              { time: '09:45', title: '화면 안내대로 팔 고정하고 찜질함', color: '#a78bfa' },
-              { time: '10:00', title: '환자 숨소리랑 맥박 계속 체크 중', color: '#38bdf8' },
-              { time: '10:15', title: '비상용 종이 매뉴얼 다시 확인', color: '#475569' },
+              { time: '09:45', title: '화면 안내대로 팔 고정하고 찜질함', color: '#facc15' },
+              { time: '10:00', title: '환자 숨소리랑 맥박 계속 체크 중', color: '#94d3a2' },
+              { time: '10:15', title: '비상용 종이 매뉴얼 다시 확인', color: '#38bdf8' },
               { time: '10:30', title: '다친 부위 사진 찍어서 다시 정밀 분석', color: '#38bdf8' },
-              { time: '10:45', title: '환자 상태가 조금씩 안정되는 것 같음', color: '#10b981' },
-              { time: '11:00', title: '나중에 의사한테 보여줄 기록 자동 저장', color: '#475569' },
-              { time: '11:15', title: '옆에서 계속 대기하며 상태 지켜보기', color: '#fb923c' },
-              { time: '11:30', title: '환자 의식 있는지 확인하고 기록 완료', color: '#10b981' }
+              { time: '10:45', title: '환자 상태가 조금씩 안정되는 것 같음', color: '#38bdf8' },
+              { time: '11:00', title: '나중에 의사한테 보여줄 기록 자동 저장', color: '#38bdf8' },
+              { time: '11:15', title: '옆에서 계속 대기하며 상태 지켜보기', color: '#38bdf8' },
+              { time: '11:30', title: '환자 의식 있는지 확인하고 기록 완료', color: '#38bdf8' }
             ].map((item, idx) => (
               <div key={idx} style={{ position: 'relative', paddingLeft: 36, paddingBottom: 40 }}>
                 <div style={{ position: 'absolute', left: 0, top: 4, width: 16, height: 16, borderRadius: '50%', background: '#05070a', border: `3px solid ${item.color}`, zIndex: 2 }} />
