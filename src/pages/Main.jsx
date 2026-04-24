@@ -28,7 +28,6 @@ export default function Main({ patient, onNavigate }) {
 
   // ─── 외상 분석 상태 ───
   const [isScanning, setIsScanning] = useState(false)
-  const [scanResult, setScanResult] = useState(null)
   const [scanError, setScanError] = useState(null)
 
   // ─── 실시간 바이탈 시뮬레이션 ───
@@ -106,7 +105,6 @@ export default function Main({ patient, onNavigate }) {
       handleTraumaAnalysis={handleTraumaAnalysis}
       isScanning={isScanning}
       setIsScanning={setIsScanning}
-      scanResult={scanResult}
       scanError={scanError}
       setScanError={setScanError}
       onBpEdit={handleBpEdit}

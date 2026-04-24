@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   Ship, Clock, RefreshCw, Signal, Shield, TrendingUp, CheckCircle2,
   Phone, Send, Inbox, BookOpen, Users, ChevronDown, ChevronRight,
@@ -56,18 +56,6 @@ const CHECKLIST = [
   'MDTS 기기 정상 작동 확인','당직 의료 인력 배치 확인',
 ]
 
-const TREND = [
-  { m:'11월', 응급:2, 검진:8, 원격:3 }, { m:'12월', 응급:1, 검진:10, 원격:2 },
-  { m:'1월',  응급:3, 검진:9,  원격:4 }, { m:'2월',  응급:2, 검진:7,  원격:3 },
-  { m:'3월',  응급:4, 검진:11, 원격:5 }, { m:'4월',  응급:3, 검진:8,  원격:4 },
-]
-
-const TX_LOGS = [
-  { t:'09:31', type:'바이탈', ok:true }, { t:'09:26', type:'응급알림', ok:true },
-  { t:'09:10', type:'바이탈', ok:false }, { t:'09:05', type:'환자차트', ok:true },
-  { t:'08:59', type:'정기리포트', ok:true }, { t:'08:00', type:'바이탈', ok:true },
-]
-
 const ORDERS = [
   { id:1, pri:'긴급', doc:'최원장 (부산원격)', patient:'박기관', msg:'심근경색 프로토콜 유지. 15분 간격 혈압·심전도 재전송 요망.', read:false, done:false },
   { id:2, pri:'일반', doc:'최원장 (부산원격)', patient:'이선장', msg:'혈압 약 복용 시간 준수. 과로 및 염분 섭취 자제 지도 요망.', read:true, done:true },
@@ -83,15 +71,6 @@ const SOP_LIST = [
   { code:'HYP-05', title:'물에 빠진 선원 구조', cat:'체온 저하', color:C.cyan },
   { code:'FRC-04', title:'뼈 부러진 곳 고정하기', cat:'뼈/관절 다침', color:C.purple },
   { code:'WND-06', title:'상처 씻기 및 소독', cat:'상처 보호', color:C.success },
-]
-
-const TRAINING = [
-  { name:'이선장', type:'기본 CPR', expiry:'2026-10-15', status:'유효' },
-  { name:'김항해', type:'기본 CPR', expiry:'2026-08-20', status:'유효' },
-  { name:'박기관', type:'의료 응급 처치 (STCW)', expiry:'2027-03-01', status:'유효' },
-  { name:'최갑판', type:'기본 CPR', expiry:'2026-04-10', status:'만료임박' },
-  { name:'조항구', type:'기본 CPR', expiry:'2025-12-05', status:'만료' },
-  { name:'고기압', type:'선상 응급 의료 (Advanced)', expiry:'2027-05-10', status:'유효' },
 ]
 
 const SYS_LOGS = [
@@ -128,7 +107,7 @@ export default function Settings() {
   })
   const [collapsed, setCollapsed] = useState({})
   const [sopIdx, setSopIdx] = useState(null)
-  const [orders, setOrders] = useState(ORDERS)
+  const [orders] = useState(ORDERS)
   const [logFilter, setLogFilter] = useState('전체')
   const [logSearch, setLogSearch] = useState('')
   const [editing, setEditing] = useState(false)
@@ -141,14 +120,30 @@ export default function Settings() {
   const [trainingList, setTrainingList] = useState(() => {
     try { 
       const saved = localStorage.getItem('mdts_training')
-      return saved ? JSON.parse(saved) : TRAINING 
-    } catch { return TRAINING }
+      return saved ? JSON.parse(saved) : [
+        { name: '김항해', type: '기본 CPR', expiry: '2026-12-15' },
+        { name: '이선장', type: '고급 응급처치', expiry: '2026-05-20' },
+      ]
+    } catch { return [] }
   })
   const [showAddTraining, setShowAddForm] = useState(false)
   const [newTraining, setNewTraining] = useState({ name: '', type: '기본 CPR', expiry: '' })
 
+  // --- 선내 담당자 관리 상태 ---
+  const [managerList, setManagerList] = useState(() => {
+    try {
+      const saved = localStorage.getItem('mdts_managers')
+      return saved ? JSON.parse(saved) : [
+        { id: 'm1', name: '이선장', role: '안전책임자' },
+        { id: 'm2', name: '박기관', role: '의료담당자' },
+      ]
+    } catch { return [] }
+  })
+  const [newManager, setNewManager] = useState({ name: '', role: '안전책임자' })
+
   useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t) }, [])
   useEffect(() => { localStorage.setItem('mdts_training', JSON.stringify(trainingList)) }, [trainingList])
+  useEffect(() => { localStorage.setItem('mdts_managers', JSON.stringify(managerList)) }, [managerList])
 
   const getStatusInfo = (expiry) => {
     if (!expiry) return { label: '정보없음', color: C.sub }
@@ -174,8 +169,11 @@ export default function Settings() {
 
   const stats = useMemo(() => {
     const d = CREW.filter(c => c.isEmergency).length
-    const w = CREW.filter(c => !c.isEmergency && c.chronic !== '없음').length
-    return { total: CREW.length, normal: CREW.length - d - w, caution: w, danger: d }
+    const c = CREW.filter(c => !c.isEmergency && c.chronic !== '없음').length
+    const o = CREW.filter(c => !c.isEmergency && c.chronic === '없음' && (c.allergies !== '없음' || c.lastMed !== '없음')).length
+    const n = CREW.length - d - c - o
+    const safetyIndex = Math.round(((n * 100) + (o * 80) + (c * 60) + (d * 20)) / CREW.length)
+    return { total: CREW.length, danger: d, chronic: c, observation: o, caution: c + o, normal: n, safetyIndex }
   }, [])
 
   const disease = useMemo(() => {
@@ -207,7 +205,7 @@ export default function Settings() {
   ]
 
   return (
-    <div style={{ display:'flex', height:'calc(100vh - 72px)', background:C.bg, color:C.text, fontFamily:'"Pretendard",sans-serif', overflow:'hidden', zoom: 1.82 }}>
+    <div style={{ display:'flex', height:'calc(100vh - 72px)', background:C.bg, color:C.text, fontFamily:'"Pretendard",sans-serif', overflow:'hidden' }}>
 
       {/* ── 사이드 네비 ── */}
       <nav style={{ width:52, flexShrink:0, borderRight:`1px solid ${C.border}`, display:'flex', flexDirection:'column', alignItems:'center', paddingTop:16, gap:4, background:C.panel }}>
@@ -246,24 +244,25 @@ export default function Settings() {
         {/* ══ S1 : 의료 현황 대시보드 ══════════════════════════════════════ */}
         <Section id="s1" label="선박 의료 현황" color={C.cyan} collapsed={collapsed.s1} onToggle={() => fold('s1')}>
 
-          {/* 상단 stat 행 */}
+          {/* 상단 실전 대응 지표 (KPI) */}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10, marginBottom:10 }}>
             {[
-              { l:'전체 선원', v:stats.total, u:'명', color:C.cyan, spark: Array.from({length:8},(_,i)=>({ v:24+Math.sin(i)*2 })) },
-              { l:'정상', v:stats.normal, u:'명', color:C.success, spark: Array.from({length:8},(_,i)=>({ v:16+Math.sin(i)*1 })) },
-              { l:'주의 (기저질환)', v:stats.caution, u:'명', color:C.warning, spark: Array.from({length:8},(_,i)=>({ v:6+Math.cos(i) })) },
-              { l:'위험 (응급)', v:stats.danger, u:'명', color:C.danger, spark: Array.from({length:8},(_,i)=>({ v:2+Math.abs(Math.sin(i)) })) },
+              { l:'응급 장비 신뢰도', v:checkPct, u:'%', color:C.success, sub: checkPct === 100 ? '모든 장비 정상' : '장비 점검 필요', spark: Array.from({length:8},(_,i)=>({ v:80 + i*2.5 })) },
+              { l:'대응 가용 인원', v:trainingList.filter(t => getStatusInfo(t.expiry).label === '유효').length, u:'명', color:C.info, sub: '즉시 처치 가능', spark: Array.from({length:8},(_,i)=>({ v:15 + Math.sin(i) })) },
+              { l:'원격 의료 연결', v:'STABLE', u:'', color:C.cyan, sub: '부산센터 연결됨', spark: Array.from({length:8},(_,i)=>({ v:95 - i })) },
+              { l:'최근접 구조 거점', v:'85', u:'km', color:C.warning, sub: '목포한국병원 (ETA 30m)', spark: Array.from({length:8},(_,i)=>({ v:2+Math.abs(Math.sin(i)) })) },
             ].map((s,i)=>(
-              <div key={i} style={{ background:C.panel, border:`1px solid ${C.border}`, borderTop:`2px solid ${s.color}`, borderRadius:6, padding:'14px 16px' }}>
+              <div key={i} style={{ background:C.panel, border:`1px solid ${C.border}`, borderTop:`2px solid ${s.color}`, borderRadius:6, padding:'14px 16px', display:'flex', flexDirection:'column' }}>
                 <div style={{ fontSize:11, color:C.sub, fontWeight:700, marginBottom:6 }}>{s.l}</div>
-                <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:8 }}>
-                  <span style={{ fontSize:30, fontWeight:900, color:s.color, fontFamily:"'Pretendard Variable', Pretendard, sans-serif", lineHeight:1 }}>{s.v}</span>
-                  <span style={{ fontSize:12, color:C.sub }}>{s.u}</span>
+                <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:4 }}>
+                  <span style={{ fontSize:26, fontWeight:900, color:s.color, fontFamily:"'Pretendard Variable', Pretendard, sans-serif", lineHeight:1 }}>{s.v}</span>
+                  <span style={{ fontSize:12, color:C.sub, fontWeight:700 }}>{s.u}</span>
                 </div>
-                <div style={{ height:32 }}>
+                <div style={{ fontSize:10, color:C.text, fontWeight:600, marginBottom:10, opacity:0.8 }}>{s.sub}</div>
+                <div style={{ height:24, marginTop:'auto' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={s.spark}>
-                      <Area type="monotone" dataKey="v" stroke={s.color} fill={s.color} fillOpacity={0.12} strokeWidth={1.5} dot={false} />
+                      <Area type="monotone" dataKey="v" stroke={s.color} fill={s.color} fillOpacity={0.1} strokeWidth={1.5} dot={false} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -271,85 +270,96 @@ export default function Settings() {
             ))}
           </div>
 
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:10 }}>
-            {/* 건강 비율 도넛 */}
-            <GPanel title="선원 건강 비율" icon={<Heart size={12} color={C.danger}/>}>
-              <div style={{ height:160, position:'relative' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    {/* 배경 트랙 링 */}
-                    <Pie data={[{v:1}]} innerRadius={48} outerRadius={62} stroke="none" fill={C.border} dataKey="v" isAnimationActive={false} />
-                    
-                    <Pie data={[
-                      { name:'정상', value:stats.normal, color:C.success },
-                      { name:'주의', value:stats.caution, color:C.warning },
-                      { name:'위험', value:stats.danger, color:C.danger },
-                    ]} innerRadius={48} outerRadius={62} paddingAngle={8} cornerRadius={6} dataKey="value" startAngle={90} endAngle={-270} stroke="none">
-                      {[C.success,C.warning,C.danger].map((c,i)=><Cell key={i} fill={c} />)}
-                    </Pie>
-                    <Tooltip contentStyle={{ background:C.panel, border:`1px solid ${C.border}`, fontSize:11, borderRadius:6, boxShadow:'0 4px 12px rgba(0,0,0,0.5)' }} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', textAlign:'center', pointerEvents:'none' }}>
-                  <div style={{ fontSize:10, color:C.sub, fontWeight:800, letterSpacing:0.5, marginBottom:2 }}>TOTAL</div>
-                  <div style={{ fontSize:24, fontWeight:950, color:'#fff', fontFamily:"'Pretendard Variable', sans-serif", lineHeight:1 }}>{stats.total}</div>
-                  <div style={{ fontSize:10, color:C.sub, marginTop:2 }}>CREW</div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+            {/* 2. 실전 응급 대응 준비도 (Checklist) */}
+            <GPanel title="응급 대응 준비 상태" icon={<Shield size={12} color={checkPct===100?C.success:C.warning}/>} 
+              right={<div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                <span style={{ fontSize:14, fontWeight:900, color:checkPct===100?C.success:C.warning, fontFamily:'monospace' }}>{checkPct}%</span>
+              </div>}>
+              <div style={{ marginBottom:12 }}>
+                <div style={{ height:6, background:C.border, borderRadius:3, overflow:'hidden' }}>
+                  <div style={{ height:'100%', width:`${checkPct}%`, borderRadius:3, transition:'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                    background: `linear-gradient(90deg, ${C.info}, ${checkPct===100?C.success:C.warning})` }} />
                 </div>
               </div>
-              <div style={{ display:'flex', justifyContent:'space-around', paddingTop:12, borderTop:`1px solid ${C.border}`, marginTop:4 }}>
-                {[{l:'정상',v:stats.normal,c:C.success},{l:'주의',v:stats.caution,c:C.warning},{l:'위험',v:stats.danger,c:C.danger}].map((x,i)=>(
-                  <div key={i} style={{ textAlign:'center' }}>
-                    <div style={{ fontSize:15, fontWeight:900, color:x.c, fontFamily:"'Pretendard Variable', sans-serif" }}>{Math.round((x.v/stats.total)*100)}%</div>
-                    <div style={{ fontSize:9, color:C.sub, fontWeight:700 }}>{x.l} ({x.v})</div>
-                  </div>
-                ))}
-              </div>
-            </GPanel>
-
-            {/* 준비도 체크리스트 */}
-            <GPanel title="응급 준비도" icon={<CheckCircle2 size={12} color={checkPct===100?C.success:C.warning}/>}
-              right={<span style={{ fontFamily:'monospace', fontSize:13, fontWeight:800, color:checkPct===100?C.success:C.warning }}>{checkPct}%</span>}>
-              <div style={{ marginBottom:10 }}>
-                <div style={{ height:6, background:C.dim, borderRadius:3 }}>
-                  <div style={{ height:'100%', width:`${checkPct}%`, borderRadius:3, transition:'width 0.4s',
-                    background: checkPct===100?C.success:checkPct>=60?C.warning:C.danger }} />
-                </div>
-              </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:5, maxHeight:130, overflowY:'auto' }}>
+              <div style={{ display:'flex', flexDirection:'column', gap:6, maxHeight:180, overflowY:'auto', paddingRight:4 }}>
                 {CHECKLIST.map((item, i) => {
                   const done = !!checks[i]
                   return (
-                    <div key={i} onClick={()=>toggle(i)} style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', padding:'5px 8px', borderRadius:4, background: done?`${C.success}0a`:C.panel2 }}>
-                      <div style={{ width:14, height:14, borderRadius:3, flexShrink:0, border:`1.5px solid ${done?C.success:C.dim}`,
-                        background:done?C.success:'transparent', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                        {done && <span style={{ fontSize:9, color:'#000', fontWeight:900 }}>✓</span>}
+                    <div key={i} onClick={()=>toggle(i)} style={{ 
+                      display:'flex', alignItems:'center', gap:10, cursor:'pointer', padding:'8px 12px', borderRadius:8, 
+                      background: done ? `${C.success}08` : C.panel2,
+                      border: `1px solid ${done ? `${C.success}33` : C.border}`,
+                      transition: 'all 0.2s'
+                    }}>
+                      <div style={{ 
+                        width:18, height:18, borderRadius:5, flexShrink:0, 
+                        border:`2px solid ${done ? C.success : C.dim}`,
+                        background: done ? C.success : 'transparent', 
+                        display:'flex', alignItems:'center', justifyContent:'center' 
+                      }}>
+                        {done && <CheckCircle2 size={12} color="#000" strokeWidth={3} />}
                       </div>
-                      <span style={{ fontSize:11, color:done?C.success:C.sub, lineHeight:1.3 }}>{item}</span>
+                      <span style={{ fontSize:11, color: done ? C.text : C.sub, fontWeight: done ? 700 : 500, flex:1 }}>{item}</span>
+                      {done && <Tag color={C.success} small>확인됨</Tag>}
                     </div>
                   )
                 })}
               </div>
             </GPanel>
 
-            {/* 당직 연락처 */}
-            <GPanel title="당직 의료 담당" icon={<Phone size={12} color={C.info}/>}>
-              <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            {/* 3. 시스템 및 장비 건전성 */}
+            <GPanel title="시스템 및 장비 건전성" icon={<Shield size={12} color={C.success}/>}>
+              <div style={{ display:'flex', flexDirection:'column', gap:8, marginTop:5 }}>
                 {[
-                  { lv:'1차', name:'이선장', sub:'브릿지 · 내선 101', color:C.success },
-                  { lv:'2차', name:'부산원격의료센터 최원장', sub:'위성통신 #BUM-01 · 24시간', color:C.info },
-                  { lv:'3차', name:'제3해양경찰서', sub:'122 · 목포 해경', color:C.warning },
-                ].map((c,i)=>(
-                  <div key={i} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px', borderRadius:5, background:C.panel2, border:`1px solid ${C.border}` }}>
-                    <Tag color={c.color} small>{c.lv}</Tag>
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:12, fontWeight:700, color:C.text, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{c.name}</div>
-                      <div style={{ fontSize:10, color:C.sub }}>{c.sub}</div>
+                  { n:'MDTS 메인 서버', s:'ACTIVE', c:C.success, detail:'Uptime: 142d 08h' },
+                  { n:'AED 배터리/패드', s:'NORMAL', c:C.success, detail:'만료: 2026-11-20' },
+                  { n:'바이탈 센서 (Hub)', s:'STABLE', c:C.info, detail:'5개 노드 연결됨' },
+                  { n:'위성 통신 링크', s:'EXCELLENT', c:C.success, detail:'Starlink Gen3' },
+                ].map((d,i)=>(
+                  <div key={i} style={{ padding:'8px 12px', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:6 }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
+                      <span style={{ fontSize:11, fontWeight:700, color:C.text }}>{d.n}</span>
+                      <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                        <Dot color={d.c} pulse={d.c===C.success} />
+                        <span style={{ fontSize:9, fontWeight:900, color:d.c }}>{d.s}</span>
+                      </div>
                     </div>
-                    <button style={{ padding:'3px 10px', borderRadius:3, background:`${c.color}18`, border:`1px solid ${c.color}44`, color:c.color, fontSize:10, fontWeight:700, cursor:'pointer', flexShrink:0 }}>연결</button>
+                    <div style={{ fontSize:10, color:C.sub, fontFamily:'monospace' }}>{d.detail}</div>
                   </div>
                 ))}
-                <div style={{ padding:'8px 10px', borderRadius:5, background:`${C.cyan}0a`, border:`1px solid ${C.cyan}2a`, fontSize:11, color:C.cyan }}>
-                  <span style={{ color:C.sub }}>최근접 병원 </span>목포한국병원 85km · 헬기 30분
+              </div>
+            </GPanel>
+
+            {/* 4. 선내 담당자 관리 (추가됨) */}
+            <GPanel title="선내 담당자 관리 (차트 연동)" icon={<Users size={12} color={C.info}/>}>
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                <div style={{ background:C.panel2, border:`1px solid ${C.border}`, borderRadius:6, padding:10, display:'flex', flexDirection:'column', gap:8 }}>
+                   <div style={{ display:'flex', gap:6 }}>
+                      <input placeholder="이름" value={newManager.name} onChange={e=>setNewManager({...newManager, name:e.target.value})} style={{ flex:1, background:C.bg, border:`1px solid ${C.border}`, borderRadius:4, padding:'4px 8px', color:'#fff', fontSize:11 }} />
+                      <select value={newManager.role} onChange={e=>setNewManager({...newManager, role:e.target.value})} style={{ flex:1, background:C.bg, border:`1px solid ${C.border}`, borderRadius:4, padding:'4px 8px', color:'#fff', fontSize:11 }}>
+                        <option>안전책임자</option>
+                        <option>의료담당자</option>
+                        <option>당직사관</option>
+                        <option>선장</option>
+                      </select>
+                      <button onClick={()=>{
+                        if(!newManager.name) return alert('이름을 입력하세요.');
+                        setManagerList([...managerList, { ...newManager, id: 'm'+Date.now() }]);
+                        setNewManager({ name: '', role: '안전책임자' });
+                      }} style={{ background:C.info, color:'#000', border:'none', borderRadius:4, padding:'4px 12px', fontWeight:800, fontSize:11, cursor:'pointer' }}>등록</button>
+                   </div>
+                </div>
+                <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+                  {managerList.map((m, i) => (
+                    <div key={m.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 10px', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:6 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                        <span style={{ fontSize:11, fontWeight:800 }}>{m.name}</span>
+                        <Tag color={C.sub} small>{m.role}</Tag>
+                      </div>
+                      <button onClick={()=>{ if(confirm('삭제하시겠습니까?')) setManagerList(managerList.filter(x=>x.id!==m.id)) }} style={{ background:'none', border:'none', color:C.danger, cursor:'pointer', fontSize:10 }}>삭제</button>
+                    </div>
+                  ))}
                 </div>
               </div>
             </GPanel>
@@ -358,6 +368,60 @@ export default function Settings() {
 
         {/* ══ S2 : 선원 건강 모니터링 ════════════════════════════════════════ */}
         <Section id="s2" label="선원 건강 모니터링" color={C.success} collapsed={collapsed.s2} onToggle={()=>fold('s2')}>
+
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:10, marginBottom:10 }}>
+            <GPanel title="건강 위험 분포" icon={<Activity size={12} color={C.danger}/>}>
+              <div style={{ height:140, position:'relative' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={gaugeData} innerRadius={35} outerRadius={50} paddingAngle={5} dataKey="value" stroke="none">
+                      {gaugeData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.fill} />)}
+                    </Pie>
+                    <Tooltip contentStyle={{ background:C.panel, border:`1px solid ${C.border}`, fontSize:11 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', textAlign:'center', pointerEvents:'none' }}>
+                  <div style={{ fontSize:10, color:C.sub, fontWeight:800 }}>SAFETY</div>
+                  <div style={{ fontSize:18, fontWeight:900, color:'#fff' }}>{stats.safetyIndex}%</div>
+                </div>
+              </div>
+              <div style={{ display:'flex', justifyContent:'space-around', marginTop:5 }}>
+                {[{l:'정상',v:stats.normal,c:C.success},{l:'주의',v:stats.caution,c:C.warning},{l:'위험',v:stats.danger,c:C.danger}].map((x,i)=>(
+                  <div key={i} style={{ textAlign:'center' }}>
+                    <div style={{ fontSize:11, fontWeight:800, color:x.c }}>{x.v}</div>
+                    <div style={{ fontSize:9, color:C.sub }}>{x.l}</div>
+                  </div>
+                ))}
+              </div>
+            </GPanel>
+
+            <GPanel title="부서별 건강 상태" icon={<Users size={12} color={C.info}/>}>
+              <div style={{ height:140 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={deptPie} innerRadius={35} outerRadius={50} paddingAngle={5} dataKey="val" stroke="none" label={({name, percent})=>`${name} ${(percent*100).toFixed(0)}%`}>
+                      {deptPie.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                    </Pie>
+                    <Tooltip contentStyle={{ background:C.panel, border:`1px solid ${C.border}`, fontSize:11 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </GPanel>
+
+            <GPanel title="기저 질환 통계" icon={<AlertCircle size={12} color={C.warning}/>}>
+              <div style={{ height:170 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={disease.slice(0,5)} layout="vertical" margin={{ left: -10, right: 20 }}>
+                    <XAxis type="number" hide />
+                    <YAxis dataKey="name" type="category" stroke={C.sub} fontSize={9} width={60} tickLine={false} axisLine={false} />
+                    <Bar dataKey="val" radius={[0, 4, 4, 0]} barSize={10} fill={C.warning}>
+                      {disease.map((_, i) => <Cell key={i} fill={C.warning} fillOpacity={1 - i*0.15} />)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </GPanel>
+          </div>
 
           <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
             {/* 히트맵 */}
@@ -398,7 +462,12 @@ export default function Settings() {
         </Section>
 
         {/* ══ S4 : 응급처치 지침 & 교육 ══════════════════════════════════════ */}
-        <Section id="s4" label="응급처치 지침 및 교육 자료" color={C.purple} collapsed={collapsed.s4} onToggle={()=>fold('s4')}>
+        <Section id="s4" label={
+          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+            <span>응급처치 지침 및 교육 자료</span>
+            {unread > 0 && <span style={{ background:C.danger, color:'#fff', fontSize:10, padding:'1px 6px', borderRadius:10, fontWeight:900 }}>{unread} NEW</span>}
+          </div>
+        } color={C.purple} collapsed={collapsed.s4} onToggle={()=>fold('s4')}>
 
           <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:10 }}>
             {/* 상황별 처치 가이드 */}
@@ -476,7 +545,7 @@ export default function Settings() {
           {/* 통신 품질 + stat */}
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8, marginBottom:10 }}>
             {[
-              { l:'위성 신호', v:'매우 강함', c:C.success, sub:'스타링크' },
+              { l:'위Satellite 신호', v:'매우 강함', c:C.success, sub:'스타링크' },
               { l:'응답 속도', v:'42ms', c:C.info, sub:'최근 24h 평균' },
               { l:'마지막 동기화', v:'09:31', c:C.success, sub:'동기화 완료' },
               { l:'AI 버전', v:'v2.4.1', c:C.purple, sub:'Maritime-Edge' },
@@ -546,7 +615,7 @@ export default function Settings() {
                 <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
                   {[
                     { l:'생체 인증 로그인', k:'bio' },
-                    { l:'데이터 암호화', k:'enc' },
+                    { l:'데이터 암화화', k:'enc' },
                     { l:'30분 자동 로그아웃', k:'auto' },
                   ].map((s,i)=>(
                     <div key={i} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:11 }}>
@@ -611,7 +680,7 @@ export default function Settings() {
                 </div>
               ))}
               {filteredLogs.length===0 && <div style={{ color:C.sub }}>해당 로그가 없습니다.</div>}
-              <div style={{ color:C.sub }}>대기 중... <span style={{ animation:'blink 1s infinite' }}>|</span></div>
+              <div style={{ color:C.sub }}>대기 중...</div>
             </div>
           </GPanel>
         </Section>
@@ -632,9 +701,9 @@ export default function Settings() {
 
 /* ─── 서브 컴포넌트 ─── */
 
-const Section = React.forwardRef(function Section({ id, label, color, collapsed, onToggle, children }, _ref) {
+const Section = React.forwardRef(function Section({ id, label, color, collapsed, onToggle, children }, ref) {
   return (
-    <div id={id} style={{ marginBottom:20 }}>
+    <div id={id} ref={ref} style={{ marginBottom:20 }}>
       <div onClick={onToggle} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 12px', borderRadius:5,
         background:`${color}08`, border:`1px solid ${color}2a`, cursor:'pointer', marginBottom:collapsed?0:10, userSelect:'none' }}>
         <div style={{ width:2, height:14, borderRadius:1, background:color }}/>

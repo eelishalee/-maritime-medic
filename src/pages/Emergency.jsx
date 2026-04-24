@@ -204,11 +204,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     setTriageStep('SUMMARY')
   }
 
-  const handleFinish = () => {
-    setEndTime(new Date())
-    setTriageStep('SUMMARY')
-  }
-
   const getDuration = () => {
     if (!startTime || !endTime) return '0분 0초'
     const diff = Math.floor((endTime - startTime) / 1000)
@@ -368,7 +363,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const currentActionData = activeAction ? ACTION_GUIDES[activeAction] : null
   const activeDisplayIndex = hoveredStepIndex !== null ? hoveredStepIndex : (currentActionData?.steps.findIndex((_, i) => !completedSteps.includes(i)) ?? 0)
   const stepNum = activeDisplayIndex + 1
-  const stepImage = currentActionData?.steps[activeDisplayIndex]?.stepImage || currentActionData?.image
 
   return (
     <div style={{ height: 'calc(100vh - 72px)', width: '100%', background: '#020617', color: '#fff', position: 'relative', overflow: 'hidden', fontFamily: '"Pretendard", sans-serif' }}>
@@ -386,11 +380,8 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
           <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}><div style={{ fontSize: 18, fontWeight: 950 }}>처치 동작 시각 가이드</div></div>
             <div style={{ flex: 1, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-              {activeAction === '심폐소생술' && stepImage ? (
-                <img src={stepImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="SOP" />
-              ) : (
-                <div style={{ textAlign: 'center', color: '#64748b' }}><div style={{ fontSize: 22, fontWeight: 950, color: '#38bdf8' }}>{activeAction} 일러스트 준비 중</div></div>
-              )}
+              <IllustrationSelector action={activeAction} step={stepNum} />
+              
               {activeAction === '심폐소생술' && stepNum >= 3 && (
                 <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', background: beat ? '#ef4444' : '#b91c1c', borderRadius: '0 0 24px 24px', padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 12, transition: '0.1s', zIndex: 20 }}>
                   <Heart size={18} fill="#fff" color="#fff" /><div style={{ fontSize: 18, fontWeight: 950, color: '#fff' }}>박자에 맞춰 가슴을 힘껏 누르세요</div>
@@ -516,4 +507,26 @@ function ActionButtonIcon({ label, size = 24 }) {
   if (label === '상처 세척') return <Scissors size={size} />
   if (label === '화상') return <Flame size={size} />
   return <Info size={size} />
+}
+
+function IllustrationSelector({ action, step }) {
+  if (action === '심폐소생술') {
+    // Cardiac has steps 1, 2/3 (Press), 4 (AED)
+    const s = step === 2 ? 1 : step === 3 ? 2 : step;
+    return <CardiacIllustration step={s} />
+  }
+  if (action === '지혈/압박') {
+    return <TraumaIllustration step={step} />
+  }
+  if (action === '기도 확보') {
+    if (step === 1) return <UnconsciousIllustration step={1} />
+    if (step === 2) return <UnconsciousIllustration step={2} />
+    if (step === 3) return <RespiratoryIllustration step={2} /> // Oxygen mask
+    return <UnconsciousIllustration step={step} />
+  }
+  return (
+    <div style={{ textAlign: 'center', color: '#64748b' }}>
+      <div style={{ fontSize: 22, fontWeight: 950, color: '#38bdf8' }}>{action} 일러스트 준비 중</div>
+    </div>
+  )
 }

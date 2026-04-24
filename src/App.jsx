@@ -7,7 +7,6 @@ import Emergency from './pages/Emergency'
 import Patients from './pages/Patients'
 import PatientChart from './pages/PatientChart'
 import Settings from './pages/Settings'
-import ceAvatar from './assets/CE.jpeg'
 
 export default function App() {
   const [auth, setAuth] = useState(null)

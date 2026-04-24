@@ -91,12 +91,12 @@ export default function Layout({ activePage, onNavigate, auth, onLogout, isOnlin
         <div style={{
           display: 'flex', alignItems: 'center', gap: 5,
           padding: '4px 10px', borderRadius: 6,
-          background: 'rgba(255,77,109,0.1)',
-          border: '1px solid rgba(255,77,109,0.3)',
+          background: isOnline ? 'rgba(38,222,129,0.1)' : 'rgba(255,77,109,0.1)',
+          border: `1px solid ${isOnline ? 'rgba(38,222,129,0.3)' : 'rgba(255,77,109,0.3)'}`,
         }}>
-          <WifiOff size={11} color="var(--red-400)" />
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--red-400)' }}>
-            OFF LINE
+          {isOnline ? <Wifi size={11} color="var(--green-400)" /> : <WifiOff size={11} color="var(--red-400)" />}
+          <span style={{ fontSize: 11, fontWeight: 600, color: isOnline ? 'var(--green-400)' : 'var(--red-400)' }}>
+            {isOnline ? 'ON LINE' : 'OFF LINE'}
           </span>
         </div>
         {auth && (

@@ -1,17 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
 import { Activity, History, RotateCcw, Droplets, Upload, AlertTriangle, Camera, Mic, User, Pill, AlertCircle, MapPin, Phone, Anchor, Weight, Ruler, HeartPulse, Paperclip, ArrowUp, Sparkles, CheckCircle2, Clock, Database, ChevronRight, Info, ShieldCheck, Zap, Crosshair, Eye, Maximize } from 'lucide-react'
-import logoImg from '../../../assets/logo.png'
 import { DashboardVital, InfoItem, TimelineItem } from '../../../components/ui'
 import EmergencyGuide from './EmergencyGuide.jsx'
 
 export default function DashboardView({
   activePatient, hr, spo2, rr, bp, bt, chat, prompt, setPrompt,
   handlePromptAnalysis, startEmergencyAction, handleTraumaAnalysis,
-  isScanning, scanResult, scanError, setScanError, setIsScanning,
+  isScanning, scanError, setScanError, setIsScanning,
   setBp, setBt
 }) {
   const videoRef = useRef(null)
-  const [stream, setStream] = useState(null)
+  const streamRef = useRef(null)
+  const [isCameraActive, setIsCameraActive] = useState(false)
 
   // ─── 센서 상태 및 점검 안내 ───
   const [spo2Status, setSpo2Status] = useState('normal') // 'normal' | 'error'
@@ -44,27 +44,37 @@ export default function DashboardView({
 
   // 카메라 스트림 관리
   useEffect(() => {
+    let activeStream = null
     async function startCamera() {
       if (isScanning) {
         try {
           const s = await navigator.mediaDevices.getUserMedia({ 
             video: { facingMode: 'environment', width: 1280, height: 720 } 
           })
-          setStream(s)
+          activeStream = s
+          streamRef.current = s
           if (videoRef.current) videoRef.current.srcObject = s
+          setIsCameraActive(true)
         } catch (err) {
           console.error("카메라 접근 실패:", err)
         }
       } else {
-        if (stream) {
-          stream.getTracks().forEach(track => track.stop())
-          setStream(null)
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop())
+          streamRef.current = null
         }
+        setIsCameraActive(false)
       }
     }
     startCamera()
     return () => {
-      if (stream) stream.getTracks().forEach(track => track.stop())
+      if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop())
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop())
+        streamRef.current = null
+      }
     }
   }, [isScanning])
 
@@ -116,7 +126,13 @@ export default function DashboardView({
           }} />
 
           {/* 상단 안내 문구 영역 */}
-          <div style={{ position: 'absolute', top: 80, left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 1010 }}>
+          <div style={{ position: 'absolute', top: 80, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, zIndex: 1010 }}>
+            {isCameraActive && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(38,222,129,0.2)', padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(38,222,129,0.4)', animation: 'pulse 2s infinite' }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#26de81' }} />
+                <span style={{ fontSize: 13, fontWeight: 900, color: '#26de81', letterSpacing: '0.5px' }}>CAMERA ACTIVE</span>
+              </div>
+            )}
             <div style={{ background: 'rgba(0,0,0,0.75)', padding: '16px 50px', borderRadius: '16px', color: '#fff', fontSize: 22, fontWeight: 800, border: '1px solid rgba(255,255,255,0.1)', letterSpacing: '-0.5px', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
               외상 부위 전체를 사각형 프레임에 맞춰 인식해 주세요
             </div>
@@ -180,9 +196,11 @@ export default function DashboardView({
               <div style={{ fontSize: 16, color: '#475569', fontWeight: 700 }}>ID : {activePatient?.id || 'S2026-026'}</div>
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
             <InfoItem label="나이/성별" value={`${activePatient?.age || 55}세 / 남`} size="xl_ultra" />
             <InfoItem label="혈액형" value={activePatient?.blood || 'A+형'} size="xl_ultra" />
+            <InfoItem label="신장" value={`${activePatient?.height || 178} cm`} size="xl_ultra" />
+            <InfoItem label="몸무게" value={`${activePatient?.weight || 82} kg`} size="xl_ultra" />
           </div>
         </div>
 
@@ -290,7 +308,7 @@ export default function DashboardView({
       {/* [Center] Vitals & AI Assistant */}
       <section style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', borderRight: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ padding: '14px 45px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#080b12', position: 'relative' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 0.9fr 0.9fr 1.15fr 1.15fr', gap: 12 }}>
             <DashboardVital label="심박수" value={hr} unit="bpm" color="#ff4d6d" live />
             <div onClick={toggleSpo2Status} style={{ cursor: 'pointer' }}>
               <DashboardVital 

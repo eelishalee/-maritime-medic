@@ -780,7 +780,6 @@ function StepTimer({ seconds, color }) {
   const [running, setRunning] = useState(false)
   const ref = useRef(null)
 
-  useEffect(() => { setRemaining(seconds); setRunning(false); clearInterval(ref.current) }, [seconds])
   useEffect(() => () => clearInterval(ref.current), [])
 
   const toggle = () => {

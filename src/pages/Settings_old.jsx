@@ -23,7 +23,6 @@ const CHANNEL_COLORS = {
 
 export default function Settings() {
   const [activeChannel, setActiveChannel] = useState('ch16')
-  const [monitorChannel, setMonitorChannel] = useState('ch06')
   const [customFreq, setCustomFreq] = useState('')
   const [volume, setVolume] = useState(80)
   const [squelch, setSquelch] = useState(5)
@@ -74,7 +73,6 @@ export default function Settings() {
             {CHANNELS.map(ch => {
               const color = CHANNEL_COLORS[ch.type]
               const isActive = activeChannel === ch.id
-              const isMonitor = monitorChannel === ch.id && !isActive
               return (
                 <button
                   key={ch.id}

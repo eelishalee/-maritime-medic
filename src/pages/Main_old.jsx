@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Send, Activity, User, Clock, Edit3, Check, AlertCircle, ShieldCheck, Pill, ClipboardList, Thermometer, Droplets, Heart, Sparkles, Satellite, Radio, CheckCircle2, FileText, ChevronRight, Wifi, Upload, RotateCcw, History } from 'lucide-react'
+import { Send, Activity, Clock, Edit3, AlertCircle, Radio, CheckCircle2, History, Sparkles, RotateCcw } from 'lucide-react'
 import profileImg from '../assets/CE.jpeg'
 
 const HISTORY_DATA = [
@@ -21,11 +21,8 @@ const TX_LOG = [
   { time: '08:15', type: '전송완료', msg: '바이탈 데이터 패킷 #46', ok: true },
 ]
 
-export default function Main({ patient }) {
+export default function Main() {
   const [prompt, setPrompt] = useState('')
-  const [messages, setMessages] = useState([
-    { role: 'ai', text: `김항해 환자의 데이터가 로드되었습니다. 현재 상태에 대해 궁금한 점을 입력하세요.` }
-  ])
   
   // 실시간 심박수 시뮬레이션
   const [hr, setHr] = useState(82)
@@ -36,21 +33,14 @@ export default function Main({ patient }) {
     return () => clearInterval(t)
   }, [])
 
-  const [bp, setBp] = useState('128/84')
-  const [bt, setBt] = useState('36.7')
-  const [historyFilter, setHistoryFilter] = useState('전체')
+  const bp = '128/84'
+  const bt = '36.7'
+  const historyFilter = '전체'
   const [txLog] = useState(TX_LOG)
 
   const send = () => {
     if (!prompt.trim()) return
-    const userMsg = { role: 'user', text: prompt }
-    setMessages(m => [...m, userMsg])
-    const q = prompt
     setPrompt('')
-    setTimeout(() => {
-      const reply = getAiReply(q, patient)
-      setMessages(m => [...m, { role: 'ai', text: reply }])
-    }, 800)
   }
 
   const filteredHistory = historyFilter === '전체'
@@ -168,7 +158,7 @@ export default function Main({ patient }) {
                 <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(13,217,197,0.12)', borderRadius: 20, padding: '24px 28px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}><span style={{ fontSize: 14, padding: '4px 14px', borderRadius: 8, background: `${item.color}20`, color: item.color, fontWeight: 800 }}>{item.type}</span><span style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>{item.label}</span></div>
                   <div style={{ fontSize: 18, color: '#8da2c0', lineHeight: 1.7 }}>{item.detail}</div>
-                  <div style={{ marginTop: 14, fontSize: 14, color: '#4a6080', fontWeight: 500 }}>담당: {item.doctor}</div>
+                  <div style={{ marginTop: 14, fontSize: 14, color: '#4a6080', fontWeight: 500 }}>담당: 선내 의무관</div>
                 </div>
               </div>
             ))}
@@ -242,11 +232,4 @@ function SensorCard({ label, value, unit, color, status }) {
       )}
     </div>
   )
-}
-
-function getAiReply(text, patient) {
-  const t = text.toLowerCase()
-  if (t.includes('흉통') || t.includes('가슴')) return `김항해 환자의 흉통 증상은 기존 고혈압·고지혈증 병력과 연관될 수 있습니다. 현재 아스피린 알레르기가 있으므로 투약에 주의하세요. 즉시 심전도 측정 및 원격진료 연결을 권고합니다.`
-  if (t.includes('혈압') || t.includes('고혈압')) return `현재 혈압 측정값 128/84mmHg는 정상 범위입니다. 지속적인 모니터링을 유지하세요.`
-  return `현재 김항해 환자의 활력징후를 분석합니다. 심박수 82bpm, 혈압 128/84, 체온 36.7°C — 전반적으로 안정적인 상태입니다.`
 }
