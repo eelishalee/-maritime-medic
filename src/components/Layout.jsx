@@ -23,7 +23,16 @@ export default function Layout({ activePage, onNavigate, auth, onLogout, isOnlin
       zIndex: 50,
     }}>
       {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginRight: 48, flexShrink: 0 }}>
+      <div 
+        onClick={() => {
+          document.activeElement?.blur();
+          onNavigate('main');
+        }}
+        style={{ 
+          display: 'flex', alignItems: 'center', gap: 12, marginRight: 48, flexShrink: 0,
+          cursor: 'pointer' 
+        }}
+      >
         <img src={logoImg} alt="Logo" style={{ width: 42, height: 42, objectFit: 'contain' }} />
         <span style={{ fontSize: 24, fontWeight: 950, color: '#fff', letterSpacing: '-0.8px' }}>MDTS</span>
       </div>

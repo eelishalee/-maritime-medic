@@ -323,7 +323,7 @@ export default function Settings() {
         {/* ══ S2 : 선원 건강 모니터링 ════════════════════════════════════════ */}
         <Section id="s2" label="선원 건강 모니터링" color={C.success} collapsed={collapsed.s2} onToggle={()=>fold('s2')}>
 
-          <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:10, marginBottom:10 }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
             {/* 히트맵 */}
             <GPanel title="선원 건강 위험도 히트맵" icon={<Activity size={12} color={C.success}/>}
               right={<div style={{ display:'flex', gap:8, fontSize:10 }}>
@@ -344,10 +344,10 @@ export default function Settings() {
                           const rc = riskOf(crew)
                           return (
                             <div key={crew.id} title={`${crew.name} · ${crew.role}\n기저질환: ${crew.chronic}\n알레르기: ${crew.allergies}`}
-                              style={{ width:36, padding:'5px 2px', borderRadius:4, background:`${rc}1a`, border:`1px solid ${rc}44`, textAlign:'center', cursor:'pointer', transition:'all 0.15s' }}
+                              style={{ width:44, padding:'5px 2px', borderRadius:4, background:`${rc}1a`, border:`1px solid ${rc}44`, textAlign:'center', cursor:'pointer', transition:'all 0.15s' }}
                               onMouseEnter={e=>{e.currentTarget.style.background=`${rc}33`;e.currentTarget.style.transform='scale(1.08)'}}
                               onMouseLeave={e=>{e.currentTarget.style.background=`${rc}1a`;e.currentTarget.style.transform='scale(1)'}}>
-                              <div style={{ fontSize:9, fontWeight:800, color:rc }}>{crew.name.slice(0,2)}</div>
+                              <div style={{ fontSize:9, fontWeight:800, color:rc }}>{crew.name}</div>
                               <div style={{ width:5, height:5, borderRadius:'50%', background:rc, margin:'2px auto 0' }}/>
                             </div>
                           )
@@ -356,50 +356,6 @@ export default function Settings() {
                     </div>
                   )
                 })}
-              </div>
-            </GPanel>
-
-            {/* 부서 분포 */}
-            <GPanel title="부서별 분포" icon={<Users size={12} color={C.info}/>}>
-              <div style={{ height:150 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={deptPie} innerRadius={40} outerRadius={60} paddingAngle={4} dataKey="val">
-                      {deptPie.map((d,i)=><Cell key={i} fill={d.color} stroke="none"/>)}
-                    </Pie>
-                    <Tooltip contentStyle={{ background:C.panel, border:`1px solid ${C.border}`, fontSize:11, borderRadius:6 }} formatter={(v,n)=>[`${v}명`,n]}/>
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:6, paddingTop:8, borderTop:`1px solid ${C.border}` }}>
-                {deptPie.map((d,i)=>(
-                  <div key={i} style={{ display:'flex', alignItems:'center', gap:8, fontSize:11 }}>
-                    <div style={{ width:8, height:8, borderRadius:2, background:d.color }}/>
-                    <span style={{ flex:1, color:C.sub }}>{d.name}</span>
-                    <span style={{ fontWeight:800, color:d.color, fontFamily:'monospace' }}>{d.val}명</span>
-                  </div>
-                ))}
-              </div>
-            </GPanel>
-          </div>
-
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-            {/* 기저질환 Bar */}
-            <GPanel title="기저질환 집계" icon={<Heart size={12} color={C.danger}/>}>
-              <div style={{ height:160 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={disease} layout="vertical" margin={{ left:-10 }}>
-                    <XAxis type="number" hide />
-                    <YAxis dataKey="name" type="category" stroke={C.sub} fontSize={11} width={80} tickLine={false} axisLine={false}/>
-                    <Tooltip contentStyle={{ background:C.panel, border:`1px solid ${C.border}`, fontSize:11, borderRadius:6 }} formatter={v=>[`${v}명`,'']}/>
-                    <Bar dataKey="val" fill={C.danger} radius={[0,4,4,0]} barSize={12}
-                      label={{ position:'right', fill:C.sub, fontSize:10, formatter:v=>`${v}명` }}/>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div style={{ marginTop:8, padding:'8px 10px', background:`${C.danger}0a`, border:`1px solid ${C.danger}2a`, borderRadius:5, fontSize:11 }}>
-                <span style={{ color:C.danger, fontWeight:700 }}>약물 알레르기 </span>
-                <span style={{ color:C.sub }}>아스피린→박기관 · 페니실린→김항해 · 땅콩→서냉각</span>
               </div>
             </GPanel>
 
@@ -434,7 +390,7 @@ export default function Settings() {
         {/* ══ S3 : 원격 의료 연결 ══════════════════════════════════════════ */}
         <Section id="s3" label="원격 의료 연결 관리" color={C.info} collapsed={collapsed.s3} onToggle={()=>fold('s3')}>
 
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
             {/* 전송 현황 */}
             <GPanel title="데이터 전송 이력" icon={<Send size={12} color={C.info}/>}
               right={<button style={{ padding:'3px 10px', borderRadius:4, background:`${C.info}18`, border:`1px solid ${C.info}44`, color:C.info, fontSize:10, fontWeight:700, cursor:'pointer' }}>수동 전송</button>}>
@@ -463,58 +419,30 @@ export default function Settings() {
               </div>
             </GPanel>
 
-            {/* 의사 지시사항 */}
-            <GPanel title="의사 지시사항 수신함" icon={<Inbox size={12} color={C.purple}/>}
-              right={unread>0?<span style={{ padding:'2px 8px', borderRadius:10, background:C.danger, color:'#fff', fontSize:10, fontWeight:700 }}>미확인 {unread}</span>:null}>
-              <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-                {orders.map(o=>{
-                  const pc = o.pri==='긴급'?C.danger:o.pri==='일반'?C.info:C.sub
-                  return (
-                    <div key={o.id} style={{ padding:'10px 12px', borderRadius:5, border:`1px solid ${pc}33`, background:`${pc}06` }}>
-                      <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
-                        <div style={{ display:'flex', gap:6, alignItems:'center' }}>
-                          <Tag color={pc} small>{o.pri}</Tag>
-                          <span style={{ fontSize:10, color:C.sub }}>{o.doc}</span>
-                        </div>
-                        {!o.read && <Dot color={C.danger}/>}
-                      </div>
-                      <div style={{ fontSize:10, color:C.sub, marginBottom:3 }}>대상: {o.patient}</div>
-                      <div style={{ fontSize:12, color:C.text, lineHeight:1.5 }}>{o.msg}</div>
-                      <div style={{ display:'flex', gap:6, marginTop:8 }}>
-                        {!o.read && <Btn color={C.info} onClick={()=>setOrders(p=>p.map(x=>x.id===o.id?{...x,read:true}:x))}>읽음</Btn>}
-                        {!o.done && <Btn color={C.success} onClick={()=>setOrders(p=>p.map(x=>x.id===o.id?{...x,done:true,read:true}:x))}>이행 완료</Btn>}
-                        {o.done && <span style={{ fontSize:10, color:C.success }}>✓ 완료</span>}
-                      </div>
+            {/* 병원 조회 */}
+            <GPanel title="해상 위치 기반 수신 병원 (34°30'N 127°45'E · 여수해협)" icon={<MapPin size={12} color={C.warning}/>}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8 }}>
+                {[
+                  { name:'목포한국병원', dist:85, eta:'헬기 30분', trauma:false, cardio:true, gen:true },
+                  { name:'부산대학교병원', dist:120, eta:'헬기 45분', trauma:true, cardio:true, gen:true },
+                  { name:'여수전남병원', dist:150, eta:'헬기 55분', trauma:true, cardio:false, gen:true },
+                  { name:'인천성모병원', dist:310, eta:'헬기 95분', trauma:true, cardio:true, gen:true },
+                ].map((h,i)=>(
+                  <div key={i} style={{ padding:'12px', borderRadius:5, background:C.panel2, border:`1px solid ${C.border}` }}>
+                    <div style={{ fontSize:12, fontWeight:700, marginBottom:4 }}>{h.name}</div>
+                    <div style={{ fontSize:18, fontWeight:900, color:C.cyan, fontFamily:'monospace' }}>{h.dist}<span style={{ fontSize:11, color:C.sub }}> km</span></div>
+                    <div style={{ fontSize:10, color:C.sub, marginBottom:8 }}>{h.eta}</div>
+                    <div style={{ display:'flex', flexWrap:'wrap', gap:3 }}>
+                      {h.trauma && <Tag color={C.danger} small>외상</Tag>}
+                      {h.cardio && <Tag color={C.info} small>심혈관</Tag>}
+                      {h.gen && <Tag color={C.success} small>일반외과</Tag>}
                     </div>
-                  )
-                })}
+                    <button style={{ width:'100%', marginTop:8, padding:'5px', borderRadius:4, background:`${C.warning}18`, border:`1px solid ${C.warning}44`, color:C.warning, fontSize:10, fontWeight:700, cursor:'pointer' }}>헬기 후송</button>
+                  </div>
+                ))}
               </div>
             </GPanel>
           </div>
-
-          {/* 병원 조회 */}
-          <GPanel title="해상 위치 기반 수신 병원 (34°30'N 127°45'E · 여수해협)" icon={<MapPin size={12} color={C.warning}/>} style={{ marginTop:10 }}>
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8 }}>
-              {[
-                { name:'목포한국병원', dist:85, eta:'헬기 30분', trauma:false, cardio:true, gen:true },
-                { name:'부산대학교병원', dist:120, eta:'헬기 45분', trauma:true, cardio:true, gen:true },
-                { name:'여수전남병원', dist:150, eta:'헬기 55분', trauma:true, cardio:false, gen:true },
-                { name:'인천성모병원', dist:310, eta:'헬기 95분', trauma:true, cardio:true, gen:true },
-              ].map((h,i)=>(
-                <div key={i} style={{ padding:'12px', borderRadius:5, background:C.panel2, border:`1px solid ${C.border}` }}>
-                  <div style={{ fontSize:12, fontWeight:700, marginBottom:4 }}>{h.name}</div>
-                  <div style={{ fontSize:18, fontWeight:900, color:C.cyan, fontFamily:'monospace' }}>{h.dist}<span style={{ fontSize:11, color:C.sub }}> km</span></div>
-                  <div style={{ fontSize:10, color:C.sub, marginBottom:8 }}>{h.eta}</div>
-                  <div style={{ display:'flex', flexWrap:'wrap', gap:3 }}>
-                    {h.trauma && <Tag color={C.danger} small>외상</Tag>}
-                    {h.cardio && <Tag color={C.info} small>심혈관</Tag>}
-                    {h.gen && <Tag color={C.success} small>일반외과</Tag>}
-                  </div>
-                  <button style={{ width:'100%', marginTop:8, padding:'5px', borderRadius:4, background:`${C.warning}18`, border:`1px solid ${C.warning}44`, color:C.warning, fontSize:10, fontWeight:700, cursor:'pointer' }}>헬기 후송</button>
-                </div>
-              ))}
-            </div>
-          </GPanel>
         </Section>
 
         {/* ══ S4 : SOP 매뉴얼 & 교육 ══════════════════════════════════════ */}

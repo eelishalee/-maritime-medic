@@ -324,7 +324,6 @@ export default function DashboardView({
                 {editTarget === 'bp' ? '혈압 입력' : '체온 입력'}
               </div>
               <input 
-                autoFocus
                 value={editValue} 
                 placeholder={editTarget === 'bp' ? '예: 120/80' : '예: 36.5'}
                 onChange={e => setEditValue(e.target.value)}
