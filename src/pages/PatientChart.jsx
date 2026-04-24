@@ -33,7 +33,7 @@ export default function PatientChart({ patient: activePatientProp }) {
     <div style={{ padding: '0', height: 'calc(100vh - 56px)', overflow: 'auto', background: '#020617', color: '#fff', fontFamily: '"Pretendard", sans-serif' }}>
       
       {/* 상단 고정 헤더 : 환자 선택 셀렉터 및 요약 */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(7, 15, 30, 0.95)', backdropFilter: 'blur(15px)', borderBottom: `1px solid ${patient.isEmergency ? '#ff4d6d40' : 'rgba(13,217,197,0.2)'}`, padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(7, 15, 30, 0.95)', backdropFilter: 'blur(15px)', borderBottom: `1px solid ${patient.isEmergency ? '#ff4d6d40' : 'rgba(13,217,197,0.2)'}`, padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           {/* 환자 선택 셀렉트 박스 */}
           <div style={{ position: 'relative', minWidth: '320px' }}>
@@ -102,7 +102,7 @@ export default function PatientChart({ patient: activePatientProp }) {
         </div>
       </div>
 
-      <div style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: '280px 1fr', gap: 20 }}>
+      <div style={{ padding: '10px 16px', display: 'grid', gridTemplateColumns: '240px 1fr', gap: 12 }}>
         
         {/* 왼쪽 사이드바 : 환자 기본 의료 정보 (정적 정보) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -134,10 +134,10 @@ export default function PatientChart({ patient: activePatientProp }) {
               <InputGroup label="발생 시각 및 장소" placeholder="예: 오전 10:30, 2번 데크 작업 중" />
               <InputGroup label="통증 부위" placeholder="예: 오른쪽 발목, 가슴 답답함 등" />
               <div style={{ gridColumn: 'span 2' }}>
-                <label style={{ fontSize: 15, color: '#94a3b8', fontWeight: 700, marginBottom: 10, display: 'block' }}>통증 강도 (0: 없음 ~ 10: 참을 수 없음)</label>
-                <div style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)', padding: '15px', borderRadius: 15, border: '1px solid rgba(255,255,255,0.05)' }}>
+                <label style={{ fontSize: 13, color: '#94a3b8', fontWeight: 700, marginBottom: 6, display: 'block' }}>통증 강도 (0: 없음 ~ 10: 참을 수 없음)</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.05)' }}>
                   {[0,1,2,3,4,5,6,7,8,9,10].map(n => (
-                    <button key={n} style={{ width: 36, height: 36, borderRadius: '50%', border: 'none', background: n > 7 ? '#ff4d6d' : n > 4 ? '#fb923c' : '#475569', color: '#fff', fontWeight: 900, cursor: 'pointer' }}>{n}</button>
+                    <button key={n} style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: n > 7 ? '#ff4d6d' : n > 4 ? '#fb923c' : '#475569', color: '#fff', fontWeight: 900, cursor: 'pointer', fontSize: 12 }}>{n}</button>
                   ))}
                 </div>
               </div>
@@ -154,13 +154,13 @@ export default function PatientChart({ patient: activePatientProp }) {
               <CheckItem label="호흡 곤란" />
               <CheckItem label="안색 창백/청색증" />
             </div>
-            <button style={{ marginTop: 20, width: '100%', padding: '15px', borderRadius: 15, background: 'rgba(13,217,197,0.1)', border: '1px dashed #0dd9c5', color: '#0dd9c5', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-              <Camera size={20}/> 환부 사진 촬영 및 첨부
+            <button style={{ marginTop: 12, width: '100%', padding: '10px', borderRadius: 10, background: 'rgba(13,217,197,0.1)', border: '1px dashed #0dd9c5', color: '#0dd9c5', fontWeight: 800, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <Camera size={16}/> 환부 사진 촬영 및 첨부
             </button>
           </ChartSection>
 
           {/* A & P: 판단 및 조치 계획 */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 25 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 12 }}>
             <ChartSection title="STEP 3. 의료 판단 (NEWS/MEWS)" sub="현재 환자의 상태 단계는 무엇인가요?" icon={<AlertCircle size={24}/>}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <StatusOption color="#10b981" label="정상 (Normal)" desc="정기적 모니터링" />
@@ -171,13 +171,13 @@ export default function PatientChart({ patient: activePatientProp }) {
             </ChartSection>
 
             <ChartSection title="STEP 4. 조치 내역 및 계획" sub="어떤 도움을 주었나요?" icon={<Pill size={24}/>}>
-              <textarea 
+              <textarea
                 placeholder="예: 상처 부위 소독 후 압박 붕대 실시. 타이레놀 1정 복용함. 1시간 뒤 다시 체크 예정."
-                style={{ width: '100%', minHeight: 120, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 15, padding: '15px', color: '#fff', fontSize: 16, outline: 'none', resize: 'none' }}
+                style={{ width: '100%', minHeight: 80, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px', color: '#fff', fontSize: 14, outline: 'none', resize: 'none' }}
               />
-              <div style={{ marginTop: 15, display: 'flex', justifyContent: 'flex-end' }}>
-                <button style={{ padding: '12px 30px', borderRadius: 12, background: '#0dd9c5', color: '#020617', border: 'none', fontWeight: 900, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <CheckCircle2 size={20}/> 차트 저장 및 원격 보고
+              <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
+                <button style={{ padding: '10px 20px', borderRadius: 10, background: '#0dd9c5', color: '#020617', border: 'none', fontWeight: 900, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <CheckCircle2 size={16}/> 차트 저장 및 원격 보고
                 </button>
               </div>
             </ChartSection>
@@ -191,12 +191,12 @@ export default function PatientChart({ patient: activePatientProp }) {
 
 function VitalCard({ label, value, unit, icon, color, alert }) {
   return (
-    <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${alert ? color : 'rgba(255,255,255,0.1)'}`, padding: '12px 20px', borderRadius: 16, minWidth: 120, textAlign: 'center' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#64748b', fontSize: 14, marginBottom: 5 }}>
+    <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${alert ? color : 'rgba(255,255,255,0.1)'}`, padding: '8px 14px', borderRadius: 12, minWidth: 100, textAlign: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, color: '#64748b', fontSize: 12, marginBottom: 3 }}>
         <span style={{ color }}>{icon}</span> {label}
       </div>
-      <div style={{ fontSize: 20, fontWeight: 950, color: alert ? color : '#fff' }}>
-        {value}<span style={{ fontSize: 13, fontWeight: 500, color: '#475569', marginLeft: 3 }}>{unit}</span>
+      <div style={{ fontSize: 17, fontWeight: 950, color: alert ? color : '#fff' }}>
+        {value}<span style={{ fontSize: 11, fontWeight: 500, color: '#475569', marginLeft: 3 }}>{unit}</span>
       </div>
     </div>
   )
@@ -204,8 +204,8 @@ function VitalCard({ label, value, unit, icon, color, alert }) {
 
 function StaticInfoCard({ title, icon, children, color = '#0dd9c5' }) {
   return (
-    <div style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: '24px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 15, color, fontSize: 16, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>
+    <div style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: '14px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color, fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
         {icon} {title}
       </div>
       {children}
@@ -215,16 +215,16 @@ function StaticInfoCard({ title, icon, children, color = '#0dd9c5' }) {
 
 function InfoRow({ label, value }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-      <span style={{ color: '#64748b', fontSize: 15, fontWeight: 600 }}>{label}</span>
-      <span style={{ color: '#fff', fontSize: 15, fontWeight: 800 }}>{value}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+      <span style={{ color: '#64748b', fontSize: 12, fontWeight: 600 }}>{label}</span>
+      <span style={{ color: '#fff', fontSize: 12, fontWeight: 800 }}>{value}</span>
     </div>
   )
 }
 
 function Tag({ children, color }) {
   return (
-    <span style={{ padding: '4px 12px', borderRadius: 8, background: `${color}15`, color, border: `1px solid ${color}30`, fontSize: 14, fontWeight: 700 }}>
+    <span style={{ padding: '3px 8px', borderRadius: 6, background: `${color}15`, color, border: `1px solid ${color}30`, fontSize: 12, fontWeight: 700 }}>
       {children}
     </span>
   )
@@ -232,14 +232,14 @@ function Tag({ children, color }) {
 
 function ChartSection({ title, sub, icon, children }) {
   return (
-    <div style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: '30px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 15, marginBottom: 25 }}>
-        <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(13,217,197,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0dd9c5' }}>
+    <div style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: '16px 18px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(13,217,197,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0dd9c5', flexShrink: 0 }}>
           {icon}
         </div>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 950, color: '#fff' }}>{title}</div>
-          <div style={{ fontSize: 15, color: '#64748b', marginTop: 2 }}>{sub}</div>
+          <div style={{ fontSize: 15, fontWeight: 950, color: '#fff' }}>{title}</div>
+          <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{sub}</div>
         </div>
       </div>
       {children}
@@ -249,12 +249,12 @@ function ChartSection({ title, sub, icon, children }) {
 
 function InputGroup({ label, placeholder }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <label style={{ fontSize: 15, color: '#94a3b8', fontWeight: 700 }}>{label}</label>
-      <input 
-        type="text" 
-        placeholder={placeholder} 
-        style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '14px 18px', color: '#fff', fontSize: 16, outline: 'none', boxSizing: 'border-box' }} 
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <label style={{ fontSize: 13, color: '#94a3b8', fontWeight: 700 }}>{label}</label>
+      <input
+        type="text"
+        placeholder={placeholder}
+        style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
       />
     </div>
   )
@@ -262,22 +262,22 @@ function InputGroup({ label, placeholder }) {
 
 function CheckItem({ label }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 15, cursor: 'pointer' }}>
-      <div style={{ width: 22, height: 22, borderRadius: 6, border: '2px solid #475569' }} />
-      <span style={{ fontSize: 16, fontWeight: 700, color: '#cbd5e1' }}>{label}</span>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 10, cursor: 'pointer' }}>
+      <div style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #475569', flexShrink: 0 }} />
+      <span style={{ fontSize: 13, fontWeight: 700, color: '#cbd5e1' }}>{label}</span>
     </div>
   )
 }
 
 function StatusOption({ color, label, desc, active }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 15, padding: '18px', background: active ? `${color}15` : 'rgba(255,255,255,0.02)', border: `2px solid ${active ? color : 'transparent'}`, borderRadius: 15, cursor: 'pointer', transition: '0.2s' }}>
-      <div style={{ width: 16, height: 16, borderRadius: '50%', background: color }} />
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: active ? `${color}15` : 'rgba(255,255,255,0.02)', border: `2px solid ${active ? color : 'transparent'}`, borderRadius: 10, cursor: 'pointer', transition: '0.2s' }}>
+      <div style={{ width: 12, height: 12, borderRadius: '50%', background: color, flexShrink: 0 }} />
       <div>
-        <div style={{ fontSize: 17, fontWeight: 900, color: active ? color : '#fff' }}>{label}</div>
-        <div style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>{desc}</div>
+        <div style={{ fontSize: 13, fontWeight: 900, color: active ? color : '#fff' }}>{label}</div>
+        <div style={{ fontSize: 11, color: '#64748b', marginTop: 1 }}>{desc}</div>
       </div>
-      {active && <CheckCircle2 size={20} style={{ marginLeft: 'auto', color }} />}
+      {active && <CheckCircle2 size={16} style={{ marginLeft: 'auto', color }} />}
     </div>
   )
 }

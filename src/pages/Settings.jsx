@@ -224,9 +224,9 @@ export default function Settings() {
             ].map((s,i)=>(
               <div key={i} style={{ background:C.panel, border:`1px solid ${C.border}`, borderTop:`2px solid ${s.color}`, borderRadius:6, padding:'14px 16px' }}>
                 <div style={{ fontSize:11, color:C.sub, fontWeight:700, marginBottom:6 }}>{s.l}</div>
-                <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:8 }}>
-                  <span style={{ fontSize:30, fontWeight:900, color:s.color, fontFamily:"'Pretendard Variable', Pretendard, sans-serif", lineHeight:1 }}>{s.v}</span>
-                  <span style={{ fontSize:12, color:C.sub }}>{s.u}</span>
+                <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:6 }}>
+                  <span style={{ fontSize:24, fontWeight:900, color:s.color, fontFamily:"'Pretendard Variable', Pretendard, sans-serif", lineHeight:1 }}>{s.v}</span>
+                  <span style={{ fontSize:11, color:C.sub }}>{s.u}</span>
                 </div>
                 <div style={{ height:32 }}>
                   <ResponsiveContainer width="100%" height="100%">

@@ -4,8 +4,10 @@ import logoImg from '../assets/logo.png'
 const NAV = [
   { id: 'main',      label: '메인' },
   { id: 'chart',     label: '환자 차트' },
+  { id: 'patients',  label: '선원 환자' },
   { id: 'crew',      label: '선원 관리' },
   { id: 'emergency', label: '응급 처치' },
+  { id: 'ai',        label: 'AI 분석' },
   { id: 'settings',  label: '시스템 설정' },
 ]
 
@@ -37,12 +39,12 @@ export default function Layout({ activePage, onNavigate, auth, onLogout, isOnlin
               key={id}
               onClick={() => onNavigate(id)}
               style={{
-                padding: '0 20px',
+                padding: '0 14px',
                 height: '100%',
                 border: 'none', cursor: 'pointer',
                 background: active ? 'rgba(13,217,197,0.1)' : 'transparent',
                 color: active ? 'var(--teal-400)' : 'var(--text-secondary)',
-                fontSize: 15, fontWeight: active ? 700 : 500,
+                fontSize: 13, fontWeight: active ? 700 : 500,
                 transition: 'all 0.15s',
                 position: 'relative',
                 display: 'flex', alignItems: 'center', gap: 10,

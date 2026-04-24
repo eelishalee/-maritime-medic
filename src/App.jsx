@@ -7,6 +7,7 @@ import Emergency from './pages/Emergency'
 import Patients from './pages/Patients'
 import PatientChart from './pages/PatientChart'
 import Settings from './pages/Settings'
+import AIAnalysis from './pages/AIAnalysis'
 import ceAvatar from './assets/CE.jpeg'
 
 export default function App() {
@@ -70,14 +71,20 @@ export default function App() {
           <CrewManagement onSelectPatient={p => { setActivePatient(p); handleNavigate('main') }} />
         )}
         {page === 'emergency' && (
-          <Emergency 
-            patient={activePatient} 
-            initialAction={emergencyData?.traumaType || emergencyData?.type} 
+          <Emergency
+            patient={activePatient}
+            initialAction={emergencyData?.traumaType || emergencyData?.type}
             onNavigate={handleNavigate}
           />
         )}
         {page === 'chart'     && (
           <PatientChart patient={activePatient} />
+        )}
+        {page === 'patients'  && (
+          <Patients onSelectPatient={p => { setActivePatient(p); handleNavigate('chart') }} />
+        )}
+        {page === 'ai'        && (
+          <AIAnalysis patient={activePatient} onNavigate={handleNavigate} />
         )}
         {page === 'settings'  && <Settings />}
       </div>

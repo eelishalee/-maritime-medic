@@ -49,7 +49,7 @@ const PATIENTS = [
 const RISK_COLOR = { low: '#26de81', medium: '#fb923c', high: '#ef4444' }
 const RISK_BG = { low: 'rgba(38,222,129,0.1)', medium: 'rgba(251,146,60,0.1)', high: 'rgba(239,68,68,0.1)' }
 
-export default function Patients() {
+export default function Patients({ onSelectPatient }) {
   const [selected, setSelected] = useState(PATIENTS[0])
   const [query, setQuery] = useState('')
 
@@ -58,14 +58,14 @@ export default function Patients() {
   )
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', height: 'calc(100vh - 56px)', background: '#020617', color: '#f1f5f9', overflow: 'hidden', fontFamily: '"Pretendard", sans-serif' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', height: 'calc(100vh - 56px)', background: '#020617', color: '#f1f5f9', overflow: 'hidden', fontFamily: '"Pretendard", sans-serif' }}>
       
       {/* ── 좌측 환자 리스트 영역 ── */}
       <div style={{ borderRight: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', background: '#030816' }}>
-        <div style={{ padding: '24px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <Activity color="#0dd9c5" size={24} />
-            <h1 style={{ fontSize: 22, fontWeight: 950, margin: 0, letterSpacing: '-0.5px' }}>선원 환자 차트</h1>
+        <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <Activity color="#0dd9c5" size={18} />
+            <h1 style={{ fontSize: 17, fontWeight: 950, margin: 0, letterSpacing: '-0.5px' }}>선원 환자 차트</h1>
           </div>
           <div style={{ position: 'relative' }}>
             <Search style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#475569' }} size={16} />
@@ -121,30 +121,30 @@ export default function Patients() {
           <div style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
             
             {/* 상단 슬림 프로필 헤더 */}
-            <div style={{ 
-              background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', 
-              borderRadius: 24, padding: '24px 32px', display: 'flex', gap: 32, alignItems: 'center',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+            <div style={{
+              background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
+              borderRadius: 16, padding: '14px 20px', display: 'flex', gap: 20, alignItems: 'center',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
             }}>
-              <div style={{ width: 84, height: 84, borderRadius: 20, background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${RISK_COLOR[selected.risk]}44` }}>
-                <User size={42} color={RISK_COLOR[selected.risk]} />
+              <div style={{ width: 60, height: 60, borderRadius: 14, background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${RISK_COLOR[selected.risk]}44`, flexShrink: 0 }}>
+                <User size={30} color={RISK_COLOR[selected.risk]} />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
-                  <h2 style={{ fontSize: 32, fontWeight: 950, margin: 0, letterSpacing: '-1px' }}>{selected.name}</h2>
-                  <span style={{ fontSize: 12, padding: '4px 12px', borderRadius: 8, background: RISK_BG[selected.risk], color: RISK_COLOR[selected.risk], fontWeight: 900, border: `1px solid ${RISK_COLOR[selected.risk]}33` }}>{selected.risk.toUpperCase()} SEVERITY</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
+                  <h2 style={{ fontSize: 22, fontWeight: 950, margin: 0, letterSpacing: '-0.5px' }}>{selected.name}</h2>
+                  <span style={{ fontSize: 11, padding: '3px 8px', borderRadius: 6, background: RISK_BG[selected.risk], color: RISK_COLOR[selected.risk], fontWeight: 900, border: `1px solid ${RISK_COLOR[selected.risk]}33` }}>{selected.risk.toUpperCase()}</span>
                 </div>
-                <div style={{ display: 'flex', gap: 20, fontSize: 14, color: '#94a3b8', fontWeight: 700 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Activity size={14} /> {selected.role}</div>
+                <div style={{ display: 'flex', gap: 14, fontSize: 12, color: '#94a3b8', fontWeight: 700 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Activity size={12} /> {selected.role.split('(')[0].trim()}</div>
                   <span>나이: {selected.age}세</span>
                   <span style={{ color: '#ff4d6d' }}>혈액형: {selected.blood}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Weight size={14} /> {selected.weight}kg</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Ruler size={14} /> {selected.height}cm</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Weight size={12} /> {selected.weight}kg</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Ruler size={12} /> {selected.height}cm</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <button style={{ height: 48, padding: '0 24px', borderRadius: 14, background: '#0dd9c5', color: '#020617', border: 'none', fontWeight: 950, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}><Phone size={18} /> 원격진료</button>
-                <button style={{ height: 48, padding: '0 24px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', fontWeight: 800, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}><FileText size={18} /> 기록 작성</button>
+              <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                <button style={{ height: 38, padding: '0 16px', borderRadius: 10, background: '#0dd9c5', color: '#020617', border: 'none', fontWeight: 950, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><Phone size={14} /> 원격진료</button>
+                <button style={{ height: 38, padding: '0 16px', borderRadius: 10, background: 'rgba(255,255,255,0.03)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', fontWeight: 800, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><FileText size={14} /> 기록 작성</button>
               </div>
             </div>
 
@@ -168,8 +168,8 @@ export default function Patients() {
               </div>
 
               {/* 2. 주간 심박 트렌드 */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: '24px', height: 400 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0dd9c5', marginBottom: 20 }}>WEEKLY VITAL TREND</h3>
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: '16px', height: 280 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 900, color: '#0dd9c5', marginBottom: 12 }}>WEEKLY VITAL TREND</h3>
                 <div style={{ height: 'calc(100% - 40px)' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={selected.trend}>
