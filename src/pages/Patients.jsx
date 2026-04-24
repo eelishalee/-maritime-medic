@@ -58,11 +58,11 @@ export default function Patients({ onSelectPatient }) {
   )
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', height: 'calc(100vh - 56px)', background: '#020617', color: '#f1f5f9', overflow: 'hidden', fontFamily: '"Pretendard", sans-serif' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'var(--col-left) 1fr', height: 'var(--content-h)', background: '#020617', color: '#f1f5f9', overflow: 'hidden', fontFamily: '"Pretendard", sans-serif' }}>
       
       {/* ── 좌측 환자 리스트 영역 ── */}
       <div style={{ borderRight: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', background: '#030816' }}>
-        <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: 'var(--sp-4) var(--sp-4)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <Activity color="#0dd9c5" size={18} />
             <h1 style={{ fontSize: 17, fontWeight: 950, margin: 0, letterSpacing: '-0.5px' }}>선원 환자 차트</h1>
@@ -78,7 +78,7 @@ export default function Patients({ onSelectPatient }) {
           </div>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 8 }}>
           {filtered.map(p => {
             const active = selected?.id === p.id
             return (
@@ -86,7 +86,7 @@ export default function Patients({ onSelectPatient }) {
                 key={p.id}
                 onClick={() => setSelected(p)}
                 style={{
-                  padding: '16px', borderRadius: 16, textAlign: 'left', cursor: 'pointer', transition: '0.2s',
+                  padding: 'var(--sp-4)', borderRadius: 16, textAlign: 'left', cursor: 'pointer', transition: '0.2s',
                   background: active ? 'rgba(13,217,197,0.08)' : 'rgba(255,255,255,0.01)',
                   border: `1.5px solid ${active ? '#0dd9c5' : 'transparent'}`,
                   boxShadow: active ? '0 4px 20px rgba(0,0,0,0.4)' : 'none'
@@ -116,14 +116,14 @@ export default function Patients({ onSelectPatient }) {
       </div>
 
       {/* ── 우측 환자 상세 차트 영역 ── */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--sp-6)' }}>
         {selected && (
           <div style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
             
             {/* 상단 슬림 프로필 헤더 */}
             <div style={{
               background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
-              borderRadius: 16, padding: '14px 20px', display: 'flex', gap: 20, alignItems: 'center',
+              borderRadius: 16, padding: 'var(--sp-4) var(--sp-5)', display: 'flex', gap: 20, alignItems: 'center',
               boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
             }}>
               <div style={{ width: 60, height: 60, borderRadius: 14, background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${RISK_COLOR[selected.risk]}44`, flexShrink: 0 }}>
@@ -149,15 +149,15 @@ export default function Patients({ onSelectPatient }) {
             </div>
 
             {/* 3컬럼 메인 그리드 */}
-            <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr 260px', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'var(--col-left) 1fr var(--col-narrow)', gap: 14 }}>
               
               {/* 1. 바이탈 수치 */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: 'var(--sp-5)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <VitalCard label="혈압" value={selected.bp} unit="mmHg" color="#fb923c" icon={<Activity size={16}/>} />
                 <VitalCard label="심박수" value={selected.hr} unit="bpm" color="#ef4444" icon={<HeartPulse size={16}/>} />
                 <VitalCard label="체온" value={selected.temp} unit="°C" color="#38bdf8" icon={<Thermometer size={16}/>} />
                 <VitalCard label="산소" value={selected.spo2} unit="%" color="#2dd4bf" icon={<Wind size={16}/>} />
-                <div style={{ gridColumn: 'span 2', marginTop: 8, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 16 }}>
+                <div style={{ gridColumn: 'span 2', marginTop: 8, padding: 'var(--sp-4)', background: 'rgba(255,255,255,0.02)', borderRadius: 16 }}>
                   <div style={{ fontSize: 13, fontWeight: 900, color: '#4a6080', marginBottom: 12 }}>ACTIVE CONDITIONS</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {selected.conditions.map(c => (
@@ -168,7 +168,7 @@ export default function Patients({ onSelectPatient }) {
               </div>
 
               {/* 2. 주간 심박 트렌드 */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: '16px', height: 280 }}>
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: 'var(--sp-4)', height: 280 }}>
                 <h3 style={{ fontSize: 14, fontWeight: 900, color: '#0dd9c5', marginBottom: 12 }}>WEEKLY VITAL TREND</h3>
                 <div style={{ height: 'calc(100% - 40px)' }}>
                   <ResponsiveContainer width="100%" height="100%">
@@ -188,7 +188,7 @@ export default function Patients({ onSelectPatient }) {
               </div>
 
               {/* 3. 건강 지수 레이더 */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: '24px' }}>
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: 'var(--sp-6)' }}>
                 <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0dd9c5', marginBottom: 10 }}>HEALTH RADAR</h3>
                 <div style={{ height: 300 }}>
                   <ResponsiveContainer width="100%" height="100%">
@@ -204,18 +204,18 @@ export default function Patients({ onSelectPatient }) {
 
             {/* AI 분석 섹션 */}
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.8fr', gap: 24 }}>
-              <div style={{ background: 'linear-gradient(135deg, rgba(13,217,197,0.05) 0%, rgba(0,168,150,0.02) 100%)', border: '1px solid rgba(13,217,197,0.15)', borderRadius: 28, padding: 28 }}>
+              <div style={{ background: 'linear-gradient(135deg, rgba(13,217,197,0.05) 0%, rgba(0,168,150,0.02) 100%)', border: '1px solid rgba(13,217,197,0.15)', borderRadius: 28, padding: 'var(--sp-8)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
                   <Brain size={20} color="#0dd9c5" />
                   <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0dd9c5', margin: 0 }}>AI CLINICAL INTELLIGENCE</h3>
                 </div>
-                <div style={{ background: 'rgba(255,255,255,0.02)', padding: 16, borderRadius: 16, borderLeft: '4px solid #ef4444' }}>
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: 'var(--sp-4)', borderRadius: 16, borderLeft: '4px solid #ef4444' }}>
                   <div style={{ fontSize: 13, color: '#ef4444', fontWeight: 900, marginBottom: 6 }}>CRITICAL INSIGHT</div>
                   <p style={{ fontSize: 15, color: '#e2e8f0', margin: 0, lineHeight: 1.6, fontWeight: 700 }}>심혈관계 스트레스 징후가 포착되니 지속적 모니터링이 필요합니다.</p>
                 </div>
               </div>
 
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 28, padding: 28 }}>
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 28, padding: 'var(--sp-8)' }}>
                 <h3 style={{ fontSize: 18, fontWeight: 900, color: '#fff', marginBottom: 20 }}>24H RISK PROJECTION</h3>
                 <div style={{ height: 180 }}>
                   <ResponsiveContainer width="100%" height="100%">
@@ -234,11 +234,11 @@ export default function Patients({ onSelectPatient }) {
             </div>
 
             {/* 히스토리 */}
-            <div style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 24, padding: 24 }}>
+            <div style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: 24, padding: 'var(--sp-6)' }}>
               <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 20 }}>MEDICAL TIMELINE</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
                 {selected.history.map((h, i) => (
-                  <div key={i} style={{ padding: '16px 20px', borderRadius: 16, background: 'rgba(255,255,255,0.02)', display: 'flex', gap: 16 }}>
+                  <div key={i} style={{ padding: 'var(--sp-4) var(--sp-5)', borderRadius: 16, background: 'rgba(255,255,255,0.02)', display: 'flex', gap: 16 }}>
                     <AlertCircle size={20} color={h.type === '응급' ? '#ef4444' : '#38bdf8'} />
                     <div>
                       <div style={{ fontSize: 15, fontWeight: 900, color: '#fff' }}>[{h.type}] {h.date}</div>
@@ -258,7 +258,7 @@ export default function Patients({ onSelectPatient }) {
 
 function VitalCard({ label, value, unit, icon, color }) {
   return (
-    <div style={{ padding: '16px', borderRadius: 16, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+    <div style={{ padding: 'var(--sp-4)', borderRadius: 16, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#4a6080', fontSize: 11, fontWeight: 900, marginBottom: 8 }}>
         <div style={{ color }}>{icon}</div> {label}
       </div>

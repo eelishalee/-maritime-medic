@@ -69,7 +69,7 @@ export default function DashboardView({
   }, [isScanning])
 
   return (
-    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '320px 1fr 360px', overflow: 'hidden', height: '100%', position: 'relative', background: '#020408' }}>
+    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'var(--col-left) 1fr var(--col-right)', overflow: 'hidden', height: 'var(--content-h)', position: 'relative', background: '#020408' }}>
 
       {/* 센서 점검 안내 오버레이 */}
       {showSensorGuide && (
@@ -86,7 +86,7 @@ export default function DashboardView({
             </p>
             <button 
               onClick={() => { setShowSensorGuide(false); setSpo2Status('normal'); }}
-              style={{ width: '100%', padding: '18px', borderRadius: 16, background: '#fbbf24', color: '#000', border: 'none', fontWeight: 950, fontSize: 18, cursor: 'pointer', transition: '0.2s' }}
+              style={{ width: '100%', height: 'var(--touch-lg)', borderRadius: 'var(--r-md)', background: '#fbbf24', color: '#000', border: 'none', fontWeight: 950, fontSize: 18, cursor: 'pointer', transition: '0.2s' }}
             >
               확인 및 재시도
             </button>
@@ -161,7 +161,7 @@ export default function DashboardView({
       <aside style={{ borderRight: '1px solid rgba(255,255,255,0.05)', background: '#05070a', display: 'flex', flexDirection: 'column', position: 'relative', minHeight: 0 }}>
         <div style={{ flexShrink: 0, padding: '14px 18px 12px 18px', borderBottom: '1px solid rgba(56,189,248,0.1)', background: 'rgba(56,189,248,0.03)' }}>
           <div style={{ display: 'flex', gap: 14, marginBottom: 14 }}>
-            <div style={{ width: 80, height: 80, borderRadius: 18, background: '#1e293b', border: '3px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
+            <div style={{ width: 'clamp(60px, 7vw, 90px)', height: 'clamp(60px, 7vw, 90px)', borderRadius: 'var(--r-lg)', background: '#1e293b', border: '3px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
               <img 
                 src={activePatient?.avatar || '/CE.jpeg'} 
                 onError={(e) => {
@@ -174,7 +174,7 @@ export default function DashboardView({
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 6 }}>
-                <div style={{ fontSize: 24, fontWeight: 950, letterSpacing: '-0.5px', color: '#fff' }}>{activePatient?.name || '김항해'}</div>
+                <div style={{ fontSize: 'var(--text-xl)', fontWeight: 950, letterSpacing: '-0.5px', color: '#fff' }}>{activePatient?.name || '김항해'}</div>
                 <div style={{ fontSize: 15, color: '#38bdf8', fontWeight: 800 }}>{activePatient?.role || '기관장'}</div>
               </div>
               <div style={{ fontSize: 16, color: '#475569', fontWeight: 700 }}>ID : {activePatient?.id || 'S2026-026'}</div>
@@ -281,7 +281,7 @@ export default function DashboardView({
         </div>
         
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '12px 14px 14px 14px', borderTop: '1px solid rgba(255,77,109,0.2)', background: 'linear-gradient(to top, #05070a 85%, transparent)', zIndex: 10 }}>
-          <button onClick={() => startEmergencyAction('CPR')} style={{ width: '100%', height: 52, borderRadius: 14, background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontSize: 15, boxShadow: '0 6px 20px rgba(244, 63, 94, 0.3)' }}>
+          <button onClick={() => startEmergencyAction('CPR')} style={{ width: '100%', height: 'var(--touch-xl)', borderRadius: 'var(--r-lg)', background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontSize: 15, boxShadow: '0 6px 20px rgba(244, 63, 94, 0.3)' }}>
             <AlertTriangle size={18} /> 응급 처치 액션 시작
           </button>
         </div>
@@ -350,7 +350,7 @@ export default function DashboardView({
 
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#080b12', overflow: 'hidden', position: 'relative' }}>
           <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0a0d17', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-            <div style={{ fontSize: 18, fontWeight: 900, display: 'flex', alignItems: 'center', gap: 10, color: '#e2e8f0' }}>
+            <div style={{ fontSize: 'var(--text-lg)', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 10, color: '#e2e8f0' }}>
               <Sparkles size={20} color="#38bdf8" /> MDTS 진단 어시스턴트
             </div>
             <div style={{ fontSize: 11, fontWeight: 800, color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', padding: '4px 10px', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>AI 분석 엔진 v2.0</div>
@@ -474,7 +474,7 @@ export default function DashboardView({
 
         {/* 외상 촬영 버튼 (하단 고정) */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px 14px 14px 14px', borderTop: '1px solid rgba(56,189,248,0.2)', background: 'linear-gradient(to top, #05070a 85%, transparent)', zIndex: 10 }}>
-          <button onClick={handleTraumaAnalysis} style={{ width: '100%', height: 52, borderRadius: 14, background: 'linear-gradient(135deg, #0ea5e9, #38bdf8)', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontSize: 14, boxShadow: '0 6px 20px rgba(56, 189, 248, 0.3)' }}>
+          <button onClick={handleTraumaAnalysis} style={{ width: '100%', height: 'var(--touch-xl)', borderRadius: 'var(--r-lg)', background: 'linear-gradient(135deg, #0ea5e9, #38bdf8)', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontSize: 14, boxShadow: '0 6px 20px rgba(56, 189, 248, 0.3)' }}>
             <Camera size={18} /> 외상 촬영 및 AI 정밀 분석
           </button>
         </div>

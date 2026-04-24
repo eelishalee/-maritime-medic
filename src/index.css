@@ -1,10 +1,19 @@
-* {
+/* =================================================================
+   MDTS Design Tokens
+   Primary: 2000×1200 @ DPR 1.5 → CSS viewport 1333×800
+   모든 clamp() 값은 1333×800 에서 ideal 값에 도달하도록 조정
+   ================================================================= */
+
+/* ── 1. Reset ── */
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* ── 2. CSS Design Tokens ── */
 :root {
+  /* Color Palette */
   --navy-950: #050d1a;
   --navy-900: #0a1628;
   --navy-800: #0f2040;
@@ -15,107 +24,149 @@
   --teal-300: #3de8d6;
   --teal-200: #7ef5ec;
   --teal-500: #09b8a6;
-  --red-400: #ff4d6d;
-  --red-300: #ff6b84;
+  --red-400:  #ff4d6d;
+  --red-300:  #ff6b84;
   --orange-400: #ff9f43;
-  --green-400: #26de81;
-  --blue-400: #4fc3f7;
-  --text-primary: #e8f0fe;
+  --green-400:  #26de81;
+  --blue-400:   #4fc3f7;
+  --text-primary:   #e8f0fe;
   --text-secondary: #8da2c0;
-  --text-muted: #4a6080;
-  --border: rgba(13, 217, 197, 0.12);
-  --border-hover: rgba(13, 217, 197, 0.3);
-  --card-bg: rgba(15, 32, 64, 0.7);
-  --card-bg-solid: #0f2040;
-  --glass: rgba(10, 22, 40, 0.85);
+  --text-muted:     #4a6080;
+  --border:         rgba(13, 217, 197, 0.12);
+  --border-hover:   rgba(13, 217, 197, 0.3);
+  --card-bg:        rgba(15, 32, 64, 0.7);
+  --card-bg-solid:  #0f2040;
+  --glass:          rgba(10, 22, 40, 0.85);
+
+  /* ── Typography (fluid, 1333vw 기준)
+     xs ~11  sm ~13  base ~14  md ~16  lg ~18  xl ~21  2xl ~25  3xl ~30  */
+  --text-xs:   clamp(10px, 0.83vw, 12px);
+  --text-sm:   clamp(11px, 0.98vw, 14px);
+  --text-base: clamp(12px, 1.05vw, 15px);
+  --text-md:   clamp(13px, 1.2vw, 17px);
+  --text-lg:   clamp(14px, 1.35vw, 19px);
+  --text-xl:   clamp(16px, 1.58vw, 22px);
+  --text-2xl:  clamp(19px, 1.88vw, 26px);
+  --text-3xl:  clamp(23px, 2.25vw, 32px);
+  --text-hero: clamp(28px, 2.85vw, 40px);
+
+  /* ── Spacing (fluid) ── */
+  --sp-1:  clamp(3px,  0.3vw,  5px);
+  --sp-2:  clamp(5px,  0.6vw,  8px);
+  --sp-3:  clamp(8px,  0.9vw, 12px);
+  --sp-4:  clamp(10px, 1.2vw, 16px);
+  --sp-5:  clamp(12px, 1.5vw, 20px);
+  --sp-6:  clamp(16px, 1.8vw, 24px);
+  --sp-8:  clamp(20px, 2.4vw, 32px);
+  --sp-10: clamp(26px, 3.0vw, 40px);
+  --sp-12: clamp(32px, 3.6vw, 50px);
+
+  /* ── Layout ── */
+  --header-h:  clamp(48px, 7vh, 64px);    /* 7% of 800 = 56px (ideal) */
+  --content-h: calc(100dvh - var(--header-h));
+
+  /* Sidebar widths */
+  --col-left:  clamp(220px, 24vw, 340px); /* 24% of 1333 = 320px */
+  --col-right: clamp(260px, 27vw, 380px); /* 27% of 1333 = 360px */
+  --col-narrow:clamp(180px, 20vw, 280px); /* 20% of 1333 = 266px */
+  --col-wide:  clamp(300px, 30vw, 400px); /* 30% of 1333 = 400px */
+
+  /* ── Touch Targets (min 48dp = 3rem) ──
+     기준: 1dp ≈ 1px at DPR 1.0, 안전을 위해 44-56px 범위 사용 */
+  --touch-sm: clamp(36px, 5vh,   46px);
+  --touch-md: clamp(44px, 6vh,   54px);   /* 기본 액션 버튼 */
+  --touch-lg: clamp(50px, 7vh,   62px);   /* 중요 버튼 */
+  --touch-xl: clamp(56px, 7.5vh, 70px);   /* 응급 버튼 */
+
+  /* ── Border Radius (fluid) ── */
+  --r-xs: clamp(4px,  0.4vw,  6px);
+  --r-sm: clamp(6px,  0.6vw, 10px);
+  --r-md: clamp(8px,  0.9vw, 14px);
+  --r-lg: clamp(12px, 1.2vw, 18px);
+  --r-xl: clamp(16px, 1.8vw, 24px);
+  --r-2xl:clamp(22px, 2.4vw, 32px);
+
+  /* ── Safe Areas (안드로이드 상태바·네비게이션 바) ── */
+  --safe-top:    env(safe-area-inset-top,    24px);
+  --safe-bottom: env(safe-area-inset-bottom, 16px);
+  --safe-left:   env(safe-area-inset-left,    0px);
+  --safe-right:  env(safe-area-inset-right,   0px);
+
+  /* ── Icon Sizes (fluid) ── */
+  --icon-sm:  clamp(12px, 1.1vw, 16px);
+  --icon-md:  clamp(14px, 1.35vw, 20px);
+  --icon-lg:  clamp(18px, 1.7vw, 24px);
+  --icon-xl:  clamp(22px, 2.1vw, 30px);
+}
+
+/* ── 3. Body & Root ── */
+html {
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #ffffff;
+  background: #0a0c12;
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
-  font-size: 16px;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--text-base);
+
+  /* 태블릿 전체 화면 채우기 */
+  width: 100dvw;
+  height: 100dvh;
+  overflow: hidden;
+
+  /* 안드로이드 시스템 바(상태바·내비게이션 바) 회피 */
+  padding-top:    var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  padding-left:   var(--safe-left);
+  padding-right:  var(--safe-right);
 }
 
-/* PC 미리보기 래퍼 : 400×250 px */
-#app-wrapper {
-  width: 400px;
-  height: 250px;
+#root {
+  width:   100%;
+  height:  100%;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  flex-shrink: 0;
   position: relative;
 }
 
-/* 내부 앱은 1280×800 그대로 유지 후 scale(0.3125) 적용 */
-#root {
-  width: 1280px;
-  height: 800px;
-  overflow: hidden;
-  display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: scale(0.3125);
-  transform-origin: top left;
-}
-
-/* Scrollbar Customization */
-::-webkit-scrollbar { 
-  width: 10px; 
-  height: 10px; 
-}
-::-webkit-scrollbar-track { 
-  background: rgba(255, 255, 255, 0.02);
+/* ── 4. Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(13,217,197,0.3);
   border-radius: 10px;
-}
-::-webkit-scrollbar-thumb { 
-  background: rgba(13, 217, 197, 0.3); /* 테일 색상 반투명 */
-  border-radius: 10px;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   background-clip: padding-box;
 }
-::-webkit-scrollbar-thumb:hover { 
-  background: rgba(13, 217, 197, 0.6); 
-}
+::-webkit-scrollbar-thumb:hover { background: rgba(13,217,197,0.55); }
+* { scrollbar-width: thin; scrollbar-color: rgba(13,217,197,0.3) transparent; }
 
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(13, 217, 197, 0.3) transparent;
-}
-
-/* Animations */
+/* ── 5. Animations ── */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(1.4); }
 }
-
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes slideInLeft {
   from { opacity: 0; transform: translateX(-20px); }
   to   { opacity: 1; transform: translateX(0); }
 }
-
 @keyframes imgSlideIn {
   from { opacity: 0; transform: translateX(40px) scale(1.03); }
   to   { opacity: 1; transform: translateX(0) scale(1); }
 }
-
 @keyframes imgSlideInLeft {
   from { opacity: 0; transform: translateX(-40px) scale(1.03); }
   to   { opacity: 1; transform: translateX(0) scale(1); }
 }
-
-/* 스텝 아이콘 애니메이션들 */
 @keyframes stepPulse {
   0%, 100% { transform: scale(1); }
   50%       { transform: scale(1.25); }
@@ -141,10 +192,30 @@ body {
   from { opacity: 0; transform: scale(0.9); }
   to   { opacity: 1; transform: scale(1); }
 }
-
 @keyframes spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
+}
+@keyframes borderRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes scanMoveInner {
+  0%   { top: 0; }
+  50%  { top: calc(100% - 4px); }
+  100% { top: 0; }
+}
+@keyframes flowingLight {
+  from { left: -100%; }
+  to   { left: 200%; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .fade-in { animation: fadeInUp 0.35s ease both; }

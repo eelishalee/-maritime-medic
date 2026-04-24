@@ -174,7 +174,7 @@ export default function Settings() {
   ]
 
   return (
-    <div style={{ display:'flex', height:'calc(100vh - 56px)', background:C.bg, color:C.text, fontFamily:'"Pretendard",sans-serif', overflow:'hidden' }}>
+    <div style={{ display:'flex', height:'var(--content-h)', background:C.bg, color:C.text, fontFamily:'"Pretendard",sans-serif', overflow:'hidden' }}>
 
       {/* ── 사이드 네비 ── */}
       <nav style={{ width:52, flexShrink:0, borderRight:`1px solid ${C.border}`, display:'flex', flexDirection:'column', alignItems:'center', paddingTop:16, gap:4, background:C.panel }}>

@@ -86,7 +86,7 @@ export default function AIAnalysis({ patient, onNavigate }) {
 
   if (scanning && progress < 100) {
     return (
-      <div style={{ height:'calc(100vh - 56px)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#050d1a', gap:28 }}>
+      <div style={{ height:'var(--content-h)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#050d1a', gap:28 }}>
         <div style={{ position:'relative', width:140, height:140 }}>
           {/* 원형 진행 — CSS border 방식 (no SVG) */}
           <div style={{
@@ -114,7 +114,7 @@ export default function AIAnalysis({ patient, onNavigate }) {
   const diag = DIAGNOSES[activeIdx]
 
   return (
-    <div style={{ display:'grid', gridTemplateColumns:'280px 1fr 260px', height:'calc(100vh - 56px)', overflow:'hidden', background:'#050d1a' }}>
+    <div style={{ display:'grid', gridTemplateColumns:'var(--col-left) 1fr var(--col-narrow)', height:'var(--content-h)', overflow:'hidden', background:'#050d1a' }}>
 
       {/* ── 좌: 모드 선택 + 진단 목록 ── */}
       <div style={{ borderRight:'1.5px solid rgba(13,217,197,0.13)', background:'rgba(8,18,35,0.98)', padding:'18px 16px', overflowY:'auto', display:'flex', flexDirection:'column', gap:14 }}>

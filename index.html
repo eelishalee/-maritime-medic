@@ -1,16 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Primary target : Samsung SM-T505N (2000×1200, DPR ≈ 1.5 → CSS 1333×800)
+      Adaptive       : 모든 태블릿 해상도에서 CSS clamp() 로 자동 스케일
+      Safe-area      : env(safe-area-inset-*) 로 안드로이드 시스템 바 회피
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet" />
     <title>MDTS - Maritime Medical System</title>
   </head>
   <body>
-    <div id="app-wrapper">
-      <div id="root"></div>
-    </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

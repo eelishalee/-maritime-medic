@@ -96,7 +96,7 @@ export default function PatientInfo({ patient }) {
   return (
     <div style={{
       display:'grid', gridTemplateColumns:'300px 1fr 280px',
-      height:'calc(100vh - 56px)', overflow:'hidden', background:'#050d1a',
+      height:'var(--content-h)', overflow:'hidden', background:'#050d1a',
     }}>
       {showNote && <NoteModal onSave={addNote} onClose={()=>setShowNote(false)}/>}
 

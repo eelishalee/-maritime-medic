@@ -57,7 +57,7 @@ export default function App() {
   if (!auth) return <Login onLogin={setAuth} />
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '800px', width: '1280px', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', width: '100dvw', overflow: 'hidden' }}>
       <Layout
         activePage={page}
         onNavigate={handleNavigate}

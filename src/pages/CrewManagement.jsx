@@ -81,7 +81,7 @@ export default function CrewManagement({ onSelectPatient }) {
   })
 
   return (
-    <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12, height: 'calc(100vh - 56px)', background: '#020617', color: '#fff', fontFamily: '"Pretendard", sans-serif', overflow: 'hidden', position: 'relative' }}>
+    <div style={{ padding: 'var(--sp-4) var(--sp-5)', display: 'flex', flexDirection: 'column', gap: 12, height: 'var(--content-h)', background: '#020617', color: '#fff', fontFamily: '"Pretendard", sans-serif', overflow: 'hidden', position: 'relative' }}>
       
       {/* 상단 헤더 섹션 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
@@ -128,7 +128,7 @@ export default function CrewManagement({ onSelectPatient }) {
 
       {/* 등록 모달 */}
       {isAdding && (
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(2,6,23,0.85)', backdropFilter: 'blur(20px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 20px' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(2,6,23,0.85)', backdropFilter: 'blur(20px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--sp-4) var(--sp-5)' }}>
           
           {/* 닫기 버튼 배치용 Wrapper */}
           <div style={{ position: 'relative', width: '100%', maxWidth: 1000 }}>
@@ -136,7 +136,7 @@ export default function CrewManagement({ onSelectPatient }) {
             {/* 닫기(X) 버튼 : 박스 밖 우측 상단 */}
             <button 
               onClick={() => setIsAdding(false)} 
-              style={{ position: 'absolute', top: 0, right: -54, zIndex: 110, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', borderRadius: '50%', padding: 8, transition: '0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+              style={{ position: 'absolute', top: 0, right: -54, zIndex: 110, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', borderRadius: '50%', padding: 'var(--sp-2)', transition: '0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
               className="modal-close-btn-outer"
             >
               <X size={22} strokeWidth={3} />
@@ -144,7 +144,7 @@ export default function CrewManagement({ onSelectPatient }) {
 
             <div style={{ background: '#0a1224', border: '2px solid rgba(255,255,255,0.1)', borderRadius: 40, width: '100%', maxHeight: '82vh', overflow: 'hidden', boxShadow: '0 40px 100px rgba(0,0,0,0.7)', animation: 'modalShow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)' }}>
               {/* 스크롤 구역 */}
-              <div style={{ overflowY: 'auto', maxHeight: '82vh', padding: '24px' }} className="modal-scroll-area">
+              <div style={{ overflowY: 'auto', maxHeight: '82vh', padding: 'var(--sp-6)' }} className="modal-scroll-area">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
                   <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(13,217,197,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0dd9c5', flexShrink: 0 }}>
                     <UserPlus size={24} />
@@ -156,7 +156,7 @@ export default function CrewManagement({ onSelectPatient }) {
                 </div>
 
                 <form onSubmit={handleAddCrew} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div style={{ background: 'rgba(255,255,255,0.01)', padding: '16px 18px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.04)' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.01)', padding: 'var(--sp-4) var(--sp-5)', borderRadius: 18, border: '1px solid rgba(255,255,255,0.04)' }}>
                     <div style={{ fontSize: 14, fontWeight: 900, marginBottom: 12, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: 8, letterSpacing: '0.5px' }}><Users size={16}/> 기본 인적사항</div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                       <FormGroup label="선원 성명" value={newCrew.name} onChange={v => setNewCrew({...newCrew, name: v})} placeholder="실명을 입력하세요" required icon={<UserIcon size={16} color="#64748b"/>} />
@@ -171,7 +171,7 @@ export default function CrewManagement({ onSelectPatient }) {
                     </div>
                   </div>
 
-                  <div style={{ background: 'rgba(255,255,255,0.01)', padding: '16px 18px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.04)' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.01)', padding: 'var(--sp-4) var(--sp-5)', borderRadius: 18, border: '1px solid rgba(255,255,255,0.04)' }}>
                     <div style={{ fontSize: 14, fontWeight: 900, marginBottom: 12, color: '#fb923c', display: 'flex', alignItems: 'center', gap: 8, letterSpacing: '0.5px' }}><Anchor size={16}/> 소속 및 승선 정보</div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
                       <SelectGroup label="소속 부서" value={newCrew.dept} onChange={v => setNewCrew({...newCrew, dept: v})} options={['항해부', '기관부', '지원부']} />
@@ -181,7 +181,7 @@ export default function CrewManagement({ onSelectPatient }) {
                     </div>
                   </div>
 
-                  <div style={{ background: 'rgba(255,255,255,0.01)', padding: '16px 18px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.04)' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.01)', padding: 'var(--sp-4) var(--sp-5)', borderRadius: 18, border: '1px solid rgba(255,255,255,0.04)' }}>
                     <div style={{ fontSize: 14, fontWeight: 900, marginBottom: 12, color: '#2dd4bf', display: 'flex', alignItems: 'center', gap: 8, letterSpacing: '0.5px' }}><ShieldAlert size={16}/> 의료 정보 및 연락처</div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                       <FormGroup label="기저질환" value={newCrew.chronic} onChange={v => setNewCrew({...newCrew, chronic: v})} placeholder="질환명" icon={<Activity size={16} color="#64748b"/>} />
@@ -191,11 +191,11 @@ export default function CrewManagement({ onSelectPatient }) {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                         <label style={{ fontSize: 13, color: '#64748b', fontWeight: 950, marginLeft: 4, display: 'flex', alignItems: 'center', gap: 6 }}><FileText size={15}/> 과거 병력 및 수술 이력</label>
-                        <textarea value={newCrew.pastHistory} onChange={e => setNewCrew({...newCrew, pastHistory: e.target.value})} placeholder="상세 과거력을 입력하세요" style={{ width: '100%', minHeight: 72, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '10px 14px', color: '#fff', outline: 'none', fontWeight: 700, fontSize: 13, resize: 'none', boxSizing: 'border-box', transition: '0.2s' }} className="form-textarea" />
+                        <textarea value={newCrew.pastHistory} onChange={e => setNewCrew({...newCrew, pastHistory: e.target.value})} placeholder="상세 과거력을 입력하세요" style={{ width: '100%', minHeight: 72, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: 'var(--sp-3) var(--sp-3)', color: '#fff', outline: 'none', fontWeight: 700, fontSize: 13, resize: 'none', boxSizing: 'border-box', transition: '0.2s' }} className="form-textarea" />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                         <label style={{ fontSize: 13, color: '#64748b', fontWeight: 950, marginLeft: 4, display: 'flex', alignItems: 'center', gap: 6 }}><Pill size={15}/> 관리 특이사항 (메모)</label>
-                        <textarea value={newCrew.note} onChange={e => setNewCrew({...newCrew, note: e.target.value})} placeholder="건강관리 상 주의사항 입력" style={{ width: '100%', minHeight: 72, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '10px 14px', color: '#fff', outline: 'none', fontWeight: 700, fontSize: 13, resize: 'none', boxSizing: 'border-box', transition: '0.2s' }} className="form-textarea" />
+                        <textarea value={newCrew.note} onChange={e => setNewCrew({...newCrew, note: e.target.value})} placeholder="건강관리 상 주의사항 입력" style={{ width: '100%', minHeight: 72, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: 'var(--sp-3) var(--sp-3)', color: '#fff', outline: 'none', fontWeight: 700, fontSize: 13, resize: 'none', boxSizing: 'border-box', transition: '0.2s' }} className="form-textarea" />
                       </div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
@@ -205,8 +205,8 @@ export default function CrewManagement({ onSelectPatient }) {
                   </div>
 
                   <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
-                    <button type="button" onClick={() => setIsAdding(false)} style={{ flex: 1, padding: '14px', background: 'rgba(255,255,255,0.03)', border: '1.5px solid rgba(255,255,255,0.05)', borderRadius: 14, color: '#94a3b8', fontSize: 14, fontWeight: 900, cursor: 'pointer', transition: '0.2s' }} className="cancel-btn">등록 취소</button>
-                    <button type="submit" style={{ flex: 2, padding: '14px', background: 'linear-gradient(135deg, #0dd9c5 0%, #00a896 100%)', border: 'none', borderRadius: 14, color: '#020617', fontSize: 14, fontWeight: 950, cursor: 'pointer', boxShadow: '0 8px 20px rgba(13,217,197,0.25)', transition: '0.2s' }} className="submit-btn">선원 데이터 저장 및 시스템 등록</button>
+                    <button type="button" onClick={() => setIsAdding(false)} style={{ flex: 1, padding: 'var(--sp-4)', background: 'rgba(255,255,255,0.03)', border: '1.5px solid rgba(255,255,255,0.05)', borderRadius: 14, color: '#94a3b8', fontSize: 14, fontWeight: 900, cursor: 'pointer', transition: '0.2s' }} className="cancel-btn">등록 취소</button>
+                    <button type="submit" style={{ flex: 2, padding: 'var(--sp-4)', background: 'linear-gradient(135deg, #0dd9c5 0%, #00a896 100%)', border: 'none', borderRadius: 14, color: '#020617', fontSize: 14, fontWeight: 950, cursor: 'pointer', boxShadow: '0 8px 20px rgba(13,217,197,0.25)', transition: '0.2s' }} className="submit-btn">선원 데이터 저장 및 시스템 등록</button>
                   </div>
                 </form>
               </div>
@@ -221,14 +221,14 @@ export default function CrewManagement({ onSelectPatient }) {
           <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
             <tr style={{ background: '#020617' }}>
               {['선원 프로필', '소속 및 직위', '신체 정보', '기저질환', '알레르기', '긴급 연락망', '응급 환자 등록'].map((h, i) => (
-                <th key={i} style={{ padding: '10px 14px', textAlign: i === 6 ? 'center' : 'left', fontSize: '12px', color: '#64748b', fontWeight: 950, textTransform: 'uppercase', letterSpacing: '0.8px' }}>{h}</th>
+                <th key={i} style={{ padding: 'var(--sp-3) var(--sp-3)', textAlign: i === 6 ? 'center' : 'left', fontSize: '12px', color: '#64748b', fontWeight: 950, textTransform: 'uppercase', letterSpacing: '0.8px' }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filtered.map((c) => (
               <tr key={c.id} onClick={() => handleSelect(c)} style={{ cursor: 'pointer', transition: '0.2s' }} className="crew-card-row">
-                <td style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '14px 0 0 14px' }}>
+                <td style={{ padding: 'var(--sp-3) var(--sp-3)', background: 'rgba(255,255,255,0.02)', borderRadius: '14px 0 0 14px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 40, height: 50, borderRadius: '10px', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', background: '#0a1628', flexShrink: 0 }}>
                       <img
@@ -247,7 +247,7 @@ export default function CrewManagement({ onSelectPatient }) {
                     </div>
                   </div>
                 </td>
-                <td style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.02)' }}>
+                <td style={{ padding: 'var(--sp-3) var(--sp-3)', background: 'rgba(255,255,255,0.02)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                       {c.dept === '항해부' && <Anchor size={14} color="#38bdf8" />}
@@ -259,7 +259,7 @@ export default function CrewManagement({ onSelectPatient }) {
                     <div style={{ fontSize: '13px', color: '#fff', fontWeight: 900 }}>{c.role}</div>
                   </div>
                 </td>
-                <td style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.02)' }}>
+                <td style={{ padding: 'var(--sp-3) var(--sp-3)', background: 'rgba(255,255,255,0.02)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 950, marginBottom: 1 }}>나이</div>
@@ -272,7 +272,7 @@ export default function CrewManagement({ onSelectPatient }) {
                     </div>
                   </div>
                 </td>
-                <td style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.02)' }}>
+                <td style={{ padding: 'var(--sp-3) var(--sp-3)', background: 'rgba(255,255,255,0.02)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {c.chronic && c.chronic !== '없음' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#fb923c', background: 'rgba(251,146,60,0.12)', padding: '5px 10px', borderRadius: '8px', width: 'fit-content', border: '1px solid rgba(251,146,60,0.2)' }}>
@@ -281,7 +281,7 @@ export default function CrewManagement({ onSelectPatient }) {
                     )}
                   </div>
                 </td>
-                <td style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.02)' }}>
+                <td style={{ padding: 'var(--sp-3) var(--sp-3)', background: 'rgba(255,255,255,0.02)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {c.allergies && c.allergies !== '없음' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#ff708d', background: 'rgba(255,112,141,0.12)', padding: '5px 10px', borderRadius: '8px', width: 'fit-content', border: '1px solid rgba(255,112,141,0.2)' }}>
@@ -290,13 +290,13 @@ export default function CrewManagement({ onSelectPatient }) {
                     )}
                   </div>
                 </td>
-                <td style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.02)' }}>
+                <td style={{ padding: 'var(--sp-3) var(--sp-3)', background: 'rgba(255,255,255,0.02)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#cbd5e1' }}>
                     <Phone size={13} color="#ff4d6d" />
                     <span style={{ fontSize: '12px', fontWeight: 800 }}>{c.emergency}</span>
                   </div>
                 </td>
-                <td style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '0 14px 14px 0', textAlign: 'center' }}>
+                <td style={{ padding: 'var(--sp-3) var(--sp-3)', background: 'rgba(255,255,255,0.02)', borderRadius: '0 14px 14px 0', textAlign: 'center' }}>
                   <button onClick={e => { e.stopPropagation(); handleSelect(c); }} className="register-btn" style={{ padding: '8px 14px', borderRadius: '10px', background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.2)', color: '#38bdf8', fontSize: '13px', fontWeight: 950, cursor: 'pointer', transition: '0.2s', display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
                     <UserPlus size={14} strokeWidth={3} /> 응급 환자 등록
                   </button>

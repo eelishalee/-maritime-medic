@@ -279,7 +279,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
       { label: '전혀 반응이 없나요?', desc: '무반응', action: '심폐소생술', color: '#ef4444' },
     ]
     return (
-      <div style={{ height: 'calc(100vh - 56px)', background: '#020617', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ height: 'var(--content-h)', background: '#020617', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'var(--sp-5)' }}>
         <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, border: '1px solid rgba(255,255,255,0.1)' }}><Brain size={36} color="#38bdf8"/></div>
         <h1 style={{ fontSize: 22, fontWeight: 950, color: '#fff', marginBottom: 8, letterSpacing: '-0.5px' }}>환자의 현재 의식 수준을 판별하십시오</h1>
         <p style={{ fontSize: 14, color: '#64748b', fontWeight: 600, marginBottom: 28 }}>AI 가이드 활성화를 위한 첫 번째 단계입니다.</p>
@@ -299,8 +299,8 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   // 2. 처치 완료 요약 화면 (SUMMARY)
   if (triageStep === 'SUMMARY') {
     return (
-      <div style={{ height: 'calc(100vh - 56px)', background: '#020617', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-        <div style={{ maxWidth: 800, width: '100%', background: 'rgba(2, 12, 27, 0.9)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: '24px 28px', position: 'relative', overflow: 'hidden', boxShadow: '0 20px 40px -12px rgba(0,0,0,0.6)' }}>
+      <div style={{ height: 'var(--content-h)', background: '#020617', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'var(--sp-5)' }}>
+        <div style={{ maxWidth: 800, width: '100%', background: 'rgba(2, 12, 27, 0.9)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: 'var(--sp-6) var(--sp-8)', position: 'relative', overflow: 'hidden', boxShadow: '0 20px 40px -12px rgba(0,0,0,0.6)' }}>
           
           {/* 흐르는 빛 효과 애니메이션 레이어 */}
           <div style={{ 
@@ -329,7 +329,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 20, position: 'relative', zIndex: 2 }}>
-            <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ background: 'rgba(255,255,255,0.04)', padding: 'var(--sp-4)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ fontSize: 13, color: '#94a3b8', fontWeight: 800, marginBottom: 12 }}>처치 결과 요약</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -354,7 +354,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                 </div>
               </div>
             </div>
-            <div style={{ background: 'rgba(56,189,248,0.06)', padding: '16px', borderRadius: 16, border: '1px solid rgba(56,189,248,0.2)' }}>
+            <div style={{ background: 'rgba(56,189,248,0.06)', padding: 'var(--sp-4)', borderRadius: 16, border: '1px solid rgba(56,189,248,0.2)' }}>
               <div style={{ fontSize: 13, color: '#38bdf8', fontWeight: 800, marginBottom: 12 }}>AI 후속 지침</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ display: 'flex', gap: 8, fontSize: 13, fontWeight: 700, color: '#e2e8f0' }}><AlertCircle size={14} color="#38bdf8" style={{flexShrink:0, marginTop:1}}/> <span>환자 상태 안정 시까지 바이탈을 지속적으로 모니터링하십시오.</span></div>
@@ -365,10 +365,10 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
           </div>
 
           <div style={{ display: 'flex', gap: 12, position: 'relative', zIndex: 2 }}>
-            <button onClick={handleResetSession} style={{ flex: 1, padding: '14px', borderRadius: 12, background: '#fff', color: '#000', border: 'none', fontWeight: 950, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <button onClick={handleResetSession} style={{ flex: 1, padding: 'var(--sp-4)', borderRadius: 12, background: '#fff', color: '#000', border: 'none', fontWeight: 950, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
               <RefreshCw size={16}/> 새로운 처치 시작
             </button>
-            <button onClick={() => onNavigate('main')} style={{ flex: 1, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', fontWeight: 950, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <button onClick={() => onNavigate('main')} style={{ flex: 1, padding: 'var(--sp-4)', borderRadius: 12, background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', fontWeight: 950, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
               <LayoutDashboard size={16}/> 메인 대시보드로 복귀
             </button>
           </div>
@@ -384,7 +384,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const stepImage = currentActionData?.steps[activeDisplayIndex]?.stepImage || currentActionData?.image
 
   return (
-    <div style={{ height: 'calc(100vh - 56px)', width: '100%', background: '#020617', color: '#fff', position: 'relative', overflow: 'hidden', fontFamily: '"Pretendard", sans-serif' }}>
+    <div style={{ height: 'var(--content-h)', width: '100%', background: '#020617', color: '#fff', position: 'relative', overflow: 'hidden', fontFamily: '"Pretendard", sans-serif' }}>
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at center, transparent 0%, #020617 98%)' }} />
 
       {/* 상단 긴급 브리핑 바 */}
@@ -403,11 +403,11 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         </div>
       )}
 
-      <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '360px 1fr 340px', gridTemplateRows: '1fr 90px', gap: '10px', padding: '10px', height: selectedTriage ? 'calc(100% - 49px)' : '100%', boxSizing: 'border-box' }}>
+      <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'clamp(260px, 27vw, 380px) 1fr clamp(240px, 25vw, 360px)', gridTemplateRows: '1fr 90px', gap: '10px', padding: '10px', height: selectedTriage ? 'calc(100% - 49px)' : '100%', boxSizing: 'border-box' }}>
         
         <section style={{ gridRow: '1', display: 'flex', flexDirection: 'column' }}>
           <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ padding: 'var(--sp-3) var(--sp-3)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               <div style={{ fontSize: 13, fontWeight: 950 }}>처치 동작 시각 가이드</div>
             </div>
             <div style={{ flex: 1, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
@@ -430,7 +430,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
 
         <section style={{ gridRow: '1', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
           {activeAction ? (
-            <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)', padding: '14px 16px' }}>
+            <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)', padding: 'var(--sp-4) var(--sp-4)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
@@ -452,7 +452,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {currentActionData.steps.map((step, i) => (
-                  <div key={i} onClick={() => handleStepToggle(i)} onMouseEnter={() => setHoveredStepIndex(i)} onMouseLeave={() => setHoveredStepIndex(null)} style={{ display: 'flex', gap: 12, padding: '12px 14px', borderRadius: 14, cursor: 'pointer', background: completedSteps.includes(i) ? 'rgba(56,189,248,0.1)' : 'rgba(255,255,255,0.03)', border: `2px solid ${completedSteps.includes(i) ? '#38bdf8' : 'rgba(255,255,255,0.06)'}`, transition: '0.2s' }}>
+                  <div key={i} onClick={() => handleStepToggle(i)} onMouseEnter={() => setHoveredStepIndex(i)} onMouseLeave={() => setHoveredStepIndex(null)} style={{ display: 'flex', gap: 12, padding: 'var(--sp-3) var(--sp-4)', borderRadius: 14, cursor: 'pointer', background: completedSteps.includes(i) ? 'rgba(56,189,248,0.1)' : 'rgba(255,255,255,0.03)', border: `2px solid ${completedSteps.includes(i) ? '#38bdf8' : 'rgba(255,255,255,0.06)'}`, transition: '0.2s' }}>
                     <div style={{ width: 44, height: 44, borderRadius: '50%', background: completedSteps.includes(i) ? '#38bdf8' : 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center', fontWeight: 950, fontSize: 24, flexShrink: 0, color: completedSteps.includes(i) ? '#000' : '#fff', display: 'flex' }}>{i+1}</div>
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 950, marginBottom: 3, color: completedSteps.includes(i) ? '#fff' : '#e2e8f0' }}>{step.title}</div>
@@ -463,7 +463,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
               </div>
 
               {showCompletionPanel && (
-                <div style={{ marginTop: 24, padding: '28px', background: 'rgba(56,189,248,0.05)', border: '1px solid rgba(56,189,248,0.3)', borderRadius: 24 }}>
+                <div style={{ marginTop: 24, padding: 'var(--sp-8)', background: 'rgba(56,189,248,0.05)', border: '1px solid rgba(56,189,248,0.3)', borderRadius: 24 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
                     <div style={{ width: 72, height: 72, background: '#38bdf8', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(56,189,248,0.4)' }}><Send size={36} color="#000"/></div>
                     <div style={{ flex: 1 }}>
@@ -474,14 +474,14 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                     </div>
                     <div style={{ display: 'flex', gap: 12 }}>
                       <button onClick={handleSyncData} style={{ background: '#38bdf8', color: '#000', border: 'none', padding: '16px 28px', borderRadius: 14, fontWeight: 950, cursor: 'pointer', fontSize: 19, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 8px 16px rgba(56,189,248,0.2)' }}><RefreshCw size={20}/> 데이터 전송</button>
-                      <button onClick={() => setTriageStep('SUMMARY')} style={{ background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', padding: '16px 24px', borderRadius: 14, fontWeight: 950, cursor: 'pointer', fontSize: 19 }}>처치 종료</button>
+                      <button onClick={() => setTriageStep('SUMMARY')} style={{ background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', padding: 'var(--sp-4) var(--sp-6)', borderRadius: 14, fontWeight: 950, cursor: 'pointer', fontSize: 19 }}>처치 종료</button>
                     </div>
                   </div>
                 </div>
               )}
             </div>
           ) : (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: 20 }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: 'var(--sp-5)' }}>
               <div style={{ width: 120, height: 120, borderRadius: '50%', background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}><AlertTriangle size={70} color="#ef4444"/></div>
               <h2 style={{ fontSize: 18, fontWeight: 950, marginBottom: 8 }}>비의료인 자율 대응 모드</h2>
               <p style={{ fontSize: 26, color: '#94a3b8', fontWeight: 700, maxWidth: 650, lineHeight: 1.5 }}>환자의 의식 수준 판별을 통해<br/>적절한 응급처치 가이드를 활성화하십시오.</p>
@@ -490,7 +490,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         </section>
 
         <aside style={{ gridRow: '1', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0, overflow: 'hidden' }}>
-          <div style={{ padding: '20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 24, flexShrink: 0 }}>
+          <div style={{ padding: 'var(--sp-5)', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 24, flexShrink: 0 }}>
              <div style={{ display: 'flex', gap: 16, marginBottom: 20, alignItems: 'center' }}>
               <div style={{ width: 70, height: 70, borderRadius: 16, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.1)' }}><img src={patient?.avatar || 'CE.jpeg'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
               <div>
@@ -517,7 +517,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                 <div style={{ 
                   position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%) translateY(15px)', 
                   zIndex: 1000, width: 360, background: '#1e293b', border: '2px solid #38bdf8', borderRadius: 24,
-                  padding: 28, boxShadow: '0 20px 50px rgba(0,0,0,0.6)', animation: 'fadeIn 0.2s ease'
+                  padding: 'var(--sp-8)', boxShadow: '0 20px 50px rgba(0,0,0,0.6)', animation: 'fadeIn 0.2s ease'
                 }}>
                   <div style={{ fontSize: 17, fontWeight: 900, color: '#fff', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
                     {editTarget.key === 'bp' ? <Activity size={20} color="#38bdf8" /> : <Thermometer size={20} color="#38bdf8" />}
@@ -531,19 +531,19 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                     onKeyDown={e => e.key === 'Enter' && handleSaveVital()}
                     style={{
                       width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)',
-                      borderRadius: 14, padding: '16px 20px', color: '#fff', fontSize: 24, fontWeight: 800,
+                      borderRadius: 14, padding: 'var(--sp-4) var(--sp-5)', color: '#fff', fontSize: 24, fontWeight: 800,
                       outline: 'none', marginBottom: 20, textAlign: 'center', letterSpacing: '1px', boxSizing: 'border-box'
                     }}
                   />
                   <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-                    <button onClick={() => setEditTarget(null)} style={{ flex: 1, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: 'none', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}>취소</button>
-                    <button onClick={handleSaveVital} style={{ flex: 2, padding: '14px', borderRadius: 12, background: '#38bdf8', color: '#000', border: 'none', fontWeight: 950, fontSize: 16, cursor: 'pointer' }}>데이터 저장</button>
+                    <button onClick={() => setEditTarget(null)} style={{ flex: 1, padding: 'var(--sp-4)', borderRadius: 12, background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: 'none', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}>취소</button>
+                    <button onClick={handleSaveVital} style={{ flex: 2, padding: 'var(--sp-4)', borderRadius: 12, background: '#38bdf8', color: '#000', border: 'none', fontWeight: 950, fontSize: 16, cursor: 'pointer' }}>데이터 저장</button>
                   </div>
                 </div>
               )}
             </div>
           </div>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: 24, padding: '20px', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)', minHeight: 0 }}>
+          <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: 24, padding: 'var(--sp-5)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)', minHeight: 0 }}>
             <div style={{ fontWeight: 900, marginBottom: 16, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
               <History size={18} />
               <span>대응 타임라인</span>
