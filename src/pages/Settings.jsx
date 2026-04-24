@@ -75,14 +75,14 @@ const ORDERS = [
 ]
 
 const SOP_LIST = [
-  { code:'CPR-01', title:'심폐소생술·AED', cat:'심정지', color:C.danger },
-  { code:'HEI-07', title:'하임리히법', cat:'기도폐쇄', color:C.warning },
-  { code:'AIR-03', title:'기도 유지', cat:'기도확보', color:C.info },
-  { code:'BLD-02', title:'출혈 압박', cat:'외상/지혈', color:C.danger },
-  { code:'BRN-08', title:'화상 냉각', cat:'화상', color:C.yellow },
-  { code:'HYP-05', title:'익수자 구조', cat:'저체온', color:C.cyan },
-  { code:'FRC-04', title:'골절 고정', cat:'골절/탈구', color:C.purple },
-  { code:'WND-06', title:'상처 세척', cat:'감염방지', color:C.success },
+  { code:'CPR-01', title:'심장 압박 및 전기 충격', cat:'심장 정지', color:C.danger },
+  { code:'HEI-07', title:'목에 걸린 이물질 제거', cat:'음식물 걸림', color:C.warning },
+  { code:'AIR-03', title:'숨길 열기 및 산소 공급', cat:'호흡 곤란', color:C.info },
+  { code:'BLD-02', title:'피나는 곳 누르기(지혈)', cat:'심한 출혈', color:C.danger },
+  { code:'BRN-08', title:'화상 부위 식히기', cat:'불/열 화상', color:C.yellow },
+  { code:'HYP-05', title:'물에 빠진 선원 구조', cat:'체온 저하', color:C.cyan },
+  { code:'FRC-04', title:'뼈 부러진 곳 고정하기', cat:'뼈/관절 다침', color:C.purple },
+  { code:'WND-06', title:'상처 씻기 및 소독', cat:'상처 보호', color:C.success },
 ]
 
 const TRAINING = [
@@ -137,7 +137,40 @@ export default function Settings() {
   const [sec, setSec] = useState({ bio:true, enc:true, auto:true })
   const [signal] = useState(genSignal)
 
+  // --- 교육 이력 관리 상태 ---
+  const [trainingList, setTrainingList] = useState(() => {
+    try { 
+      const saved = localStorage.getItem('mdts_training')
+      return saved ? JSON.parse(saved) : TRAINING 
+    } catch { return TRAINING }
+  })
+  const [showAddTraining, setShowAddForm] = useState(false)
+  const [newTraining, setNewTraining] = useState({ name: '', type: '기본 CPR', expiry: '' })
+
   useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t) }, [])
+  useEffect(() => { localStorage.setItem('mdts_training', JSON.stringify(trainingList)) }, [trainingList])
+
+  const getStatusInfo = (expiry) => {
+    if (!expiry) return { label: '정보없음', color: C.sub }
+    const exp = new Date(expiry)
+    const today = new Date()
+    const diffTime = exp - today
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    
+    if (diffDays < 0) return { label: '만료', color: C.danger }
+    if (diffDays < 90) return { label: '만료임박', color: C.warning }
+    return { label: '유효', color: C.success }
+  }
+
+  const handleAddTraining = () => {
+    if (!newTraining.name || !newTraining.expiry) {
+      alert('이름과 만료일을 입력해주세요.')
+      return
+    }
+    setTrainingList([newTraining, ...trainingList])
+    setNewTraining({ name: '', type: '기본 CPR', expiry: '' })
+    setShowAddForm(false)
+  }
 
   const stats = useMemo(() => {
     const d = CREW.filter(c => c.isEmergency).length
@@ -181,7 +214,6 @@ export default function Settings() {
         {[
           { label:'현황', color:C.cyan, s:'s1' },
           { label:'건강', color:C.success, s:'s2' },
-          { label:'연결', color:C.info, s:'s3' },
           { label:'SOP', color:C.purple, s:'s4' },
           { label:'시스템', color:C.warning, s:'s5' },
         ].map((n, i) => (
@@ -245,26 +277,30 @@ export default function Settings() {
               <div style={{ height:160, position:'relative' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
+                    {/* 배경 트랙 링 */}
+                    <Pie data={[{v:1}]} innerRadius={48} outerRadius={62} stroke="none" fill={C.border} dataKey="v" isAnimationActive={false} />
+                    
                     <Pie data={[
                       { name:'정상', value:stats.normal, color:C.success },
                       { name:'주의', value:stats.caution, color:C.warning },
                       { name:'위험', value:stats.danger, color:C.danger },
-                    ]} innerRadius={48} outerRadius={68} paddingAngle={3} dataKey="value" startAngle={90} endAngle={-270}>
-                      {[C.success,C.warning,C.danger].map((c,i)=><Cell key={i} fill={c} stroke="none"/>)}
+                    ]} innerRadius={48} outerRadius={62} paddingAngle={8} cornerRadius={6} dataKey="value" startAngle={90} endAngle={-270} stroke="none">
+                      {[C.success,C.warning,C.danger].map((c,i)=><Cell key={i} fill={c} />)}
                     </Pie>
-                    <Tooltip contentStyle={{ background:C.panel, border:`1px solid ${C.border}`, fontSize:11, borderRadius:6 }} />
+                    <Tooltip contentStyle={{ background:C.panel, border:`1px solid ${C.border}`, fontSize:11, borderRadius:6, boxShadow:'0 4px 12px rgba(0,0,0,0.5)' }} />
                   </PieChart>
                 </ResponsiveContainer>
-                <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', textAlign:'center' }}>
-                  <div style={{ fontSize:22, fontWeight:900, color:C.text, fontFamily:"'Pretendard Variable', Pretendard, sans-serif" }}>{stats.total}</div>
-                  <div style={{ fontSize:10, color:C.sub }}>명</div>
+                <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', textAlign:'center', pointerEvents:'none' }}>
+                  <div style={{ fontSize:10, color:C.sub, fontWeight:800, letterSpacing:0.5, marginBottom:2 }}>TOTAL</div>
+                  <div style={{ fontSize:24, fontWeight:950, color:'#fff', fontFamily:"'Pretendard Variable', sans-serif", lineHeight:1 }}>{stats.total}</div>
+                  <div style={{ fontSize:10, color:C.sub, marginTop:2 }}>CREW</div>
                 </div>
               </div>
-              <div style={{ display:'flex', justifyContent:'space-around', paddingTop:8, borderTop:`1px solid ${C.border}` }}>
+              <div style={{ display:'flex', justifyContent:'space-around', paddingTop:12, borderTop:`1px solid ${C.border}`, marginTop:4 }}>
                 {[{l:'정상',v:stats.normal,c:C.success},{l:'주의',v:stats.caution,c:C.warning},{l:'위험',v:stats.danger,c:C.danger}].map((x,i)=>(
                   <div key={i} style={{ textAlign:'center' }}>
-                    <div style={{ fontSize:14, fontWeight:800, color:x.c, fontFamily:"'Pretendard Variable', Pretendard, sans-serif" }}>{x.v}</div>
-                    <div style={{ fontSize:10, color:C.sub }}>{x.l}</div>
+                    <div style={{ fontSize:15, fontWeight:900, color:x.c, fontFamily:"'Pretendard Variable', sans-serif" }}>{Math.round((x.v/stats.total)*100)}%</div>
+                    <div style={{ fontSize:9, color:C.sub, fontWeight:700 }}>{x.l} ({x.v})</div>
                   </div>
                 ))}
               </div>
@@ -358,100 +394,19 @@ export default function Settings() {
                 })}
               </div>
             </GPanel>
-
-            {/* 월별 트렌드 */}
-            <GPanel title="월별 사고·처치 트렌드" icon={<TrendingUp size={12} color={C.info}/>}>
-              <div style={{ height:190 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={TREND}>
-                    <defs>
-                      {[['gE',C.danger],['gC',C.success],['gR',C.info]].map(([id,col])=>(
-                        <linearGradient key={id} id={id} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={col} stopOpacity={0.25}/>
-                          <stop offset="95%" stopColor={col} stopOpacity={0}/>
-                        </linearGradient>
-                      ))}
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false}/>
-                    <XAxis dataKey="m" stroke={C.sub} fontSize={10} tickLine={false} axisLine={false}/>
-                    <YAxis stroke={C.sub} fontSize={10} tickLine={false} axisLine={false}/>
-                    <Tooltip contentStyle={{ background:C.panel, border:`1px solid ${C.border}`, fontSize:11, borderRadius:6 }}/>
-                    <Area type="monotone" dataKey="응급" stroke={C.danger} fill="url(#gE)" strokeWidth={2} dot={false}/>
-                    <Area type="monotone" dataKey="검진" stroke={C.success} fill="url(#gC)" strokeWidth={2} dot={false}/>
-                    <Area type="monotone" dataKey="원격" stroke={C.info} fill="url(#gR)" strokeWidth={2} dot={false}/>
-                    <Legend wrapperStyle={{ fontSize:11, paddingTop:6 }}/>
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </GPanel>
           </div>
         </Section>
 
-        {/* ══ S3 : 원격 의료 연결 ══════════════════════════════════════════ */}
-        <Section id="s3" label="원격 의료 연결 관리" color={C.info} collapsed={collapsed.s3} onToggle={()=>fold('s3')}>
-
-          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-            {/* 전송 현황 */}
-            <GPanel title="데이터 전송 이력" icon={<Send size={12} color={C.info}/>}
-              right={<button style={{ padding:'3px 10px', borderRadius:4, background:`${C.info}18`, border:`1px solid ${C.info}44`, color:C.info, fontSize:10, fontWeight:700, cursor:'pointer' }}>수동 전송</button>}>
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6, marginBottom:10 }}>
-                {[
-                  { l:'전송', v:TX_LOGS.length, c:C.info },
-                  { l:'성공', v:TX_LOGS.filter(l=>l.ok).length, c:C.success },
-                  { l:'실패', v:TX_LOGS.filter(l=>!l.ok).length, c:C.danger },
-                ].map((s,i)=>(
-                  <div key={i} style={{ padding:'10px', background:C.panel2, borderRadius:5, border:`1px solid ${C.border}`, textAlign:'center' }}>
-                    <div style={{ fontSize:22, fontWeight:900, color:s.c, fontFamily:'monospace' }}>{s.v}</div>
-                    <div style={{ fontSize:10, color:C.sub }}>{s.l}</div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
-                {TX_LOGS.map((l,i)=>(
-                  <div key={i} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 8px', borderRadius:4, background:C.panel2, border:`1px solid ${C.border}`, fontSize:11 }}>
-                    <span style={{ color:C.sub, fontFamily:'monospace', fontSize:10, flexShrink:0 }}>{l.t}</span>
-                    <span style={{ flex:1, color:C.sub }}>{l.type}</span>
-                    <span style={{ width:6, height:6, borderRadius:'50%', background:l.ok?C.success:C.danger, flexShrink:0 }}/>
-                    <span style={{ color:l.ok?C.success:C.danger, fontSize:10, fontWeight:700 }}>{l.ok?'성공':'실패'}</span>
-                    {!l.ok && <button style={{ padding:'2px 6px', borderRadius:3, background:`${C.warning}18`, border:`1px solid ${C.warning}44`, color:C.warning, fontSize:9, cursor:'pointer' }}>재시도</button>}
-                  </div>
-                ))}
-              </div>
-            </GPanel>
-
-            {/* 병원 조회 */}
-            <GPanel title="해상 위치 기반 수신 병원 (34°30'N 127°45'E · 여수해협)" icon={<MapPin size={12} color={C.warning}/>}>
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8 }}>
-                {[
-                  { name:'목포한국병원', dist:85, eta:'헬기 30분', trauma:false, cardio:true, gen:true },
-                  { name:'부산대학교병원', dist:120, eta:'헬기 45분', trauma:true, cardio:true, gen:true },
-                  { name:'여수전남병원', dist:150, eta:'헬기 55분', trauma:true, cardio:false, gen:true },
-                  { name:'인천성모병원', dist:310, eta:'헬기 95분', trauma:true, cardio:true, gen:true },
-                ].map((h,i)=>(
-                  <div key={i} style={{ padding:'12px', borderRadius:5, background:C.panel2, border:`1px solid ${C.border}` }}>
-                    <div style={{ fontSize:12, fontWeight:700, marginBottom:4 }}>{h.name}</div>
-                    <div style={{ fontSize:18, fontWeight:900, color:C.cyan, fontFamily:'monospace' }}>{h.dist}<span style={{ fontSize:11, color:C.sub }}> km</span></div>
-                    <div style={{ fontSize:10, color:C.sub, marginBottom:8 }}>{h.eta}</div>
-                    <div style={{ display:'flex', flexWrap:'wrap', gap:3 }}>
-                      {h.trauma && <Tag color={C.danger} small>외상</Tag>}
-                      {h.cardio && <Tag color={C.info} small>심혈관</Tag>}
-                      {h.gen && <Tag color={C.success} small>일반외과</Tag>}
-                    </div>
-                    <button style={{ width:'100%', marginTop:8, padding:'5px', borderRadius:4, background:`${C.warning}18`, border:`1px solid ${C.warning}44`, color:C.warning, fontSize:10, fontWeight:700, cursor:'pointer' }}>헬기 후송</button>
-                  </div>
-                ))}
-              </div>
-            </GPanel>
-          </div>
-        </Section>
-
-        {/* ══ S4 : SOP 매뉴얼 & 교육 ══════════════════════════════════════ */}
-        <Section id="s4" label="SOP 매뉴얼 및 교육 자료" color={C.purple} collapsed={collapsed.s4} onToggle={()=>fold('s4')}>
+        {/* ══ S4 : 응급처치 지침 & 교육 ══════════════════════════════════════ */}
+        <Section id="s4" label="응급처치 지침 및 교육 자료" color={C.purple} collapsed={collapsed.s4} onToggle={()=>fold('s4')}>
 
           <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:10 }}>
-            {/* SOP 카드 그리드 */}
-            <GPanel title="SOP 처치 가이드 (8종)" icon={<BookOpen size={12} color={C.purple}/>}
-              right={<button style={{ padding:'3px 10px', borderRadius:4, background:`${C.purple}18`, border:`1px solid ${C.purple}44`, color:C.purple, fontSize:10, fontWeight:700, cursor:'pointer' }}>전체 인쇄</button>}>
+            {/* 상황별 처치 가이드 */}
+            <GPanel title="상황별 응급처치 가이드 (8종)" icon={<BookOpen size={12} color={C.purple}/>}
+              right={<button style={{ padding:'3px 10px', borderRadius:4, background:`${C.purple}18`, border:`1px solid ${C.purple}44`, color:C.purple, fontSize:10, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
+                <RefreshCw size={10}/>
+                버전 업그레이드
+              </button>}>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8 }}>
                 {SOP_LIST.map((s,i)=>(
                   <div key={i} onClick={()=>setSopIdx(sopIdx===i?null:i)}
@@ -471,16 +426,38 @@ export default function Settings() {
             </GPanel>
 
             {/* 훈련 이력 */}
-            <GPanel title="STCW 훈련 이력" icon={<Users size={12} color={C.cyan}/>}>
+            <GPanel title="선원 응급처치 및 의료 교육 이력" icon={<Users size={12} color={C.cyan}/>}
+              right={<button onClick={() => setShowAddForm(!showAddTraining)} style={{ padding:'2px 8px', borderRadius:4, background:`${C.info}18`, border:`1px solid ${C.info}44`, color:C.info, fontSize:12, fontWeight:800, cursor:'pointer' }}>{showAddTraining ? '취소' : '+'}</button>}>
+              
+              {showAddTraining && (
+                <div style={{ background:C.panel2, border:`1px solid ${C.info}44`, borderRadius:6, padding:10, marginBottom:10, display:'flex', flexDirection:'column', gap:8 }}>
+                  <div style={{ display:'flex', gap:6 }}>
+                    <input placeholder="선원 이름" value={newTraining.name} onChange={e=>setNewTraining({...newTraining, name:e.target.value})} style={{ flex:1, background:C.bg, border:`1px solid ${C.border}`, borderRadius:4, padding:'4px 8px', color:'#fff', fontSize:11 }} />
+                    <select value={newTraining.type} onChange={e=>setNewTraining({...newTraining, type:e.target.value})} style={{ flex:1, background:C.bg, border:`1px solid ${C.border}`, borderRadius:4, padding:'4px 8px', color:'#fff', fontSize:11 }}>
+                      <option>기본 CPR</option>
+                      <option>의료 응급 처치 (STCW)</option>
+                      <option>선상 응급 의료 (Advanced)</option>
+                    </select>
+                  </div>
+                  <div style={{ display:'flex', gap:6, alignItems:'center' }}>
+                    <span style={{ fontSize:10, color:C.sub }}>만료일:</span>
+                    <input type="date" value={newTraining.expiry} onChange={e=>setNewTraining({...newTraining, expiry:e.target.value})} style={{ flex:1, background:C.bg, border:`1px solid ${C.border}`, borderRadius:4, padding:'4px 8px', color:'#fff', fontSize:11 }} />
+                    <button onClick={handleAddTraining} style={{ background:C.info, color:'#000', border:'none', borderRadius:4, padding:'4px 12px', fontWeight:800, fontSize:11, cursor:'pointer' }}>추가</button>
+                  </div>
+                </div>
+              )}
+
               <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
-                {TRAINING.map((r,i)=>{
-                  const sc = r.status==='유효'?C.success:r.status==='만료임박'?C.warning:C.danger
+                {trainingList.map((r,i)=>{
+                  const info = getStatusInfo(r.expiry)
                   return (
                     <div key={i} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 8px', borderRadius:4, background:C.panel2, border:`1px solid ${C.border}`, fontSize:11 }}>
-                      <div style={{ width:6, height:6, borderRadius:'50%', background:sc, flexShrink:0 }}/>
+                      <div style={{ width:6, height:6, borderRadius:'50%', background:info.color, flexShrink:0 }}/>
                       <span style={{ fontWeight:700, flex:1 }}>{r.name}</span>
                       <span style={{ color:C.sub, fontSize:10, flex:2 }}>{r.type}</span>
-                      <Tag color={sc} small>{r.status}</Tag>
+                      <span style={{ color:C.sub, fontSize:10, marginRight:4 }}>{r.expiry}</span>
+                      <Tag color={info.color} small>{info.label}</Tag>
+                      <button onClick={() => { if(confirm('삭제하시겠습니까?')) setTrainingList(trainingList.filter((_, idx) => idx !== i)) }} style={{ background:'none', border:'none', color:C.sub, cursor:'pointer', fontSize:10 }}>×</button>
                     </div>
                   )
                 })}

@@ -38,7 +38,7 @@ export default function App() {
       detail: '처방 : 타이레놀 500mg\n특이사항 : 알레르기 반응 없음'
     },
     hr: 82, bp: '128/84', temp: 36.7, spo2: 98,
-    avatar: ceAvatar
+    avatar: '/CE.jpeg'
   })
 
   const [emergencyData, setEmergencyData] = useState(null)
