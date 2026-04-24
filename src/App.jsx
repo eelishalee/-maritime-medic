@@ -66,7 +66,7 @@ export default function App() {
       <div style={{ flex: 1, overflow: 'hidden' }}>
         {page === 'main'      && <Main patient={activePatient} onNavigate={handleNavigate} />}
         {page === 'crew'      && (
-          <CrewManagement onSelectPatient={p => { setActivePatient(p); handleNavigate('main') }} />
+          <CrewManagement onSelectPatient={p => { setActivePatient(p); handleNavigate('chart') }} />
         )}
         {page === 'emergency' && (
           <Emergency 
@@ -76,7 +76,7 @@ export default function App() {
           />
         )}
         {page === 'chart'     && (
-          <PatientChart patient={activePatient} />
+          <PatientChart patient={activePatient} onNavigate={handleNavigate} />
         )}
         {page === 'settings'  && <Settings />}
       </div>

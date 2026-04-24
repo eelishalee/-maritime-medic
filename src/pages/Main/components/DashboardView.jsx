@@ -155,13 +155,14 @@ export default function DashboardView({
 
             {/* 에러 팝업 */}
             {scanError && (
-              <div style={{ position: 'absolute', background: 'rgba(255,77,77,0.95)', padding: '20px 40px', borderRadius: '16px', color: '#fff', textAlign: 'center', animation: 'fadeIn 0.3s' }}>
-                <div style={{ fontSize: 22, fontWeight: 900, marginBottom: 8 }}>외상 데이터 분석 불가</div>
-                <div style={{ fontSize: 16, fontWeight: 700 }}>초점이 흐리거나 조도가 낮습니다. 외상 부위를 정중앙에 맞추고 다시 시도해 주세요.</div>
-                <button onClick={() => setScanError(null)} style={{ marginTop: 16, padding: '10px 24px', borderRadius: '8px', border: 'none', background: '#fff', color: '#ff4d4d', fontWeight: 900, cursor: 'pointer' }}>다시 시도</button>
+              <div style={{ position: 'absolute', background: 'rgba(255,77,77,0.95)', padding: '25px 50px', borderRadius: '20px', color: '#fff', textAlign: 'center', animation: 'fadeIn 0.3s', boxShadow: '0 10px 30px rgba(0,0,0,0.3)', zIndex: 1020 }}>
+                <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 12 }}>외상 데이터 분석 불가</div>
+                <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.5, whiteSpace: 'pre-line' }}>
+                  초점이 흐리거나 너무 멀리서 촬영되었습니다.{"\n"}다시 시도해 주세요.
+                </div>
+                <button onClick={() => setScanError(null)} style={{ marginTop: 20, padding: '12px 30px', borderRadius: '10px', border: 'none', background: '#fff', color: '#ff4d4d', fontWeight: 900, fontSize: 17, cursor: 'pointer' }}>다시 시도</button>
               </div>
-            )}
-          </div>
+            )}          </div>
 
           {/* 하단 바 영역 (버튼만 유지) */}
           <div style={{ position: 'absolute', bottom: 60, left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 1010 }}>

@@ -115,6 +115,7 @@ export default function Settings() {
   const [devEdit, setDevEdit] = useState({ ...device })
   const [sec, setSec] = useState({ bio:true, enc:true, auto:true })
   const [signal] = useState(genSignal)
+  const [coords, setCoords] = useState({ lat: '35.1028° N', lng: '129.0403° E' }) // 부산항 기본값
 
   // --- 교육 이력 관리 상태 ---
   const [trainingList, setTrainingList] = useState(() => {
@@ -141,7 +142,17 @@ export default function Settings() {
   })
   const [newManager, setNewManager] = useState({ name: '', role: '안전책임자' })
 
-  useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t) }, [])
+  useEffect(() => { 
+    const t = setInterval(() => {
+      setNow(new Date())
+      // 미세한 좌표 변화 시뮬레이션
+      setCoords(prev => ({
+        lat: (parseFloat(prev.lat) + (Math.random() - 0.5) * 0.0001).toFixed(4) + '° N',
+        lng: (parseFloat(prev.lng) + (Math.random() - 0.5) * 0.0001).toFixed(4) + '° E'
+      }))
+    }, 1000); 
+    return () => clearInterval(t) 
+  }, [])
   useEffect(() => { localStorage.setItem('mdts_training', JSON.stringify(trainingList)) }, [trainingList])
   useEffect(() => { localStorage.setItem('mdts_managers', JSON.stringify(managerList)) }, [managerList])
 
@@ -558,10 +569,10 @@ export default function Settings() {
             ))}
           </div>
 
-          <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:10, marginBottom:10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
             {/* 통신 품질 차트 */}
             <GPanel title="위성 신호 품질 — 최근 24시간" icon={<Wifi size={12} color={C.info}/>}>
-              <div style={{ height:140 }}>
+              <div style={{ height: 140 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={signal}>
                     <defs>
@@ -577,6 +588,20 @@ export default function Settings() {
                     <Area type="monotone" dataKey="v" stroke={C.info} fill="url(#gSig)" strokeWidth={2} dot={false}/>
                   </AreaChart>
                 </ResponsiveContainer>
+              </div>
+            </GPanel>
+
+            {/* 실시간 선박 좌표 추가 */}
+            <GPanel title="실시간 선박 좌표" icon={<MapPin size={12} color={C.cyan}/>}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 15, height: 140, justifyContent: 'center' }}>
+                <div style={{ background: 'rgba(13, 217, 197, 0.05)', border: `1px solid ${C.cyan}33`, borderRadius: 8, padding: '12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 10, color: C.sub, fontWeight: 800, marginBottom: 4 }}>LATITUDE</div>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: C.cyan, fontFamily: 'monospace' }}>{coords.lat}</div>
+                </div>
+                <div style={{ background: 'rgba(13, 217, 197, 0.05)', border: `1px solid ${C.cyan}33`, borderRadius: 8, padding: '12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 10, color: C.sub, fontWeight: 800, marginBottom: 4 }}>LONGITUDE</div>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: C.cyan, fontFamily: 'monospace' }}>{coords.lng}</div>
+                </div>
               </div>
             </GPanel>
 
