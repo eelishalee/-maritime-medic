@@ -128,8 +128,8 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
   let displayEmergency = { name: '미지정', phone: '-', relation: '-' };
 
   const PROTECTOR_MAP = {
-    'S26-001': '김도윤', 'S26-002': '이서연', 'S26-003': '양정희', 'S26-004': '박지호',
-    'S26-005': '최민준', 'S26-006': '정하윤', 'S26-007': '강준우', 'S26-008': '조예은',
+    'S26-001': '김도윤', 'S26-002': '김도장', 'S26-003': '양정희', 'S26-004': '박지호',
+    'S26-005': '정민준', 'S26-006': '정하윤', 'S26-007': '강준우', 'S26-008': '조예은',
     'S26-009': '임도현', 'S26-010': '장수빈', 'S26-011': '황지훈', 'S26-012': '한지민',
     'S26-013': '오세현', 'S26-014': '나혜지', 'S26-015': '송다희', 'S26-016': '김한혜'
   };
@@ -179,6 +179,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
   const [hour, setHour] = useState('12')
   const [minute, setMinute] = useState('00')
   const [occurrenceTime, setOccurrenceTime] = useState('오후 12:00')
+  const [lastMealTime, setLastMealTime] = useState('기록 없음')
 
   // 환자 변경 시 바이탈 데이터 동기화
   useEffect(() => {
@@ -197,6 +198,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
       setDetailedNote('')
       setSelectedMeds([])
       setOtherActions('')
+      setLastMealTime('기록 없음')
       setShowPlan(false)
     }
   }, [selectedId])
@@ -697,57 +699,80 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
           </SectionCard>
           
           <SectionCard title="1. 환자 상태 관찰 일지" icon={<Stethoscope size={36} color="#38bdf8"/>}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
-              <div style={{ marginBottom: 5, padding: '18px 24px', background: 'rgba(56,189,248,0.05)', borderRadius: 16, border: '1px solid rgba(56,189,248,0.1)', fontSize: '23px', color: '#38bdf8', fontWeight: 700, lineHeight: 1.5 }}>
-                💡 환자가 직접 말하는 증상과 관리자가 눈으로 본 내용을 차례대로 기록해 주세요.
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 35 }}>
+              <div style={{ padding: '18px 24px', background: 'rgba(56,189,248,0.05)', borderRadius: 16, border: '1px solid rgba(56,189,248,0.1)', fontSize: '23px', color: '#38bdf8', fontWeight: 700, lineHeight: 1.5 }}>
+                💡 환자가 통증을 느끼는 부위를 선택하고, 관찰된 증상을 기록해 주세요.
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 30, alignItems: 'end' }}>
-                <InputBox label="가장 불편한 곳 (어디가 아픈가요?)" placeholder='예: "심한 두통", "어깨 통증", "어지러움"' value={mainComplaint} onChange={(v) => { setMainComplaint(v); setShowPlan(false); }} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}><label style={{ fontSize: '23px', color: '#94a3b8', fontWeight: 800 }}>증상이 나타난 시각</label><button onClick={(e) => { e.stopPropagation(); setNowTime(); }} style={{ padding: '8px 14px', borderRadius: 10, background: 'rgba(56,189,248,0.2)', border: '1px solid #38bdf8', color: '#38bdf8', fontSize: '17px', fontWeight: 900, cursor: 'pointer' }}>지금 시각으로 설정</button></div>
-                  <div style={{ background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, height: '62px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
-                    <span style={{ fontSize: '28px', fontWeight: 950, color: '#38bdf8', letterSpacing: '1px' }}>{occurrenceTime}</span>
-                    <button onClick={(e) => { e.stopPropagation(); setIsTimeModalOpen(true); }} style={{ padding: '8px 16px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', fontSize: '16.5px', fontWeight: 700, cursor: 'pointer' }}>직접 변경</button>
-                  </div>
-                </div>
-              </div>
-
+              
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <label style={{ fontSize: '23px', color: '#94a3b8', fontWeight: 800 }}>통증 부위 선택 (환자가 아프다고 하는 곳)</label>
+                <label style={{ fontSize: '28px', color: '#94a3b8', fontWeight: 800 }}>통증 부위 선택 (환자가 아프다고 하는 곳)</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 20 }}>
-                  <PainAreaGroup label="머리 / 목" icon={<User size={22} color="#38bdf8" />} areas={['머리(두통)', '얼굴', '목', '치아/잇몸']} selectedAreas={painAreas} onClick={handlePainAreaClick} />
-                  <PainAreaGroup label="몸통 (앞/뒤)" icon={<Activity size={22} color="#38bdf8" />} areas={['가슴(흉통)', '어깨', '상복부', '하복부', '옆구리', '등/허리']} selectedAreas={painAreas} onClick={handlePainAreaClick} />
-                  <PainAreaGroup label="하체" icon={<Zap size={22} color="#38bdf8" />} areas={['골반', '허벅지', '무릎', '종아리', '발목/발']} selectedAreas={painAreas} onClick={handlePainAreaClick} />
-                  <PainAreaGroup label="팔 / 기타" icon={<Sparkles size={22} color="#38bdf8" />} areas={['팔꿈치', '팔(전체)', '손목/손', '항문/회음부', '전신 통증']} selectedAreas={painAreas} onClick={handlePainAreaClick} />
+                  <PainAreaGroup label="머리 / 목" icon={<User size={26} color="#38bdf8" />} areas={['머리(두통)', '얼굴', '목', '치아/잇몸']} selectedAreas={painAreas} onClick={handlePainAreaClick} />
+                  <PainAreaGroup label="몸통 (앞/뒤)" icon={<Activity size={26} color="#38bdf8" />} areas={['가슴(흉통)', '어깨', '상복부', '하복부', '옆구리', '등/허리']} selectedAreas={painAreas} onClick={handlePainAreaClick} />
+                  <PainAreaGroup label="하체" icon={<Zap size={26} color="#38bdf8" />} areas={['골반', '허벅지', '무릎', '종아리', '발목/발']} selectedAreas={painAreas} onClick={handlePainAreaClick} />
+                  <PainAreaGroup label="팔 / 기타" icon={<Sparkles size={26} color="#38bdf8" />} areas={['팔꿈치', '팔(전체)', '손목/손', '항문/회음부', '전신 통증']} selectedAreas={painAreas} onClick={handlePainAreaClick} />
                 </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
                 <div>
-                  <div style={{ fontSize: '23px', color: '#94a3b8', fontWeight: 800, marginBottom: 15 }}>눈에 보이는 증상 (관찰된 것)</div>
-                  <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, padding: '20px 30px', border: '1.5px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', gap: 18 }}>
+                  <div style={{ fontSize: '28px', color: '#94a3b8', fontWeight: 800, marginBottom: 15 }}>눈에 보이는 증상 (관찰된 것)</div>
+                  <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, padding: '25px 30px', border: '1.5px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', gap: 22 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                      <span style={{ fontSize: '17.5px', color: '#64748b', fontWeight: 800, whiteSpace: 'nowrap', width: '140px' }}>전신/의식 상태</span>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      <span style={{ fontSize: '21px', color: '#64748b', fontWeight: 800, whiteSpace: 'nowrap', width: '180px' }}>전신/의식 상태</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                         {['의식 변화', '호흡 곤란', '구토', '발열', '식은땀', '청색증'].map(s => {
-                          const active = selectedSymptoms.includes(s) || detailedNote.includes(s)
-                          return (<button key={s} onClick={() => toggleSymptom(s)} style={{ padding: '10px 16px', borderRadius: 12, background: active ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.03)', border: `1.5px solid ${active ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, color: active ? '#38bdf8' : '#fff', fontSize: '17.5px', fontWeight: 700, cursor: 'pointer', transition: '0.2s' }}>{s}</button>)
+                          const active = selectedSymptoms.includes(s)
+                          return (<button key={s} onClick={() => toggleSymptom(s)} style={{ padding: '12px 20px', borderRadius: 14, background: active ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.03)', border: `1.5px solid ${active ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, color: active ? '#38bdf8' : '#fff', fontSize: '21px', fontWeight: 700, cursor: 'pointer', transition: '0.2s' }}>{s}</button>)
                         })}
                       </div>
                     </div>
-                    <div style={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.05)' }}></div>
+                    <div style={{ width: '100%', height: '1.5px', background: 'rgba(255,255,255,0.05)' }}></div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                      <span style={{ fontSize: '17.5px', color: '#64748b', fontWeight: 800, whiteSpace: 'nowrap', width: '140px' }}>외상/환부 상태</span>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      <span style={{ fontSize: '21px', color: '#64748b', fontWeight: 800, whiteSpace: 'nowrap', width: '180px' }}>외상/환부 상태</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                         {['출혈', '대량 출혈(위험)', '부종(부기)', '피부 발진', '마비/저림', '찰과상/열상', '총상/자상(초응급)', '변형(골절의심)'].map(s => {
-                          const active = selectedSymptoms.includes(s) || detailedNote.includes(s)
-                          return (<button key={s} onClick={() => toggleSymptom(s)} style={{ padding: '10px 16px', borderRadius: 12, background: active ? (s.includes('위험') || s.includes('응급') ? 'rgba(244,63,94,0.3)' : 'rgba(56,189,248,0.25)') : 'rgba(255,255,255,0.03)', border: `1.5px solid ${active ? (s.includes('위험') || s.includes('응급') ? '#f43f5e' : '#38bdf8') : 'rgba(255,255,255,0.1)'}`, color: active ? (s.includes('위험') || s.includes('응급') ? '#ff4d6d' : '#38bdf8') : '#fff', fontSize: '17.5px', fontWeight: 700, cursor: 'pointer', transition: '0.2s' }}>{s}</button>)
+                          const active = selectedSymptoms.includes(s)
+                          return (<button key={s} onClick={() => toggleSymptom(s)} style={{ padding: '12px 20px', borderRadius: 14, background: active ? (s.includes('위험') || s.includes('응급') ? 'rgba(244,63,94,0.3)' : 'rgba(56,189,248,0.25)') : 'rgba(255,255,255,0.03)', border: `1.5px solid ${active ? (s.includes('위험') || s.includes('응급') ? '#f43f5e' : '#38bdf8') : 'rgba(255,255,255,0.1)'}`, color: active ? (s.includes('위험') || s.includes('응급') ? '#ff4d6d' : '#38bdf8') : '#fff', fontSize: '21px', fontWeight: 700, cursor: 'pointer', transition: '0.2s' }}>{s}</button>)
                         })}
                       </div>
                     </div>
                   </div>
                 </div>
                 <InputBox label="상세한 증상 이야기 (언제부터, 어떻게 아픈가요?)" placeholder="증상이 시작된 계기나 통증의 느낌(콕콕 쑤심, 묵직함 등)을 자유롭게 적어주세요." isTextArea value={detailedNote} onChange={(v) => { setDetailedNote(v); setShowPlan(false); }} />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 25, marginTop: 10 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, background: 'rgba(56,189,248,0.03)', padding: '20px', borderRadius: 20, border: '1.5px solid rgba(56,189,248,0.1)' }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                    <label style={{ fontSize: '24px', color: '#38bdf8', fontWeight: 900 }}>증상이 나타난 시각</label>
+                    <button onClick={(e) => { e.stopPropagation(); setNowTime(); }} style={{ padding: '8px 16px', borderRadius: 10, background: 'rgba(56,189,248,0.2)', border: '1.5px solid #38bdf8', color: '#38bdf8', fontSize: '18px', fontWeight: 900, cursor: 'pointer' }}>지금으로 설정</button>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 15, background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: 15 }}>
+                    <Clock size={24} color="#38bdf8" />
+                    <span style={{ fontSize: '34px', fontWeight: 950, color: '#fff', letterSpacing: '1px' }}>{occurrenceTime}</span>
+                    <button onClick={(e) => { e.stopPropagation(); setIsTimeModalOpen(true); }} style={{ padding: '8px 16px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', color: '#94a3b8', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}>변경</button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: 20, border: '1.5px solid rgba(255,255,255,0.05)' }}>
+                  <label style={{ fontSize: '24px', color: '#94a3b8', fontWeight: 900 }}>최종 취식/음용 시각</label>
+                  <div style={{ display: 'flex', gap: 12, marginTop: 5 }}>
+                    <input 
+                      type="text" 
+                      placeholder='예: "1시간 전", "오전 8시"' 
+                      value={lastMealTime === '기록 없음' ? '' : lastMealTime} 
+                      onChange={(e) => setLastMealTime(e.target.value)}
+                      style={{ flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 15, padding: '15px 22px', color: '#fff', fontSize: '24px', outline: 'none', fontFamily: '"Pretendard", sans-serif' }} 
+                    />
+                    <button onClick={() => setLastMealTime('금식 중')} style={{ padding: '0 25px', borderRadius: 15, background: 'rgba(244,63,94,0.1)', border: '1.5px solid rgba(244,63,94,0.3)', color: '#f43f5e', fontSize: '20px', fontWeight: 800, cursor: 'pointer' }}>금식</button>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ padding: '15px 25px', background: 'rgba(56,189,248,0.03)', borderRadius: 18, border: '1.2px dashed rgba(56,189,248,0.2)', display: 'flex', alignItems: 'center', gap: 15 }}>
+                <Info size={26} color="#38bdf8" style={{ flexShrink: 0 }} />
+                <span style={{ fontSize: '21.5px', color: '#94a3b8', fontWeight: 600, lineHeight: 1.4 }}>수술 및 마취가 필요할 수 있는 응급 상황에 대비해 마지막 음식 섭취 시각을 반드시 확인하십시오.</span>
               </div>
 
               {!showPlan && (
@@ -990,11 +1015,11 @@ function SectionCard({ title, icon, children }) {
 function PainAreaGroup({ label, areas, selectedAreas, onClick, icon }) {
   return (
     <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, padding: '24px', border: '1.5px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', gap: 18 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 15 }}>
         {icon}
-        <div style={{ fontSize: '21px', color: '#e2e8f0', fontWeight: 850 }}>{label}</div>
+        <div style={{ fontSize: '25px', color: '#e2e8f0', fontWeight: 850 }}>{label}</div>
       </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15 }}>
         {areas.map(area => {
           const isActive = selectedAreas.includes(area)
           return (
@@ -1002,12 +1027,12 @@ function PainAreaGroup({ label, areas, selectedAreas, onClick, icon }) {
               key={area} 
               onClick={() => onClick(area)} 
               style={{ 
-                padding: '11px 20px', 
-                borderRadius: 14, 
+                padding: '13px 24px', 
+                borderRadius: 16, 
                 background: isActive ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.03)', 
                 border: `1.5px solid ${isActive ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, 
                 color: isActive ? '#38bdf8' : '#cbd5e1', 
-                fontSize: '19px', 
+                fontSize: '23px', 
                 fontWeight: 700, 
                 cursor: 'pointer', 
                 transition: 'all 0.2s' 
@@ -1023,7 +1048,7 @@ function PainAreaGroup({ label, areas, selectedAreas, onClick, icon }) {
 }
 
 function InputBox({ label, placeholder, isTextArea, value, onChange }) {
-  return (<div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}><label style={{ fontSize: '24px', color: '#94a3b8', fontWeight: 800 }}>{label}</label>{isTextArea ? (<textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', minHeight: 120, background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '22px', color: '#fff', fontSize: '23px', outline: 'none', resize: 'none', lineHeight: 1.5 }} />) : (<input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '20px 28px', color: '#fff', fontSize: '23px', outline: 'none' }} />)}</div>)
+  return (<div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}><label style={{ fontSize: '24px', color: '#94a3b8', fontWeight: 800 }}>{label}</label>{isTextArea ? (<textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', minHeight: 120, background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '22px', color: '#fff', fontSize: '23px', outline: 'none', resize: 'none', lineHeight: 1.5, fontFamily: '"Pretendard", sans-serif' }} />) : (<input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '20px 28px', color: '#fff', fontSize: '23px', outline: 'none', fontFamily: '"Pretendard", sans-serif' }} />)}</div>)
 }
 
 function VitalField({ label, value, status, editable, onEdit }) {
