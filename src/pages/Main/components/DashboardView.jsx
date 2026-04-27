@@ -76,6 +76,55 @@ export default function DashboardView({
     }
   }, [isScanning])
 
+  // ─── 타임라인 및 진단 데이터 로드 ───
+  const [dynamicTimeline, setDynamicTimeline] = useState([])
+
+  useEffect(() => {
+    const loadRecords = () => {
+      const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
+      // 현재 선택된 환자의 기록만 필터링
+      const patientRecords = records.filter(r => r.patientId === activePatient?.id)
+      
+      const newTimeline = patientRecords.map(r => ({
+        time: new Date(r.timestamp).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }),
+        title: r.mainComplaint || '환자 상태 기록 업데이트',
+        color: r.isEmergency ? '#f43f5e' : '#38bdf8',
+        detail: `• 주요증상: ${r.selectedSymptoms.join(', ') || '관찰 중'}\n• 조치내용: ${r.prescribedMeds.join(', ') || '경과 관찰'}\n• 특이사항: ${r.otherActions || '없음'}`
+      }))
+
+      // 기본 타임라인 데이터와 병합 (최신순)
+      const baseTimeline = [
+        { time: '09:12', title: '상황 발생 감지', color: '#f43f5e', detail: '• 시스템 모니터링 시작\n• 바이탈 센서 연동 대기' },
+      ]
+
+      setDynamicTimeline([...newTimeline, ...baseTimeline])
+    }
+
+    loadRecords()
+    // 1초마다 데이터 갱신 (저장 즉시 반영을 위함)
+    const interval = setInterval(loadRecords, 1000)
+    return () => clearInterval(interval)
+  }, [activePatient])
+
+  // 비상연락처 데이터 파싱 (Dashboard 전용)
+  const getEmergencyDisplay = () => {
+    let display = { name: '미지정', phone: '-', relation: '-' };
+    if (activePatient?.emergencyContact && typeof activePatient.emergencyContact === 'object') {
+      display = {
+        name: activePatient.emergencyContact.name || '미지정',
+        phone: activePatient.emergencyContact.phone || '-',
+        relation: activePatient.emergencyContact.relation || '-'
+      };
+    } else if (activePatient?.emergency && typeof activePatient.emergency === 'string') {
+      const parts = activePatient.emergency.split(' ');
+      display.phone = parts[0] || '-';
+      display.relation = parts[1] ? parts[1].replace(/[()]/g, '') : '가족';
+      display.name = activePatient.emergencyName || '비상 연락인';
+    }
+    return display;
+  };
+  const emergency = getEmergencyDisplay();
+
   return (
     <div style={{ flex: 1, display: 'flex', overflow: 'hidden', height: '100%', position: 'relative', background: '#020408' }}>
 
@@ -203,28 +252,28 @@ export default function DashboardView({
 
           {/* 작업 위치 복원 */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><MapPin size={20}/> 작업 위치 (Location)</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><MapPin size={20}/> 환자 작업 위치</div>
             <div style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 16, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(56,189,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Anchor size={22} color="#38bdf8" />
               </div>
-              <div>
-                <div style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{activePatient?.workLocation || '미지정'}</div>
-                <div style={{ fontSize: 14, color: '#4a6080', fontWeight: 700, marginTop: 2 }}>Main Deck · Sector B-2</div>
-              </div>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{activePatient?.location || activePatient?.workLocation || '미지정'}</div>
+              <div style={{ fontSize: 14, color: '#4a6080', fontWeight: 700, marginTop: 2 }}>실시간 위치 트래킹 활성화됨</div>
+            </div>
             </div>
           </div>
 
           {/* 비상 연락망 복원 */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#26de81', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><Phone size={20}/> 비상 연락망 (Emergency)</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#26de81', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><Phone size={20}/> 비상 연락망</div>
             <div style={{ background: 'rgba(38,222,129,0.06)', border: '1px solid rgba(38,222,129,0.2)', borderRadius: 16, padding: '18px 20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <span style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{activePatient?.emergencyContact?.name || '미지정'}</span>
-                <span style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, background: 'rgba(38,222,129,0.15)', color: '#26de81', fontWeight: 800 }}>{activePatient?.emergencyContact?.relation || '-'}</span>
+                <span style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{emergency.name}</span>
+                <span style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, background: 'rgba(38,222,129,0.15)', color: '#26de81', fontWeight: 800 }}>{emergency.relation}</span>
               </div>
               <div style={{ fontSize: 20, fontWeight: 900, color: '#26de81', letterSpacing: '0.5px' }}>
-                {activePatient?.emergencyContact?.phone || '-'}
+                {emergency.phone}
               </div>
             </div>
           </div>
@@ -325,13 +374,7 @@ export default function DashboardView({
         <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px 120px 28px', scrollbarWidth: 'none' }}>
            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
              <div style={{ position: 'absolute', left: 7, top: 10, bottom: 10, width: 2, background: 'linear-gradient(to bottom, #f43f5e, #facc15, #38bdf8)' }} />
-             {[
-               { time: '09:12', title: '사고 발생 (낙상 추락)', color: '#f43f5e', detail: '• 왼쪽 어깨 변형 및 통증\n• 흉부 통증 호소\n• 제2엔진실 B2 구역' },
-               { time: '09:20', title: 'MDTS 실시간 AI 진단 시작', color: '#f43f5e', detail: '• 바이탈 센서 연동 완료\n• AI 어시스턴트 분석 중' },
-               { time: '09:45', title: '응급 처치 SOP 가동', color: '#fb923c', detail: '• 기도 확보 및 산소 공급\n• 외상 부위 고정 조치' },
-               { time: '10:15', title: '해안의료 화상 협진 완료', color: '#facc15', detail: '• 김원격 의사 소견 반영\n• 진통제(타이레놀) 투약' },
-               { time: '10:30', title: '환부 정밀 촬영 및 재분석', color: '#38bdf8', detail: '• 외상 스캐너 진단 결과 업데이트' }
-             ].map((item, idx) => (
+             {dynamicTimeline.map((item, idx) => (
                <div key={idx} style={{ position: 'relative', paddingLeft: 36, paddingBottom: 40 }}>
                  <div style={{ position: 'absolute', left: 0, top: 4, width: 16, height: 16, borderRadius: '50%', background: '#05070a', border: `3px solid ${item.color}`, zIndex: 2 }} />
                  <div style={{ fontSize: 18, fontWeight: 900, color: item.color }}>{item.time}</div>

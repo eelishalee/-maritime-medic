@@ -11,20 +11,28 @@ export default function Main({ patient, onNavigate }) {
 
   // ─── AI 어시스턴트 상태 ───
   const [prompt, setPrompt] = useState('')
-  const [chat, setChat] = useState([
-    {
-      role: 'ai',
-      text: `박기관 기관장 (55세, 고혈압·고지혈증) 환자 데이터가 로드되었습니다.\n\n⚠ 현재 사고 발생 중 — 기관실 제2엔진 추락 외상. 즉각 대응이 필요합니다.`
-    },
-    {
-      role: 'user',
-      text: '환자 현재 상태 요약'
-    },
-    {
-      role: 'ai',
-      text: `📋 현재 상태 요약\n\n• 사고 경위 : 기관실 제2엔진 점검 중 약 1.8m 추락\n• 주요 소견 : 좌측 흉부 압통, 어깨 변형, 호흡 시 통증 심화\n\n[CONFIDENCE: 91%]\n[EVIDENCE: 좌측 제4-6 늑골의 비정상적 굴곡(Step-off) 및 비대칭적 흉벽 움직임 포착]\n[GUIDE: SOP-TRA-01]`
-    }
-  ])
+  const [chat, setChat] = useState(() => {
+    const initialMsgs = [
+      {
+        role: 'ai',
+        text: `${patient?.name || '김항해'} ${patient?.role || '선원'} (${patient?.age || '45'}세) 환자 데이터가 로드되었습니다.\n\n⚠ 현재 상황 모니터링 중입니다.`
+      }
+    ]
+    
+    // 로컬 스토리지에서 최신 기록 하나 가져와서 추가
+    try {
+      const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
+      const latest = records.find(r => r.patientId === patient?.id)
+      if (latest) {
+        initialMsgs.push({
+          role: 'ai',
+          text: `📋 최근 저장된 차트 기록 요약\n\n• 주요 증상 : ${latest.mainComplaint}\n• 세부 증상 : ${latest.selectedSymptoms.join(', ') || '관찰 중'}\n• 시행 조치 : ${latest.prescribedMeds.join(', ') || '경과 관찰'}\n\n[CONFIDENCE: 100%]\n[EVIDENCE: 사용자 최종 기록 데이터 동기화 완료]\n[GUIDE: SOP-GEN-01]`
+        })
+      }
+    } catch(e) {}
+    
+    return initialMsgs
+  })
 
   // ─── 외상 분석 상태 ───
   const [isScanning, setIsScanning] = useState(false)

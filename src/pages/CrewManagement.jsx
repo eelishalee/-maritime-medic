@@ -5,22 +5,22 @@ import { Search, Plus, UserPlus, Users, Anchor, Cog, Coffee, ShieldAlert, CheckC
 const getPhoto = (name) => new URL(`../assets/photo/${name}`, import.meta.url).href
 
 const INITIAL_CREW = [
-  { id: 'S26-001', name: '이선장', age: 52, role: '선장', dept: '항해부', blood: 'O+', chronic: '고혈압', allergies: '없음', contact: '010-2600-0001', emergency: '010-1234-5678 (배우자)', avatar: getPhoto('001.png'), isEmergency: false, height: 175, weight: 78, boardingDate: '2024-01-10', location: '브릿지', pastHistory: '2020년 맹장 수술', dob: '1974-05-12', gender: '남', lastMed: '암로디핀 5mg', note: '혈압 관리 주의' },
-  { id: 'S26-002', name: '김항해', age: 45, role: '1등 항해사', dept: '항해부', blood: 'A+', chronic: '없음', allergies: '페니실린', contact: '010-2600-0002', emergency: '010-9876-5432 (부친)', avatar: getPhoto('002.png'), isEmergency: false, height: 180, weight: 82, boardingDate: '2024-02-15', location: '데크', pastHistory: '없음', dob: '1981-11-20', gender: '남', lastMed: '없음', note: '특이사항 없음' },
-  { id: 'S26-003', name: '박기관', age: 55, role: '기관장', dept: '기관부', blood: 'B+', chronic: '고혈압, 고지혈증', allergies: '아스피린', contact: '010-2600-0003', emergency: '010-8765-4321 (배우자)', avatar: getPhoto('003.jpeg'), isEmergency: true, height: 172, weight: 70, boardingDate: '2024-03-01', location: '엔진룸 (사고지점)', pastHistory: '2021년 고혈압 진단', dob: '1971-08-05', gender: '남', lastMed: '암로디핀 5mg', note: '기관실 추락 사고 발생 (늑골 골절 의심)' },
-  { id: 'S26-004', name: '최갑판', age: 41, role: '갑판장', dept: '항해부', blood: 'AB+', chronic: '허리디스크', allergies: '없음', contact: '010-2600-0004', emergency: '010-1122-3344 (배우자)', avatar: getPhoto('004.png'), isEmergency: false, height: 178, weight: 75, boardingDate: '2024-01-20', location: '선수 갑판', pastHistory: '2022년 요추 시술', dob: '1985-03-15', gender: '남', lastMed: '없음', note: '중량물 운반 주의' },
-  { id: 'S26-005', name: '정조타', age: 38, role: '조타사', dept: '항해부', blood: 'O-', chronic: '없음', allergies: '조개류', contact: '010-2600-0005', emergency: '010-5566-7788 (동생)', avatar: getPhoto('005.png'), isEmergency: false, height: 170, weight: 68, boardingDate: '2024-04-10', location: '조타실', pastHistory: '없음', dob: '1988-12-22', gender: '남', lastMed: '없음', note: '식품 알레르기 주의' },
-  { id: 'S26-006', name: '한통신', age: 43, role: '통신장', dept: '항해부', blood: 'A+', chronic: '비염', allergies: '먼지', contact: '010-2600-0006', emergency: '010-9988-7766 (배우자)', avatar: getPhoto('006.png'), isEmergency: false, height: 174, weight: 72, boardingDate: '2024-02-05', location: '통신실', pastHistory: '없음', dob: '1983-05-30', gender: '남', lastMed: '없음', note: '건강 양호' },
-  { id: 'S26-007', name: '강기계', age: 47, role: '1등 기관사', dept: '기관부', blood: 'B-', chronic: '없음', allergies: '벌침', contact: '010-2600-0007', emergency: '010-4455-6677 (누나)', avatar: getPhoto('007.png'), isEmergency: false, height: 179, weight: 80, boardingDate: '2024-03-12', location: '제어실', pastHistory: '없음', dob: '1979-11-18', gender: '남', lastMed: '없음', note: '숙련 정비사' },
-  { id: 'S26-008', name: '윤조리', age: 49, role: '조리장', dept: '지원부', blood: 'O+', chronic: '당뇨', allergies: '없음', contact: '010-2600-0008', emergency: '010-6677-8899 (배우자)', avatar: getPhoto('008.png'), isEmergency: false, height: 168, weight: 76, boardingDate: '2024-01-05', location: '조리실', pastHistory: '없음', dob: '1977-09-22', gender: '남', lastMed: '메트포르민', note: '식이 관리 필요' },
-  { id: 'S26-009', name: '임전기', age: 35, role: '전기사', dept: '기관부', blood: 'AB-', chronic: '없음', allergies: '없음', contact: '010-2600-0009', emergency: '010-2211-0099 (형)', avatar: getPhoto('009.png'), isEmergency: false, height: 176, weight: 73, boardingDate: '2024-05-20', location: '발전기실', pastHistory: '없음', dob: '1991-03-12', gender: '남', lastMed: '없음', note: '전기 설비 담당' },
-  { id: 'S26-010', name: '백보급', age: 32, role: '사무장', dept: '지원부', blood: 'A-', chronic: '없음', allergies: '먼지', contact: '010-2600-0010', emergency: '010-3344-5566 (모친)', avatar: getPhoto('010.png'), isEmergency: false, height: 165, weight: 58, boardingDate: '2024-06-15', location: '사무실', pastHistory: '없음', dob: '1994-07-08', gender: '여', lastMed: '없음', note: '물자 관리 담당' },
-  { id: 'S26-011', name: '황갑판', age: 28, role: '갑판원', dept: '항해부', blood: 'B+', chronic: '없음', allergies: '없음', contact: '010-2600-0011', emergency: '010-1100-2233 (동생)', avatar: getPhoto('011.png'), isEmergency: false, height: 182, weight: 85, boardingDate: '2024-07-01', location: '페인트 창고', pastHistory: '없음', dob: '1998-01-25', gender: '남', lastMed: '없음', note: '체력 우수' },
-  { id: 'S26-012', name: '서기관', age: 30, role: '3등 기관사', dept: '기관부', blood: 'O+', chronic: '없음', allergies: '땅콩', contact: '010-2600-0012', emergency: '010-5544-3322 (친구)', avatar: getPhoto('012.png'), isEmergency: false, height: 173, weight: 70, boardingDate: '2024-08-10', location: '청정기실', pastHistory: '없음', dob: '1996-12-05', gender: '남', lastMed: '없음', note: '초임 사관' },
-  { id: 'S26-013', name: '오항해', age: 26, role: '실습 항해사', dept: '항해부', blood: 'A+', chronic: '없음', allergies: '없음', contact: '010-2600-0013', emergency: '010-7788-9900 (부친)', avatar: getPhoto('013.png'), isEmergency: false, height: 177, weight: 68, boardingDate: '2024-09-01', location: '브릿지', pastHistory: '없음', dob: '2000-04-14', gender: '남', lastMed: '없음', note: '실습 중' },
-  { id: 'S26-014', name: '나위생', age: 31, role: '위생원', dept: '지원부', blood: 'B+', chronic: '없음', allergies: '없음', contact: '010-2600-0014', emergency: '010-1122-3344 (언니)', avatar: getPhoto('014.png'), isEmergency: false, height: 162, weight: 52, boardingDate: '2024-04-20', location: '공용실', pastHistory: '없음', dob: '1995-10-30', gender: '여', lastMed: '없음', note: '방역 담당' },
-  { id: 'S26-015', name: '고기수', age: 44, role: '기수', dept: '기관부', blood: 'O-', chronic: '치질', allergies: '없음', contact: '010-2600-0015', emergency: '010-9900-1122 (배우자)', avatar: getPhoto('015.png'), isEmergency: false, height: 171, weight: 75, boardingDate: '2024-02-28', location: '워크샵', pastHistory: '없음', dob: '1982-08-12', gender: '남', lastMed: '없음', note: '용접 숙련' },
-  { id: 'S26-016', name: '문세탁', age: 33, role: '세탁원', dept: '지원부', blood: 'AB+', chronic: '습진', allergies: '세제', contact: '010-2600-0016', emergency: '010-8899-2233 (모친)', avatar: getPhoto('016.png'), isEmergency: false, height: 164, weight: 60, boardingDate: '2024-06-20', location: '세탁실', pastHistory: '없음', dob: '1993-02-14', gender: '남', lastMed: '연고', note: '장갑 착용 필수' },
+  { id: 'S26-001', name: '이선장', age: 52, role: '선장', dept: '항해부', blood: 'O+', chronic: '고혈압', allergies: '없음', contact: '010-2600-0001', emergencyName: '김정숙', emergency: '010-1234-5678 (배우자)', avatar: getPhoto('001.png'), isEmergency: false, height: 175, weight: 78, boardingDate: '2024-01-10', location: '항해 브릿지 (Nav. Bridge)', pastHistory: '2020년 맹장 수술', dob: '1974-05-12', gender: '남', lastMed: '암로디핀 5mg', note: '혈압 관리 주의' },
+  { id: 'S26-002', name: '김항해', age: 45, role: '1등 항해사', dept: '항해부', blood: 'A+', chronic: '없음', allergies: '페니실린', contact: '010-2600-0002', emergencyName: '김철수', emergency: '010-9876-5432 (부친)', avatar: getPhoto('002.png'), isEmergency: false, height: 180, weight: 82, boardingDate: '2024-02-15', location: '메인 데크 · 화물 관리구역', pastHistory: '없음', dob: '1981-11-20', gender: '남', lastMed: '없음', note: '특이사항 없음' },
+  { id: 'S26-003', name: '박기관', age: 55, role: '기관장', dept: '기관부', blood: 'B+', chronic: '고혈압, 고지혈증', allergies: '아스피린', contact: '010-2600-0003', emergencyName: '양정희', emergency: '010-8765-4321 (배우자)', avatar: getPhoto('003.jpeg'), isEmergency: true, height: 172, weight: 70, boardingDate: '2024-03-01', location: '엔진 제어실 (ECR)', pastHistory: '2021년 고혈압 진단', dob: '1971-08-05', gender: '남', lastMed: '암로디핀 5mg', note: '기관실 추락 사고 발생 (늑골 골절 의심)' },
+  { id: 'S26-004', name: '최갑판', age: 41, role: '갑판장', dept: '항해부', blood: 'AB+', chronic: '허리디스크', allergies: '없음', contact: '010-2600-0004', emergencyName: '이영희', emergency: '010-1122-3344 (배우자)', avatar: getPhoto('004.png'), isEmergency: false, height: 178, weight: 75, boardingDate: '2024-01-20', location: '선수 갑판 (Forecastle Deck)', pastHistory: '2022년 요추 시술', dob: '1985-03-15', gender: '남', lastMed: '없음', note: '중량물 운반 주의' },
+  { id: 'S26-005', name: '정조타', age: 38, role: '조타사', dept: '항해부', blood: 'O-', chronic: '없음', allergies: '조개류', contact: '010-2600-0005', emergencyName: '정우성', emergency: '010-5566-7788 (동생)', avatar: getPhoto('005.png'), isEmergency: false, height: 170, weight: 68, boardingDate: '2024-04-10', location: '조타실 (Wheel House)', pastHistory: '없음', dob: '1988-12-22', gender: '남', lastMed: '없음', note: '식품 알레르기 주의' },
+  { id: 'S26-006', name: '한통신', age: 43, role: '통신장', dept: '항해부', blood: 'A+', chronic: '비염', allergies: '먼지', contact: '010-2600-0006', emergencyName: '한지민', emergency: '010-9988-7766 (배우자)', avatar: getPhoto('006.png'), isEmergency: false, height: 174, weight: 72, boardingDate: '2024-02-05', location: '통신 제어실 (Radio Room)', pastHistory: '없음', dob: '1983-05-30', gender: '남', lastMed: '없음', note: '건강 양호' },
+  { id: 'S26-007', name: '강기계', age: 47, role: '1등 기관사', dept: '기관부', blood: 'B-', chronic: '없음', allergies: '벌침', contact: '010-2600-0007', emergencyName: '강수지', emergency: '010-4455-6677 (누나)', avatar: getPhoto('007.png'), isEmergency: false, height: 179, weight: 80, boardingDate: '2024-03-12', location: '제2엔진실 구역 B-1', pastHistory: '없음', dob: '1979-11-18', gender: '남', lastMed: '없음', note: '숙련 정비사' },
+  { id: 'S26-008', name: '윤조리', age: 49, role: '조리장', dept: '지원부', blood: 'O+', chronic: '당뇨', allergies: '없음', contact: '010-2600-0008', emergencyName: '윤미래', emergency: '010-6677-8899 (배우자)', avatar: getPhoto('008.png'), isEmergency: false, height: 168, weight: 76, boardingDate: '2024-01-05', location: '상부 데크 조리실 (Galley)', pastHistory: '없음', dob: '1977-09-22', gender: '남', lastMed: '메트포르민', note: '식이 관리 필요' },
+  { id: 'S26-009', name: '임전기', age: 35, role: '전기사', dept: '기관부', blood: 'AB-', chronic: '없음', allergies: '없음', contact: '010-2600-0009', emergencyName: '임시완', emergency: '010-2211-0099 (형)', avatar: getPhoto('009.png'), isEmergency: false, height: 176, weight: 73, boardingDate: '2024-05-20', location: '주 발전기실 (Gen. Room)', pastHistory: '없음', dob: '1991-03-12', gender: '남', lastMed: '없음', note: '전기 설비 담당' },
+  { id: 'S26-010', name: '백보급', age: 32, role: '사무장', dept: '지원부', blood: 'A-', chronic: '없음', allergies: '먼지', contact: '010-2600-0010', emergencyName: '나문희', emergency: '010-3344-5566 (모친)', avatar: getPhoto('010.png'), isEmergency: false, height: 165, weight: 58, boardingDate: '2024-06-15', location: 'A-데크 사무실', pastHistory: '없음', dob: '1994-07-08', gender: '여', lastMed: '없음', note: '물자 관리 담당' },
+  { id: 'S26-011', name: '황갑판', age: 28, role: '갑판원', dept: '항해부', blood: 'B+', chronic: '없음', allergies: '없음', contact: '010-2600-0011', emergencyName: '황정민', emergency: '010-1100-2233 (동생)', avatar: getPhoto('011.png'), isEmergency: false, height: 182, weight: 85, boardingDate: '2024-07-01', location: '보트 데크 위험물 창고', pastHistory: '없음', dob: '1998-01-25', gender: '남', lastMed: '없음', note: '체력 우수' },
+  { id: 'S26-012', name: '서기관', age: 30, role: '3등 기관사', dept: '기관부', blood: 'O+', chronic: '없음', allergies: '땅콩', contact: '010-2600-0012', emergencyName: '박서준', emergency: '010-5544-3322 (친구)', avatar: getPhoto('012.png'), isEmergency: false, height: 173, weight: 70, boardingDate: '2024-08-10', location: '청정기실 (Purifier Room)', pastHistory: '없음', dob: '1996-12-05', gender: '남', lastMed: '없음', note: '초임 사관' },
+  { id: 'S26-013', name: '오항해', age: 26, role: '실습 항해사', dept: '항해부', blood: 'A+', chronic: '없음', allergies: '없음', contact: '010-2600-0013', emergencyName: '오달수', emergency: '010-7788-9900 (부친)', avatar: getPhoto('013.png'), isEmergency: false, height: 177, weight: 68, boardingDate: '2024-09-01', location: '항해 브릿지 · 조타 지원', pastHistory: '없음', dob: '2000-04-14', gender: '남', lastMed: '없음', note: '실습 중' },
+  { id: 'S26-014', name: '나위생', age: 31, role: '위생원', dept: '지원부', blood: 'B+', chronic: '없음', allergies: '없음', contact: '010-2600-0014', emergencyName: '나연', emergency: '010-1122-3344 (언니)', avatar: getPhoto('014.png'), isEmergency: false, height: 162, weight: 52, boardingDate: '2024-04-20', location: '거주구역 공용실', pastHistory: '없음', dob: '1995-10-30', gender: '여', lastMed: '없음', note: '방역 담당' },
+  { id: 'S26-015', name: '고기수', age: 44, role: '기수', dept: '기관부', blood: 'O-', chronic: '치질', allergies: '없음', contact: '010-2600-0015', emergencyName: '고두심', emergency: '010-9900-1122 (배우자)', avatar: getPhoto('015.png'), isEmergency: false, height: 171, weight: 75, boardingDate: '2024-02-28', location: '엔진룸 기계 워크샵', pastHistory: '없음', dob: '1982-08-12', gender: '남', lastMed: '없음', note: '용접 숙련' },
+  { id: 'S26-016', name: '문세탁', age: 33, role: '세탁원', dept: '지원부', blood: 'AB+', chronic: '습진', allergies: '세제', contact: '010-2600-0016', emergencyName: '문소리', emergency: '010-8899-2233 (모친)', avatar: getPhoto('016.png'), isEmergency: false, height: 164, weight: 60, boardingDate: '2024-06-20', location: 'B-데크 세탁실', pastHistory: '없음', dob: '1993-02-14', gender: '남', lastMed: '연고', note: '장갑 착용 필수' },
 ]
 
 const TABS = [
@@ -32,7 +32,19 @@ const TABS = [
 ]
 
 export default function CrewManagement({ onSelectPatient }) {
-  const [crew, setCrew] = useState(INITIAL_CREW)
+  const [crew, setCrew] = useState(() => {
+    try {
+      const saved = localStorage.getItem('mdts_crew_list')
+      return saved ? JSON.parse(saved) : INITIAL_CREW
+    } catch { return INITIAL_CREW }
+  })
+
+  // 선원 목록 저장 유틸리티
+  const saveCrew = (newList) => {
+    setCrew(newList)
+    localStorage.setItem('mdts_crew_list', JSON.stringify(newList))
+  }
+
   const [query, setQuery] = useState('')
   const [activeTab, setActiveTab] = useState('ALL')
   const [isAdding, setIsAdding] = useState(false)
@@ -40,7 +52,7 @@ export default function CrewManagement({ onSelectPatient }) {
     name: '', age: '', dob: '', gender: '남', role: '', dept: '항해부', blood: 'A+', 
     height: '', weight: '', boardingDate: '', location: '',
     chronic: '', allergies: '', pastHistory: '', lastMed: '', note: '',
-    contact: '', emergency: '', avatar: null
+    contact: '', emergencyName: '', emergency: '', avatar: null
   })
 
   const [dateEditor, setDateEditor] = useState(null)
@@ -68,7 +80,7 @@ export default function CrewManagement({ onSelectPatient }) {
     const id = `S26-${String(crew.length + 1).padStart(3, '0')}`
     const finalAvatar = newCrew.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(newCrew.name)}&background=random&color=fff&size=200`
     const entry = { ...newCrew, id, avatar: finalAvatar, age: Number(newCrew.age), isEmergency: false }
-    setCrew([entry, ...crew])
+    saveCrew([...crew, entry])
     setIsAdding(false)
     setNewCrew({ 
       name: '', age: '', dob: '', gender: '남', role: '', dept: '항해부', blood: 'A+', 
@@ -79,8 +91,16 @@ export default function CrewManagement({ onSelectPatient }) {
   }
 
   const handleSelect = (c) => {
-    if (window.confirm(`[${c.id}] ${c.name} 선원을 응급 환자로 등록하시겠습니까?`)) {
+    if (c.isEmergency) {
       onSelectPatient(c)
+      return
+    }
+    if (window.confirm(`[${c.id}] ${c.name} 선원을 응급 환자로 등록하시겠습니까?`)) {
+      const updatedCrew = crew.map(member => 
+        member.id === c.id ? { ...member, isEmergency: true } : member
+      )
+      saveCrew(updatedCrew)
+      onSelectPatient({ ...c, isEmergency: true })
     }
   }
 
@@ -122,7 +142,7 @@ export default function CrewManagement({ onSelectPatient }) {
                   {tab.icon}
                 </span> 
                 {tab.label}
-                <span style={{ marginLeft: 10, fontSize: '15px', padding: '2px 12px', borderRadius: '8px', background: active ? tabColor : 'rgba(255,255,255,0.05)', color: active ? '#020617' : '#4a6080', fontWeight: 950 }}>{count}</span>
+                <span style={{ marginLeft: 10, fontSize: '30px', padding: '2px 16px', borderRadius: '12px', background: active ? tabColor : 'rgba(255,255,255,0.05)', color: active ? '#020617' : '#4a6080', fontWeight: 950 }}>{count}</span>
               </button>
             )
           })}
@@ -144,7 +164,7 @@ export default function CrewManagement({ onSelectPatient }) {
           <thead>
             <tr style={{ background: '#020617', position: 'sticky', top: 0, zIndex: 10 }}>
               {['선원 프로필', '소속 및 직위', '신체 정보', '기저질환', '알레르기', '긴급 연락망', '환자 관리'].map((h, i) => (
-                <th key={i} style={{ padding: '20px 24px', textAlign: 'center', fontSize: '20px', color: '#64748b', fontWeight: 950 }}>{h}</th>
+                <th key={i} style={{ padding: '20px 24px', textAlign: 'center', fontSize: '26px', color: '#64748b', fontWeight: 950 }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -153,42 +173,42 @@ export default function CrewManagement({ onSelectPatient }) {
               <tr key={c.id} onClick={() => handleSelect(c)} style={{ cursor: 'pointer', transition: '0.2s' }} className="crew-card-row">
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px 0 0 20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-                    <div style={{ width: 56, height: 70, borderRadius: '12px', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', background: '#0a1628' }}>
+                    <div style={{ width: 64, height: 80, borderRadius: '12px', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', background: '#0a1628' }}>
                       <img src={c.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={c.name} />
                     </div>
-                    <div style={{ textAlign: 'left', minWidth: '100px' }}>
-                      <div style={{ fontSize: '19px', fontWeight: 950, color: '#fff' }}>{c.name}</div>
-                      <span style={{ fontSize: '19px', color: '#0dd9c5', fontWeight: 900 }}>{c.id}</span>
+                    <div style={{ textAlign: 'left', minWidth: '120px' }}>
+                      <div style={{ fontSize: '25px', fontWeight: 950, color: '#fff' }}>{c.name}</div>
+                      <span style={{ fontSize: '24px', color: '#0dd9c5', fontWeight: 900 }}>{c.id}</span>
                     </div>
                   </div>
                 </td>
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', textAlign: 'center' }}>
-                  <div style={{ fontSize: '19px', color: '#fff', fontWeight: 900 }}>
+                  <div style={{ fontSize: '25px', color: '#fff', fontWeight: 900 }}>
                     {c.dept} <span style={{ color: '#475569', margin: '0 8px', fontWeight: 500 }}>/</span> {c.role}
                   </div>
                 </td>
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', textAlign: 'center' }}>
-                  <div style={{ fontSize: '19px', fontWeight: 950, color: '#ff4d6d' }}>{c.blood} <span style={{ fontSize: '19px', color: '#64748b', fontWeight: 800 }}>/ {c.age}세</span></div>
+                  <div style={{ fontSize: '25px', fontWeight: 950, color: '#ff4d6d' }}>{c.blood} <span style={{ fontSize: '22px', color: '#64748b', fontWeight: 800 }}>/ {c.age}세</span></div>
                 </td>
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', textAlign: 'center' }}>
-                  <span style={{ fontSize: '19px', fontWeight: 800, color: c.chronic ? '#fb923c' : '#475569' }}>{c.chronic || '없음'}</span>
+                  <span style={{ fontSize: '25px', fontWeight: 800, color: c.chronic ? '#fb923c' : '#475569' }}>{c.chronic || '없음'}</span>
                 </td>
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', textAlign: 'center' }}>
-                  <span style={{ fontSize: '19px', fontWeight: 800, color: c.allergies ? '#ff708d' : '#475569' }}>{c.allergies || '없음'}</span>
+                  <span style={{ fontSize: '25px', fontWeight: 800, color: c.allergies ? '#ff708d' : '#475569' }}>{c.allergies || '없음'}</span>
                 </td>
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', textAlign: 'center' }}>
-                  <div style={{ fontSize: '19px', fontWeight: 800, color: '#cbd5e1' }}>{c.emergency}</div>
+                  <div style={{ fontSize: '25px', fontWeight: 800, color: '#cbd5e1' }}>{c.emergency}</div>
                 </td>
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: '0 20px 20px 0', textAlign: 'center' }}>
                   <button 
                     onClick={(e) => { e.stopPropagation(); handleSelect(c); }}
                     style={{ 
-                      padding: '10px 20px', 
+                      padding: '12px 24px', 
                       borderRadius: '12px', 
                       background: c.isEmergency ? 'rgba(239, 68, 68, 0.1)' : 'rgba(13, 217, 197, 0.1)', 
                       border: `1.5px solid ${c.isEmergency ? '#ef4444' : '#0dd9c5'}`,
                       color: c.isEmergency ? '#ef4444' : '#0dd9c5',
-                      fontSize: '17px',
+                      fontSize: '22px',
                       fontWeight: 950,
                       cursor: 'pointer',
                       transition: '0.3s',
@@ -198,7 +218,7 @@ export default function CrewManagement({ onSelectPatient }) {
                       margin: '0 auto'
                     }}
                   >
-                    {c.isEmergency ? <ShieldAlert size={16}/> : <Plus size={16}/>}
+                    {c.isEmergency ? <ShieldAlert size={20}/> : <Plus size={20}/>}
                     {c.isEmergency ? '집중 관리 중' : '환자로 전환'}
                   </button>
                 </td>
@@ -211,7 +231,19 @@ export default function CrewManagement({ onSelectPatient }) {
       {isAdding && (
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(2,6,23,0.85)', backdropFilter: 'blur(20px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
           <div style={{ position: 'relative', width: '100%', maxWidth: 1000 }}>
-            <button onClick={() => setIsAdding(false)} style={{ position: 'absolute', top: 0, right: -70, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', borderRadius: '50%', padding: 12 }}><X size={32}/></button>
+            <button 
+              onClick={() => setIsAdding(false)} 
+              style={{ 
+                position: 'absolute', top: 0, right: -70, 
+                width: 60, height: 60, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', 
+                color: '#fff', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: 0
+              }}
+            >
+              <X size={32}/>
+            </button>
             <div style={{ background: '#0a1224', border: '2px solid rgba(255,255,255,0.1)', borderRadius: 40, width: '100%', maxHeight: '85vh', overflowY: 'auto', padding: '40px', boxShadow: '0 40px 100px rgba(0,0,0,0.7)' }}>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40 }}>
@@ -287,9 +319,10 @@ export default function CrewManagement({ onSelectPatient }) {
                       <textarea value={newCrew.note} onChange={e => setNewCrew({...newCrew, note: e.target.value})} placeholder="주의사항 입력..." style={{ width: '100%', minHeight: 100, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '16px 20px', color: '#fff', outline: 'none', fontWeight: 700, fontSize: 18, resize: 'none', fontFamily: 'inherit' }} />
                     </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr', gap: 20, marginTop: 20 }}>
                     <FormGroup label="본인 연락처" value={newCrew.contact} onChange={v => setNewCrew({...newCrew, contact: v})} placeholder="010-0000-0000" icon={<Phone size={18}/>} />
-                    <FormGroup label="비상 연락처" value={newCrew.emergency} onChange={v => setNewCrew({...newCrew, emergency: v})} placeholder="010-0000-0000 (관계)" icon={<Phone size={18}/>} />
+                    <FormGroup label="비상 연락인 성함" value={newCrew.emergencyName} onChange={v => setNewCrew({...newCrew, emergencyName: v})} placeholder="보호자 성함" icon={<UserIcon size={18}/>} />
+                    <FormGroup label="비상 연락처 (관계)" value={newCrew.emergency} onChange={v => setNewCrew({...newCrew, emergency: v})} placeholder="010-0000-0000 (관계)" icon={<Phone size={18}/>} />
                   </div>
                 </div>
                 <button type="submit" style={{ padding: '24px', background: 'linear-gradient(135deg, #0dd9c5 0%, #00a896 100%)', border: 'none', borderRadius: 20, color: '#020617', fontSize: 22, fontWeight: 950, cursor: 'pointer' }}>선원 데이터 저장 및 시스템 등록</button>

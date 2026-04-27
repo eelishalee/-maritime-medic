@@ -56,7 +56,7 @@ const OTC_MEDS = [
   { id: 'm9', name: '부목/삼각건', type: '골절 처치' },
 ]
 
-export default function PatientChart({ patient: activePatientProp, onNavigate }) {
+export default function PatientChart({ patient: activePatientProp, onNavigate, onSwitchPatient }) {
   // 선내 담당자 목록 불러오기 (시스템 설정 연동)
   const [managers] = useState(() => {
     try {
@@ -70,7 +70,73 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
 
   // 환자 데이터 우선순위 : Props -> ALL_CREW -> 기본값
   const [selectedId, setSelectedId] = useState(activePatientProp?.id || 'S26-003')
-  const patient = ALL_CREW.find(c => c.id === selectedId) || activePatientProp || ALL_CREW[0]
+  const [dynamicCrewList, setDynamicCrewList] = useState([])
+
+  // 환자 목록 동적 생성 (누적 로직)
+  useEffect(() => {
+    // 1. 전체 선원 목록 로드
+    const savedCrew = JSON.parse(localStorage.getItem('mdts_crew_list') || '[]')
+    const baseList = savedCrew.length > 0 ? savedCrew : ALL_CREW
+    
+    // 2. 저장된 환자 기록 로드 (누적 확인용)
+    const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
+    const recordedIds = new Set(records.map(r => r.patientId))
+
+    // 3. 드롭다운에 표시할 환자 필터링
+    // 조건: 응급 환자이거나, 저장된 기록이 있거나, 현재 선택된 환자인 경우
+    const activePatients = baseList.filter(c => 
+      c.isEmergency || recordedIds.has(c.id) || c.id === selectedId || c.id === activePatientProp?.id
+    )
+
+    setDynamicCrewList(activePatients)
+  }, [selectedId, activePatientProp])
+  
+  // 외부에서 Prop으로 넘어온 환자 정보가 있으면 그것을 최우선으로 사용, 없으면 ID로 찾기
+  const patient = (activePatientProp && activePatientProp.id === selectedId) 
+    ? activePatientProp 
+    : (dynamicCrewList.find(c => c.id === selectedId) || ALL_CREW.find(c => c.id === selectedId) || ALL_CREW[0])
+
+  // 환자 변경 시 상위 컴포넌트(App)의 상태도 업데이트
+  useEffect(() => {
+    if (patient && onSwitchPatient && patient.id !== activePatientProp?.id) {
+      onSwitchPatient(patient)
+    }
+  }, [patient])
+
+  // 필드명 매핑 (CrewManagement와 PatientChart 간의 차이 해소)
+  const displayHistory = patient.pastHistory || patient.history || '과거 이력 없음';
+  const displayWorkLocation = patient.location || patient.workLocation || '미지정';
+  const displayAllergies = patient.allergies || '알레르기 정보 없음';
+  
+  // 복용 중인 약물 처리
+  const displayMeds = (patient.lastMed || patient.currentMeds) 
+    ? (typeof (patient.lastMed || patient.currentMeds) === 'string' 
+        ? (patient.lastMed || patient.currentMeds).split(',').map(m => ({ name: m.trim(), purpose: '기재됨' }))
+        : (patient.lastMed || patient.currentMeds))
+    : [];
+
+  // 최근 진료 이력 처리
+  const displayRecentHistory = patient.recentHistory || {
+    date: patient.last_visit || '기록 없음',
+    title: '최근 진료 기록 없음',
+    detail: '해당 선원의 과거 진료 데이터가 존재하지 않습니다.'
+  };
+  
+  // 비상연락처 처리 (객체 형태거나 "전화번호 (관계)" 문자열 형태인 경우 모두 대응)
+  let displayEmergency = { name: '미지정', phone: '-', relation: '-' };
+  if (patient.emergencyContact && typeof patient.emergencyContact === 'object') {
+    displayEmergency = {
+      name: patient.emergencyContact.name || '미지정',
+      phone: patient.emergencyContact.phone || '-',
+      relation: patient.emergencyContact.relation || '-'
+    };
+  } else if (patient.emergency && typeof patient.emergency === 'string') {
+    const parts = patient.emergency.split(' ');
+    displayEmergency.phone = parts[0] || '-';
+    displayEmergency.relation = parts[1] ? parts[1].replace(/[()]/g, '') : '가족';
+    // 신규 추가된 emergencyName 필드가 있으면 사용, 없으면 기본값
+    displayEmergency.name = patient.emergencyName || '비상 연락인';
+  }
 
   const [selectedDoctor, setSelectedDoctor] = useState(managers[0] || { name: '미지정', role: '-' })
   const [isDoctorOpen, setIsDoctorOpen] = useState(false)
@@ -80,7 +146,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
   const [vitals, setVitals] = useState({
     bp: patient.vitals?.bp || '',
     hr: patient.vitals?.hr || '',
-    rr: patient.vitals?.rr || '16',
+    rr: patient.vitals?.rr || '',
     temp: patient.vitals?.temp || '',
     spo2: patient.vitals?.spo2 || ''
   })
@@ -198,6 +264,11 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
   }
 
   const handleSave = () => {
+    // 오프라인 상태 확인
+    if (!navigator.onLine) {
+      alert(`[오프라인 : 네트워크 연결 끊김]\n\n현재 시스템이 오프라인 상태입니다.\n기록은 브라우저 임시 저장소에 안전하게 보관되며,\n네트워크 재연결 시 자동으로 서버와 동기화됩니다.`);
+    }
+
     // 저장 전 페이지 최상단으로 스크롤 이동
     window.scrollTo({ top: 0, behavior: 'smooth' });
     const container = document.querySelector('.chart-scroll-container');
@@ -384,7 +455,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
             </div>
             {isSelectOpen && (
               <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(20px)', border: '1.5px solid rgba(56,189,248,0.3)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', zIndex: 1000 }}>
-                {ALL_CREW.map(c => (
+                {dynamicCrewList.map(c => (
                   <div key={c.id} onClick={() => { setSelectedId(c.id); setIsSelectOpen(false); }} style={{ padding: '16px 20px', fontSize: '20px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: selectedId === c.id ? 'rgba(56,189,248,0.2)' : 'transparent' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><div style={{ width: 10, height: 12, borderRadius: '50%', background: c.isEmergency ? '#ff4d6d' : '#26de81' }} />{c.name} ({c.role})</div>
                     {c.isEmergency && <AlertTriangle size={18} color="#ff4d6d" />}
@@ -393,7 +464,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
               </div>
             )}
           </div>
-          <div style={{ fontSize: '24px', fontWeight: 950, color: '#38bdf8' }}>환자 경과 기록 (Patient Chart)</div>
+          <div style={{ fontSize: '24px', fontWeight: 950, color: '#38bdf8' }}>환자 경과 기록</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
             <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
@@ -455,12 +526,12 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
             {/* 과거력 섹션 */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-                <History size={20}/> 과거력 (Past History)
+                <History size={20}/> 과거력
               </div>
               <div style={{ fontSize: 19, fontWeight: 750, color: '#e2e8f0', lineHeight: 1.6, background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)' }}>
-                {patient?.history ? patient.history.split('\n').map((line, i) => (
+                {displayHistory.split('\n').map((line, i) => (
                   <div key={i}>{line}</div>
-                )) : '기록 없음'}
+                ))}
               </div>
             </div>
 
@@ -471,11 +542,11 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
               </div>
               <div style={{ background: 'rgba(0, 210, 255, 0.04)', borderRadius: 16, padding: '20px', border: '1px solid rgba(0, 210, 255, 0.15)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <span style={{ fontSize: 17, fontWeight: 850, color: '#00d2ff' }}>{patient?.recentHistory?.date || '2026-03-15'}</span>
-                  <span style={{ fontSize: 15, color: '#4a6080', fontWeight: 700 }}>{patient?.recentHistory?.title || '단순 감기'}</span>
+                  <span style={{ fontSize: 17, fontWeight: 850, color: '#00d2ff' }}>{displayRecentHistory.date}</span>
+                  <span style={{ fontSize: 15, color: '#4a6080', fontWeight: 700 }}>{displayRecentHistory.title}</span>
                 </div>
                 <div style={{ fontSize: 16, color: '#8da2c0', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
-                  {patient?.recentHistory?.detail || '- 처방 : 타이레놀 500mg\n- 특이사황 : 알레르기 반응 없음'}
+                  {displayRecentHistory.detail}
                 </div>
               </div>
             </div>
@@ -486,7 +557,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
                 <AlertCircle size={20}/> 알레르기 / 주의사항
               </div>
               <div style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', borderRadius: 16, padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {(patient?.allergies || '없음').split(',').map((a, i) => (
+                {displayAllergies.split(',').map((a, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f43f5e' }} />
                     <span style={{ fontSize: 17, fontWeight: 750, color: '#fda4af' }}>{a.trim()}</span>
@@ -501,29 +572,31 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
                 <Pill size={20}/> 복용 중인 약물
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {[{ name: '혈압약 (암로디핀)', purpose: '고혈압' }, { name: '고지혈증약', purpose: '고지혈증' }].map((drug, i) => (
+                {displayMeds.length > 0 ? displayMeds.map((drug, i) => (
                   <div key={i} style={{ background: 'rgba(251,146,60,0.05)', border: '1px solid rgba(251,146,60,0.15)', borderRadius: 14, padding: '14px 18px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: 17, fontWeight: 850, color: '#fed7aa' }}>{drug.name}</span>
                       <span style={{ fontSize: 14, color: '#fb923c', fontWeight: 800 }}>{drug.purpose}</span>
                     </div>
                   </div>
-                ))}
+                )) : (
+                    <div style={{ padding: '14px 18px', background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.05)', color: '#64748b', fontSize: 16, fontWeight: 700 }}>복용 중인 약물 없음</div>
+                )}
               </div>
             </div>
 
             {/* 작업 위치 섹션 */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-                <MapPin size={20}/> 환자 작업 위치 (Work Location)
+                <MapPin size={20}/> 환자 작업 위치
               </div>
               <div style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 16, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
                 <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(56,189,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Anchor size={22} color="#38bdf8" />
                 </div>
                 <div>
-                  <div style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{patient?.workLocation || '미지정'}</div>
-                  <div style={{ fontSize: 14, color: '#4a6080', fontWeight: 700, marginTop: 2 }}>Main Deck · Sector B-2</div>
+                  <div style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{displayWorkLocation}</div>
+                  <div style={{ fontSize: 14, color: '#4a6080', fontWeight: 700, marginTop: 2 }}>선박 내 상세 위치 연동 중</div>
                 </div>
               </div>
             </div>
@@ -531,15 +604,15 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
             {/* 비상 연락망 섹션 */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#26de81', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-                <Phone size={20}/> 비상 연락망 (Emergency Contact)
+                <Phone size={20}/> 비상 연락망
               </div>
               <div style={{ background: 'rgba(38,222,129,0.06)', border: '1px solid rgba(38,222,129,0.2)', borderRadius: 16, padding: '18px 20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                  <span style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{patient?.emergencyContact?.name || '미지정'}</span>
-                  <span style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, background: 'rgba(38,222,129,0.15)', color: '#26de81', fontWeight: 800 }}>{patient?.emergencyContact?.relation || '-'}</span>
+                  <span style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{displayEmergency.name}</span>
+                  <span style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, background: 'rgba(38,222,129,0.15)', color: '#26de81', fontWeight: 800 }}>{displayEmergency.relation}</span>
                 </div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: '#26de81', letterSpacing: '0.5px' }}>
-                  {patient?.emergencyContact?.phone || '-'}
+                  {displayEmergency.phone}
                 </div>
               </div>
             </div>
@@ -557,24 +630,26 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
           {/* 활력 징후 입력 확인 섹션 */}
           <SectionCard id="vital-section" title="현재 활력 징후 확인 (실시간 센서 데이터)" icon={<HeartPulse size={36} color="#ff4d6d"/>}>
             <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 25, background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: 24, border: '1.5px solid rgba(255,255,255,0.05)' }}>
-                <VitalField label="심박수(HR)" value={vitals.hr || patient.vitals?.hr ? `${vitals.hr || patient.vitals?.hr} bpm` : ''} status={getVitalStatus('hr', vitals.hr || patient.vitals?.hr)} live />
-                <VitalField label="산소포화도(SpO2)" value={vitals.spo2 || patient.vitals?.spo2 ? `${vitals.spo2 || patient.vitals?.spo2} %` : ''} status={getVitalStatus('spo2', vitals.spo2 || patient.vitals?.spo2)} live />
-                <VitalField label="호흡수(RR)" value={`${vitals.rr || 16} /min`} status={{ label: '정상', color: '#26de81', bg: 'rgba(38,222,129,0.15)' }} />
-                <VitalField label="혈압(BP)" value={vitals.bp || ''} status={getVitalStatus('bp', vitals.bp)} editable onEdit={() => openEdit('bp', vitals.bp)} />
-                <VitalField label="체온(BT)" value={vitals.temp ? `${vitals.temp} °C` : ''} status={getVitalStatus('temp', vitals.temp)} editable onEdit={() => openEdit('temp', vitals.temp)} />
+                <VitalField label="심박수" value={vitals.hr || patient.vitals?.hr ? `${vitals.hr || patient.vitals?.hr} 회/분` : ''} status={getVitalStatus('hr', vitals.hr || patient.vitals?.hr)} />
+                <VitalField label="산소포화도" value={vitals.spo2 || patient.vitals?.spo2 ? `${vitals.spo2 || patient.vitals?.spo2} %` : ''} status={getVitalStatus('spo2', vitals.spo2 || patient.vitals?.spo2)} />
+                <VitalField label="호흡수" value={vitals.rr ? `${vitals.rr} 회/분` : ''} status={{ label: '정상', color: '#26de81', bg: 'rgba(38,222,129,0.15)' }} />
+                <VitalField label="혈압" value={vitals.bp || ''} status={getVitalStatus('bp', vitals.bp)} editable onEdit={() => openEdit('bp', vitals.bp)} />
+                <VitalField label="체온" value={vitals.temp ? `${vitals.temp} °C` : ''} status={getVitalStatus('temp', vitals.temp)} editable onEdit={() => openEdit('temp', vitals.temp)} />
 
                 {/* 인라인 플로팅 입력 모달 (메인 페이지 스타일) */}
                 {editTarget && editTarget !== 'role' && (
                   <div style={{
                     position: 'absolute', 
                     top: '110%', 
-                    left: editTarget === 'bp' ? '10%' : '70%',
+                    left: editTarget === 'bp' ? 'auto' : 'auto',
+                    right: editTarget === 'bp' ? '20%' : (editTarget === 'temp' ? '25px' : 'auto'),
+                    transform: 'none',
                     zIndex: 1000,
                     width: 360, background: '#1e293b', border: '2px solid #38bdf8', borderRadius: 24,
                     padding: 28, boxShadow: '0 20px 50px rgba(0,0,0,0.6)', animation: 'slideDown 0.2s ease'
                   }}>
-                    <div style={{ fontSize: 17, fontWeight: 900, color: '#38bdf8', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
-                      {editTarget === 'bp' ? <Activity size={20} /> : <Droplets size={20} />}
+                    <div style={{ fontSize: 21, fontWeight: 900, color: '#38bdf8', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {editTarget === 'bp' ? <Activity size={24} /> : <Droplets size={24} />}
                       {editTarget === 'bp' ? '혈압 직접 입력' : '체온 직접 입력'}
                     </div>
                     <input 
@@ -590,13 +665,13 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
                       }}
                       style={{
                         width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)',
-                        borderRadius: 14, padding: '16px 20px', color: '#fff', fontSize: 24, fontWeight: 800,
+                        borderRadius: 14, padding: '16px 20px', color: '#fff', fontSize: 29, fontWeight: 800,
                         outline: 'none', marginBottom: 20, textAlign: 'center', letterSpacing: '1px'
                       }}
                     />
                     <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-                      <button onClick={() => setEditTarget(null)} style={{ flex: 1, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: 'none', fontWeight: 800, fontSize: 16, cursor: 'pointer', transition: '0.2s' }}>취소</button>
-                      <button onClick={saveEdit} style={{ flex: 2, padding: '14px', borderRadius: 12, background: '#38bdf8', color: '#000', border: 'none', fontWeight: 950, fontSize: 16, cursor: 'pointer', transition: '0.2s' }}>데이터 저장</button>
+                      <button onClick={() => setEditTarget(null)} style={{ flex: 1, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: 'none', fontWeight: 800, fontSize: 19, cursor: 'pointer', transition: '0.2s' }}>취소</button>
+                      <button onClick={saveEdit} style={{ flex: 2, padding: '14px', borderRadius: 12, background: '#38bdf8', color: '#000', border: 'none', fontWeight: 950, fontSize: 19, cursor: 'pointer', transition: '0.2s' }}>데이터 저장</button>
                     </div>
                   </div>
                 )}
@@ -691,7 +766,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
           
           {showPlan && (
             <div style={{ animation: 'slideDown 0.6s ease-out forwards', display: 'flex', flexDirection: 'column', gap: 35 }}>
-              <SectionCard title={selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? "🚨 초응급 조치 명령 (EMERGENCY PLAN)" : "2. 조치 및 계획 (Plan)"} icon={<Pill size={36} color={selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? "#f43f5e" : "#26de81"}/>}>
+              <SectionCard title={selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? "🚨 초응급 조치 명령" : "2. 조치 및 계획"} icon={<Pill size={36} color={selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? "#f43f5e" : "#26de81"}/>}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 25 }}>
                   
                   {/* 비의료진 외상 처치 안전 수칙 안내 박스 (트라우마 특화) */}
@@ -757,14 +832,14 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
                           <AlertTriangle size={30} color="#fff" />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <div style={{ fontSize: '24px', fontWeight: 950, color: '#fff', display: 'flex', alignItems: 'center', gap: 10 }}>CRITICAL EMERGENCY : 생명 위협 상황</div>
+                          <div style={{ fontSize: '24px', fontWeight: 950, color: '#fff', display: 'flex', alignItems: 'center', gap: 10 }}>위급 상황 : 생명 위협 상황</div>
                           <div style={{ fontSize: '15px', color: '#fda4af', fontWeight: 700 }}>AI가 감지한 즉시 조치 프로토콜이 활성화되었습니다.</div>
                         </div>
                       </div>
 
                       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 20 }}>
                         <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '20px', borderRadius: 18, border: '1px solid rgba(244, 63, 94, 0.3)' }}>
-                          <div style={{ fontSize: '15px', color: '#ff4d6d', fontWeight: 900, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><ShieldAlert size={18}/> 1단계 : 지혈 (Hemostasis)</div>
+                          <div style={{ fontSize: '15px', color: '#ff4d6d', fontWeight: 900, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><ShieldAlert size={18}/> 1단계 : 지혈</div>
                           <div style={{ fontSize: '17px', color: '#fff', fontWeight: 700, lineHeight: 1.6 }}>
                             상처 부위를 깨끗한 거즈로 <span style={{ color: '#ff4d6d', textDecoration: 'underline' }}>체중을 실어 직접 압박</span>하십시오. 지혈이 되지 않을 경우 상처 상단 5-10cm 지점에 지혈대(Tourniquet)를 사용하십시오.
                           </div>
@@ -780,9 +855,9 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
                         </div>
 
                         <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '20px', borderRadius: 18, border: '1px solid rgba(244, 63, 94, 0.3)' }}>
-                          <div style={{ fontSize: '15px', color: '#ff4d6d', fontWeight: 900, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Phone size={18}/> 3단계 : MEDEVAC 요청</div>
+                          <div style={{ fontSize: '15px', color: '#ff4d6d', fontWeight: 900, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Phone size={18}/> 3단계 : 응급 후송 요청</div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                            <button style={{ width: '100%', padding: '12px', borderRadius: 12, background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 900, fontSize: '15px', cursor: 'pointer' }}>해안의료 SOS 발신</button>
+                            <button style={{ width: '100%', padding: '12px', borderRadius: 12, background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 900, fontSize: '15px', cursor: 'pointer' }}>해안의료 긴급 구조 발신</button>
                             <button style={{ width: '100%', padding: '12px', borderRadius: 12, background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid #f43f5e', fontWeight: 800, fontSize: '14px', cursor: 'pointer' }}>원격 의사 화상 연결</button>
                           </div>
                         </div>
@@ -799,7 +874,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
                         </div>
                         <div style={{ fontSize: '28px', fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
                           AI 실시간 증상 분석 리포트
-                          <span style={{ fontSize: '15px', padding: '2px 8px', borderRadius: 6, background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }}>BETA v2.0</span>
+                          <span style={{ fontSize: '15px', padding: '2px 8px', borderRadius: 6, background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }}>베타 버전</span>
                         </div>
                       </div>
 
@@ -933,7 +1008,7 @@ function InputBox({ label, placeholder, isTextArea, value, onChange }) {
   return (<div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}><label style={{ fontSize: '24px', color: '#94a3b8', fontWeight: 800 }}>{label}</label>{isTextArea ? (<textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', minHeight: 120, background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '22px', color: '#fff', fontSize: '23px', outline: 'none', resize: 'none', lineHeight: 1.5 }} />) : (<input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '20px 28px', color: '#fff', fontSize: '23px', outline: 'none' }} />)}</div>)
 }
 
-function VitalField({ label, value, status, editable, onEdit, live }) {
+function VitalField({ label, value, status, editable, onEdit }) {
     const valStr = String(value || '').trim();
     // 숫자가 하나라도 포함되어 있으면 데이터가 있는 것으로 간주
     const isNoData = !/[0-9]/.test(valStr) || valStr.startsWith('-');
@@ -950,13 +1025,6 @@ function VitalField({ label, value, status, editable, onEdit, live }) {
             border: `1.5px solid ${isNoData ? 'rgba(255,255,255,0.05)' : 'rgba(56,189,248,0.1)'}`,
             transition: 'all 0.3s'
         }}>
-            {live && !isNoData && (
-                <div style={{ position: 'absolute', top: 15, right: 15, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#26de81', animation: 'pulse 1.5s infinite' }} />
-                    <span style={{ fontSize: '11px', fontWeight: 900, color: '#26de81', letterSpacing: '0.5px' }}>LIVE</span>
-                </div>
-            )}
-
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
                 <span style={{ fontSize: '20px', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</span>
                 {!isNoData && <span style={{ padding: '2px 10px', borderRadius: 6, background: status.bg, color: status.color, fontSize: '13px', fontWeight: 900, border: `1px solid ${status.color}40` }}>{status.label}</span>}

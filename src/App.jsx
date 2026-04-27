@@ -76,7 +76,7 @@ export default function App() {
           />
         )}
         {page === 'chart'     && (
-          <PatientChart patient={activePatient} onNavigate={handleNavigate} />
+          <PatientChart patient={activePatient} onNavigate={handleNavigate} onSwitchPatient={setActivePatient} />
         )}
         {page === 'settings'  && <Settings />}
       </div>
