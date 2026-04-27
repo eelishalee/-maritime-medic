@@ -179,16 +179,30 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
 
   const toggleMed = (medName) => {
     if (medName === '항히스타민제') {
-      alert("⚠️ 주의: 항히스타민제는 졸음을 유발할 수 있으니 작업 전 주의하세요.");
+      alert("⚠️ 주의 : 항히스타민제는 졸음을 유발할 수 있으니 작업 전 주의하세요.");
     } else if (medName === '연고/소독액') {
-      alert("ℹ️ 가이드: 개방된 큰 상처에는 직접 붓지 마세요.");
+      alert("ℹ️ 가이드 : 개방된 큰 상처에는 직접 붓지 마세요.");
     }
 
-    if (selectedMeds.includes(medName)) setSelectedMeds(selectedMeds.filter(m => m !== medName))
-    else setSelectedMeds([...selectedMeds, medName])
+    if (selectedMeds.includes(medName)) {
+      setSelectedMeds(selectedMeds.filter(m => m !== medName));
+      // 텍스트 영역에서도 제거
+      setOtherActions(prev => prev.replace(new RegExp(`, ${medName}|${medName}, |${medName}`, 'g'), '').trim().replace(/^,|,$/g, ''));
+    } else {
+      setSelectedMeds([...selectedMeds, medName]);
+      // 텍스트 영역에 누적 기록
+      const prefix = medName.includes('붕대') || medName.includes('부목') ? '조치' : '투약';
+      const actionText = `${medName}(${prefix})`;
+      setOtherActions(prev => prev ? `${prev}, ${actionText}` : actionText);
+    }
   }
 
   const handleSave = () => {
+    // 저장 전 페이지 최상단으로 스크롤 이동
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const container = document.querySelector('.chart-scroll-container');
+    if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+
     // 저장할 데이터 객체 생성
     const chartRecord = {
       patientId: patient.id,
@@ -223,8 +237,15 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
       }
       localStorage.setItem('mdts_crew_status', JSON.stringify(crewStatus))
 
-      alert(`[최종 기록 저장 완료]\n환자: ${patient.name}\n조치 내용이 성공적으로 시스템에 기록되었습니다.`)
-      onNavigate?.('main')
+      // 저장 완료 알림창 띄우기
+      alert(`[최종 기록 저장 완료]\n환자 : ${patient.name}\n조치 내용이 성공적으로 시스템에 기록되었습니다.`);
+
+      // 알림창 확인 후 바이탈 섹션으로 정밀 스크롤 이동
+      const vitalSection = document.getElementById('vital-section');
+      if (vitalSection) {
+        vitalSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      
     } catch (e) {
       console.error('저장 실패:', e)
       alert('기록 저장 중 오류가 발생했습니다.')
@@ -532,15 +553,15 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
         </aside>
 
         {/* [Right] Main Panel */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 35, padding: '40px 60px', overflowY: 'auto' }}>
+        <div className="chart-scroll-container" style={{ display: 'flex', flexDirection: 'column', gap: 35, padding: '40px 60px', overflowY: 'auto' }}>
           {/* 활력 징후 입력 확인 섹션 */}
-          <SectionCard title="현재 활력 징후 확인 (실시간 센서 데이터)" icon={<HeartPulse size={36} color="#ff4d6d"/>}>
+          <SectionCard id="vital-section" title="현재 활력 징후 확인 (실시간 센서 데이터)" icon={<HeartPulse size={36} color="#ff4d6d"/>}>
             <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 25, background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: 24, border: '1.5px solid rgba(255,255,255,0.05)' }}>
-                <VitalField label="혈압(BP)" value={vitals.bp || ''} status={getVitalStatus('bp', vitals.bp)} editable onEdit={() => openEdit('bp', vitals.bp)} />
-                <VitalField label="맥박(PR)" value={vitals.hr || patient.vitals?.hr ? `${vitals.hr || patient.vitals?.hr} bpm` : ''} status={getVitalStatus('hr', vitals.hr || patient.vitals?.hr)} live />
-                <VitalField label="호흡(RR)" value={`${vitals.rr || 16} /min`} status={{ label: '정상', color: '#26de81', bg: 'rgba(38,222,129,0.15)' }} />
-                <VitalField label="체온(BT)" value={vitals.temp ? `${vitals.temp} °C` : ''} status={getVitalStatus('temp', vitals.temp)} editable onEdit={() => openEdit('temp', vitals.temp)} />
+                <VitalField label="심박수(HR)" value={vitals.hr || patient.vitals?.hr ? `${vitals.hr || patient.vitals?.hr} bpm` : ''} status={getVitalStatus('hr', vitals.hr || patient.vitals?.hr)} live />
                 <VitalField label="산소포화도(SpO2)" value={vitals.spo2 || patient.vitals?.spo2 ? `${vitals.spo2 || patient.vitals?.spo2} %` : ''} status={getVitalStatus('spo2', vitals.spo2 || patient.vitals?.spo2)} live />
+                <VitalField label="호흡수(RR)" value={`${vitals.rr || 16} /min`} status={{ label: '정상', color: '#26de81', bg: 'rgba(38,222,129,0.15)' }} />
+                <VitalField label="혈압(BP)" value={vitals.bp || ''} status={getVitalStatus('bp', vitals.bp)} editable onEdit={() => openEdit('bp', vitals.bp)} />
+                <VitalField label="체온(BT)" value={vitals.temp ? `${vitals.temp} °C` : ''} status={getVitalStatus('temp', vitals.temp)} editable onEdit={() => openEdit('temp', vitals.temp)} />
 
                 {/* 인라인 플로팅 입력 모달 (메인 페이지 스타일) */}
                 {editTarget && editTarget !== 'role' && (
@@ -822,7 +843,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
                     <div style={{ marginBottom: 18, display: 'flex', alignItems: 'center', gap: 20 }}>
                       <label style={{ fontSize: '34px', color: '#94a3b8', fontWeight: 800 }}>실제 수행한 조치 내용</label>
                       <span style={{ fontSize: '16px', color: '#ff4d6d', fontWeight: 900, background: 'rgba(255, 77, 109, 0.1)', padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(255, 77, 109, 0.3)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <AlertTriangle size={14} /> ※ 처방약 투여 시 반드시 기록
+                        <AlertTriangle size={14} /> 처방약 투여 시 반드시 기록
                       </span>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12, marginBottom: 20 }}>

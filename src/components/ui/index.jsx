@@ -11,61 +11,130 @@ export function NavTab({ label, active, onClick }) {
   )
 }
 
-export function DashboardVital({ label, value, unit, color, editable, onEdit, live, isConnected = true }) {
+export function DashboardVital({ label, value, unit, color, editable, onEdit, live, isConnected = true, valueSize = 44 }) {
+  const baseColor = isConnected ? color : '#fbbf24';
+  const glowColor = isConnected ? `${color}33` : '#fbbf2433';
+  
   return (
     <div style={{
-      background: isConnected 
-        ? 'rgba(255,255,255,0.02)' 
-        : 'rgba(251, 191, 36, 0.03)',
-      borderRadius: 24, padding: '16px 14px',
-      border: isConnected 
-        ? '3px solid #38bdf8' 
-        : '3px solid #fbbf24',
-      textAlign: 'center', position: 'relative',
-      transition: 'all 0.3s ease',
-      overflow: 'hidden'
+      position: 'relative',
+      padding: '1.2px',
+      borderRadius: '24px',
+      background: 'rgba(255, 255, 255, 0.05)',
+      overflow: 'hidden',
+      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+      minHeight: 135,
+      display: 'flex',
+      flexDirection: 'column'
     }}>
-      {live && isConnected && (
-        <div style={{
-          position: 'absolute', top: 12, right: 12,
-          width: 8, height: 8, borderRadius: '50%',
-          background: color,
-          animation: 'pulse-dot 1.4s ease-in-out infinite'
+      {/* 회전하는 빛 레이어 (오로라 스타일 : 로그인 박스와 동일한 청록색 #00e5cc 고정) */}
+      {isConnected && (
+        <div style={{ 
+          position: 'absolute', top: '-100%', left: '-100%', width: '300%', height: '300%', 
+          background: `conic-gradient(from 0deg, transparent 0%, rgba(0, 229, 204, 0.3) 20%, #fff 35%, #00e5cc 50%, rgba(0, 229, 204, 0.3) 70%, transparent 100%)`, 
+          animation: 'borderRotate 6s linear infinite', transformOrigin: 'center',
+          opacity: 0.6,
+          filter: 'blur(15px)' 
         }} />
       )}
-      
-      {!isConnected && (
-        <div style={{
-          position: 'absolute', top: 10, right: 10,
-          color: '#fbbf24',
-          animation: 'pulse 2s infinite'
-        }}>
-          <AlertCircle size={16} />
-        </div>
-      )}
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 6, position: 'relative', zIndex: 1 }}>
-        <div style={{ fontSize: 20, fontWeight: 900, color: isConnected ? '#e2e8f0' : '#fbbf24', letterSpacing: '0.5px', textTransform: 'uppercase' }}>{label}</div>
-        {editable && isConnected && (
-          <button onClick={onEdit} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}>
-            <Edit3 size={18} />
-          </button>
-        )}
+      {/* 내부 콘텐츠 카드 */}
+      <div style={{ 
+        flex: 1,
+        background: isConnected 
+          ? 'rgba(2, 12, 22, 0.95)' 
+          : 'rgba(45, 35, 10, 0.95)', 
+        backdropFilter: 'blur(40px)', 
+        borderRadius: '23px', 
+        padding: '16px 18px', 
+        position: 'relative', 
+        zIndex: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
+      }}>
+        {/* 상단 : 라벨(좌) 및 상태 점/편집 버튼(우) */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div style={{ 
+            fontSize: 21, fontWeight: 950, 
+            color: isConnected ? 'rgba(255,255,255,0.9)' : '#fbbf24', 
+            letterSpacing: '0.5px',
+            textTransform: 'uppercase',
+            textShadow: isConnected ? '0 0 10px rgba(255,255,255,0.2)' : 'none',
+            marginTop: -2 // 텍스트 상단 여백 미세 조정
+          }}>
+            {label}
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {editable && isConnected && (
+              <button 
+                onClick={onEdit} 
+                style={{ 
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', 
+                  color: '#00e5cc', cursor: 'pointer', borderRadius: 10,
+                  width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: '0.2s', marginTop: -4
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = 'rgba(0, 229, 204, 0.15)';
+                  e.currentTarget.style.borderColor = '#00e5cc';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                }}
+              >
+                <Edit3 size={16} />
+              </button>
+            )}
+
+            {live && isConnected && (
+              <div style={{
+                width: 8, height: 8, borderRadius: '50%',
+                background: color,
+                boxShadow: `0 0 12px ${color}`,
+                animation: 'pulse-dot 1.5s ease-in-out infinite'
+              }} />
+            )}
+
+            {!isConnected && (
+              <div style={{ color: '#fbbf24', animation: 'pulse 2s infinite' }}>
+                <AlertCircle size={18} />
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* 중앙/하단 : 값 및 단위 */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', width: '100%', gap: 2 }}>
+          {isConnected ? (
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, minWidth: 0, flex: 1 }}>
+              <span style={{ 
+                fontSize: valueSize, 
+                fontWeight: 950, 
+                background: 'linear-gradient(135deg, #39ff6a 0%, #00ffcc 50%, #00e5ff 100%)', 
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                letterSpacing: '-1.5px', 
+                whiteSpace: 'nowrap'
+              }}>{value}</span>
+              <span style={{ 
+                fontSize: 14, 
+                color: 'rgba(0, 255, 204, 0.5)', 
+                fontWeight: 800,
+                flexShrink: 0,
+                marginBottom: 4
+              }}>{unit}</span>
+            </div>
+          ) : (
+            <div style={{ paddingBottom: 4 }}>
+              <div style={{ fontSize: 17, fontWeight: 950, color: '#fbbf24' }}>CHECK SENSOR</div>
+              <div style={{ fontSize: 11, color: 'rgba(251, 191, 36, 0.4)', fontWeight: 700 }}>연결 확인 필요</div>
+            </div>
+          )}
+        </div>
       </div>
-      
-      {isConnected ? (
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 6, position: 'relative', zIndex: 1 }}>
-          <span style={{ 
-            fontSize: 36, fontWeight: 950, color: color, letterSpacing: '-1px', whiteSpace: 'nowrap'
-          }}>{value}</span>
-          <span style={{ fontSize: 15, color: '#fff', fontWeight: 900, flexShrink: 0, opacity: 0.9 }}>{unit}</span>
-        </div>
-      ) : (
-        <div style={{ padding: '4px 0', position: 'relative', zIndex: 1 }}>
-          <div style={{ fontSize: 16, fontWeight: 950, color: '#fbbf24', letterSpacing: '-0.3px' }}>센서 점검 필요</div>
-          <div style={{ fontSize: 11, color: 'rgba(251, 191, 36, 0.5)', fontWeight: 800, marginTop: 4 }}>데이터 수신 대기 중</div>
-        </div>
-      )}
     </div>
   )
 }
