@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Activity, History, RotateCcw, Droplets, Upload, AlertTriangle, Camera, Mic, User, Pill, AlertCircle, MapPin, Phone, Anchor, Weight, Ruler, HeartPulse, Paperclip, ArrowUp, Sparkles, CheckCircle2, Clock, Database, ChevronRight, Info, ShieldCheck, Zap, Crosshair, Eye, Maximize, Thermometer, Wind } from 'lucide-react'
+import { Activity, History, RotateCcw, Droplets, Upload, AlertTriangle, Camera, Mic, User, Pill, AlertCircle, MapPin, Phone, Anchor, Weight, Ruler, HeartPulse, Paperclip, ArrowUp, Sparkles, CheckCircle2, Clock, Database, ChevronRight, ChevronDown, Info, ShieldCheck, Zap, Crosshair, Eye, Maximize, Thermometer, Wind } from 'lucide-react'
 import { DashboardVital, InfoItem, TimelineItem } from '../../../components/ui'
 import EmergencyGuide from './EmergencyGuide.jsx'
 
@@ -7,11 +7,38 @@ export default function DashboardView({
   activePatient, hr, spo2, rr, bp, bt, chat, prompt, setPrompt,
   handlePromptAnalysis, startEmergencyAction, handleTraumaAnalysis,
   isScanning, scanError, setScanError, setIsScanning,
-  setBp, setBt
+  setBp, setBt, onSwitchPatient
 }) {
   const videoRef = useRef(null)
   const streamRef = useRef(null)
   const [isCameraActive, setIsCameraActive] = useState(false)
+
+  // ─── 환자 선택 드롭다운 상태 ───
+  const [isSelectOpen, setIsSelectOpen] = useState(false)
+  const [dynamicCrewList, setDynamicCrewList] = useState([])
+  const selectRef = useRef(null)
+
+  useEffect(() => {
+    const loadPatients = () => {
+      const savedCrew = JSON.parse(localStorage.getItem('mdts_crew_list') || '[]')
+      const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
+      const recordedIds = new Set(records.map(r => r.patientId))
+      
+      const activePatients = savedCrew.filter(c => 
+        c.isEmergency || recordedIds.has(c.id) || c.id === activePatient?.id
+      )
+      setDynamicCrewList(activePatients)
+    }
+    loadPatients()
+  }, [activePatient])
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (selectRef.current && !selectRef.current.contains(e.target)) setIsSelectOpen(false)
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   // ─── 센서 상태 및 점검 안내 ───
   const [spo2Status, setSpo2Status] = useState('normal') 
@@ -109,17 +136,44 @@ export default function DashboardView({
   // 비상연락처 데이터 파싱 (Dashboard 전용)
   const getEmergencyDisplay = () => {
     let display = { name: '미지정', phone: '-', relation: '-' };
+    
+    // 보호자 성명 강제 매핑 (데이터 누락 방지)
+    const PROTECTOR_MAP = {
+      'S26-001': '김도윤', 'S26-002': '이서연', 'S26-003': '양정희', 'S26-004': '박지호',
+      'S26-005': '최민준', 'S26-006': '정하윤', 'S26-007': '강준우', 'S26-008': '조예은',
+      'S26-009': '임도현', 'S26-010': '장수빈', 'S26-011': '황지훈', 'S26-012': '한지민',
+      'S26-013': '오세현', 'S26-014': '나혜지', 'S26-015': '송다희', 'S26-016': '김한혜'
+    };
+
+    const forcedName = PROTECTOR_MAP[activePatient?.id];
+
+    // 1. 신규 선원 등록 시 저장되는 emergencyName 필드 또는 강제 매핑 확인
+    if (activePatient?.emergencyName || forcedName) {
+      display.name = forcedName || activePatient.emergencyName;
+      
+      // 연락처 문자열 파싱 (예: "010-1234-5678 (배우자)")
+      if (activePatient?.emergency && typeof activePatient.emergency === 'string') {
+        const parts = activePatient.emergency.split(' ');
+        display.phone = parts[0] || '-';
+        display.relation = parts[1] ? parts[1].replace(/[()]/g, '') : '가족';
+      }
+      return display;
+    }
+
+    // 2. 기존 객체 형태 데이터 확인
     if (activePatient?.emergencyContact && typeof activePatient.emergencyContact === 'object') {
       display = {
-        name: activePatient.emergencyContact.name || '미지정',
+        name: forcedName || activePatient.emergencyContact.name || '미지정',
         phone: activePatient.emergencyContact.phone || '-',
         relation: activePatient.emergencyContact.relation || '-'
       };
-    } else if (activePatient?.emergency && typeof activePatient.emergency === 'string') {
+    } 
+    // 3. 문자열 형태 데이터 확인
+    else if (activePatient?.emergency && typeof activePatient.emergency === 'string') {
       const parts = activePatient.emergency.split(' ');
       display.phone = parts[0] || '-';
       display.relation = parts[1] ? parts[1].replace(/[()]/g, '') : '가족';
-      display.name = activePatient.emergencyName || '비상 연락인';
+      display.name = forcedName || activePatient.emergencyName || '보호자';
     }
     return display;
   };
@@ -194,6 +248,25 @@ export default function DashboardView({
       {/* [Left] Patient Info Panel */}
       <aside style={{ width: 420, flexShrink: 0, borderRight: '1px solid rgba(255,255,255,0.05)', background: '#05070a', display: 'flex', flexDirection: 'column', position: 'relative' }}>
         <div style={{ flexShrink: 0, padding: '24px 28px 20px 28px', borderBottom: '1px solid rgba(56,189,248,0.1)', background: 'rgba(56,189,248,0.03)' }}>
+          
+          {/* 환자 선택 셀렉트 박스 (PatientChart와 동일 디자인) */}
+          <div ref={selectRef} style={{ position: 'relative', width: '100%', marginBottom: 24 }}>
+            <div onClick={() => setIsSelectOpen(!isSelectOpen)} style={{ background: 'rgba(56,189,248,0.05)', border: `2px solid ${isSelectOpen ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, borderRadius: '16px', color: '#fff', padding: '12px 20px', fontSize: '20px', fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: '0.3s' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><User size={22} color="#38bdf8" /><span>{activePatient?.name} ({activePatient?.role})</span></div>
+              <ChevronDown size={22} style={{ transform: isSelectOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.3s', color: '#38bdf8' }} />
+            </div>
+            {isSelectOpen && (
+              <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'rgba(15, 23, 42, 0.98)', backdropFilter: 'blur(20px)', border: '1.5px solid rgba(56,189,248,0.3)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', zIndex: 1000 }}>
+                {dynamicCrewList.map(c => (
+                  <div key={c.id} onClick={() => { onSwitchPatient?.(c); setIsSelectOpen(false); }} style={{ padding: '16px 20px', fontSize: '18px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: activePatient?.id === c.id ? 'rgba(56,189,248,0.2)' : 'transparent', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><div style={{ width: 10, height: 10, borderRadius: '50%', background: c.isEmergency ? '#ff4d6d' : '#26de81' }} />{c.name} ({c.role})</div>
+                    {c.isEmergency && <AlertTriangle size={16} color="#ff4d6d" />}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div style={{ display: 'flex', gap: 24, marginBottom: 24 }}>
             <div style={{ width: 110, height: 110, borderRadius: 24, background: '#1e293b', border: '3px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
               <img src={activePatient?.avatar || '/CE.jpeg'} onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(activePatient?.name || 'User') + '&background=0ea5e9&color=fff&size=128'; }} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Profile" />
@@ -266,10 +339,10 @@ export default function DashboardView({
 
           {/* 비상 연락망 복원 */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#26de81', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><Phone size={20}/> 비상 연락망</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#26de81', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><Phone size={20}/> 보호자 연락처</div>
             <div style={{ background: 'rgba(38,222,129,0.06)', border: '1px solid rgba(38,222,129,0.2)', borderRadius: 16, padding: '18px 20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <span style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{emergency.name}</span>
+                <span style={{ fontSize: 22, fontWeight: 950, color: '#fff' }}>{emergency.name}</span>
                 <span style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, background: 'rgba(38,222,129,0.15)', color: '#26de81', fontWeight: 800 }}>{emergency.relation}</span>
               </div>
               <div style={{ fontSize: 20, fontWeight: 900, color: '#26de81', letterSpacing: '0.5px' }}>

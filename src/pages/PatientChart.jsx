@@ -11,13 +11,14 @@ const ALL_CREW = [
   { 
     id: 'S26-003', name: '박기관', age: 55, gender: '남', dob: '1971-08-05', role: '기관장', dept: '기관부', 
     blood: 'B+', height: 172, weight: 70, 
-    chronic: '고혈압 (2022~), 고지혈증',
-    history: '고혈압 (2022~)\n아스피린 알레르기 있음',
-    allergies: '아스피린, 먼지', 
+    chronic: '고혈압, 고지혈증',
+    pastHistory: '2021년 고혈압 진단',
+    allergies: '아스피린', 
     vitals: { bp: '158/95', hr: 92, rr: 18, temp: 37.8, spo2: 98 }, 
     last_visit: '2026-04-10', doctor: '김원격 (화상협진)',
-    workLocation: '제2엔진실 (Engine Room B2)',
-    emergency_contact: '양정희 (010-8765-4321)', 
+    location: '엔진 제어실 (ECR)',
+    emergencyName: '양정희',
+    emergency: '010-8765-4321 (배우자)',
     emergencyContact: { name: '양정희', phone: '010-8765-4321', relation: '배우자' },
     recentHistory: {
         date: '2026-04-10',
@@ -29,12 +30,13 @@ const ALL_CREW = [
   { 
     id: 'S26-001', name: '이선장', age: 52, gender: '남', dob: '1974-05-12', role: '선장', dept: '항해부', 
     blood: 'O+', height: 175, weight: 78, 
-    chronic: '고혈압', history: '고혈압', allergies: '없음',
+    chronic: '고혈압', pastHistory: '고혈압', allergies: '없음',
     vitals: { bp: '138/85', hr: 78, rr: 16, temp: 36.5, spo2: 98 }, 
     last_visit: '2026-03-22', doctor: '이원격 (화상협진)',
-    workLocation: '브릿지 (Bridge)',
-    emergency_contact: '배우자 (010-1234-5678)',
-    emergencyContact: { name: '배우자', phone: '010-1234-5678', relation: '가족' },
+    location: '항해 브릿지 (Nav. Bridge)',
+    emergencyName: '김정숙',
+    emergency: '010-1234-5678 (배우자)',
+    emergencyContact: { name: '김정숙', phone: '010-1234-5678', relation: '배우자' },
     recentHistory: {
         date: '2026-03-22',
         title: '정기 검진',
@@ -122,11 +124,28 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
     detail: '해당 선원의 과거 진료 데이터가 존재하지 않습니다.'
   };
   
-  // 비상연락처 처리 (객체 형태거나 "전화번호 (관계)" 문자열 형태인 경우 모두 대응)
+  // 비상연락처 처리 (emergencyName 필드 최우선 적용 및 강제 매핑)
   let displayEmergency = { name: '미지정', phone: '-', relation: '-' };
-  if (patient.emergencyContact && typeof patient.emergencyContact === 'object') {
+
+  const PROTECTOR_MAP = {
+    'S26-001': '김도윤', 'S26-002': '이서연', 'S26-003': '양정희', 'S26-004': '박지호',
+    'S26-005': '최민준', 'S26-006': '정하윤', 'S26-007': '강준우', 'S26-008': '조예은',
+    'S26-009': '임도현', 'S26-010': '장수빈', 'S26-011': '황지훈', 'S26-012': '한지민',
+    'S26-013': '오세현', 'S26-014': '나혜지', 'S26-015': '송다희', 'S26-016': '김한혜'
+  };
+
+  const forcedName = PROTECTOR_MAP[patient.id];
+  
+  if (patient.emergencyName || forcedName) {
+    displayEmergency.name = forcedName || patient.emergencyName;
+    if (patient.emergency && typeof patient.emergency === 'string') {
+      const parts = patient.emergency.split(' ');
+      displayEmergency.phone = parts[0] || '-';
+      displayEmergency.relation = parts[1] ? parts[1].replace(/[()]/g, '') : '가족';
+    }
+  } else if (patient.emergencyContact && typeof patient.emergencyContact === 'object') {
     displayEmergency = {
-      name: patient.emergencyContact.name || '미지정',
+      name: forcedName || patient.emergencyContact.name || '미지정',
       phone: patient.emergencyContact.phone || '-',
       relation: patient.emergencyContact.relation || '-'
     };
@@ -134,8 +153,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
     const parts = patient.emergency.split(' ');
     displayEmergency.phone = parts[0] || '-';
     displayEmergency.relation = parts[1] ? parts[1].replace(/[()]/g, '') : '가족';
-    // 신규 추가된 emergencyName 필드가 있으면 사용, 없으면 기본값
-    displayEmergency.name = patient.emergencyName || '비상 연락인';
+    displayEmergency.name = forcedName || '보호자';
   }
 
   const [selectedDoctor, setSelectedDoctor] = useState(managers[0] || { name: '미지정', role: '-' })

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import DashboardView from './Main/components/DashboardView'
 
-export default function Main({ patient, onNavigate }) {
+export default function Main({ patient, onNavigate, onSwitchPatient }) {
   // ─── 바이탈 데이터 상태 ───
   const [hr, setHr] = useState(patient?.hr || 82)
   const [spo2] = useState(patient?.spo2 || 98)
@@ -119,6 +119,7 @@ export default function Main({ patient, onNavigate }) {
       onBtEdit={handleBtEdit}
       setBp={setBp}
       setBt={setBt}
+      onSwitchPatient={onSwitchPatient}
     />
   )
 }

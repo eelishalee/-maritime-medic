@@ -9,35 +9,39 @@ import PatientChart from './pages/PatientChart'
 import Settings from './pages/Settings'
 
 export default function App() {
-  const [auth, setAuth] = useState(null)
+  const [auth, setAuth] = useState({ serial: 'SN-0001', device: 'MED-01', ship: 'KOREA STAR' })
   const [page, setPage] = useState('main')
 
   const [activePatient, setActivePatient] = useState({
-    id: 'S2026-026',
+    id: 'S26-003',
     name: '박기관',
     age: 55,
     role: '기관장',
-    blood: 'A+',
-    dob: '1971-04-23',
-    height: 178,
-    weight: 82,
-    chronic: '고혈압 (2022~), 고지혈증',
-    history: '고혈압 (2022~)\n페니실린 알레르기 있음',
-    allergies: '페니실린 알레르기 있음',
-    lastMed: '암로디핀 (08:00)',
-    workLocation: '제2엔진실 (Engine Room B2)',
+    dept: '기관부',
+    blood: 'B+',
+    dob: '1971-08-05',
+    height: 172,
+    weight: 70,
+    chronic: '고혈압, 고지혈증',
+    pastHistory: '2021년 고혈압 진단',
+    allergies: '아스피린',
+    lastMed: '암로디핀 5mg',
+    location: '엔진 제어실 (ECR)',
+    emergencyName: '양정희',
+    emergency: '010-8765-4321 (배우자)',
     emergencyContact: {
       name: '양정희',
       phone: '010-8765-4321',
       relation: '배우자'
     },
     recentHistory: {
-      date: '2026-03-15',
-      title: '단순 감기',
-      detail: '처방 : 타이레놀 500mg\n특이사항 : 알레르기 반응 없음'
+      date: '2026-04-10',
+      title: '혈압 상승 및 두통',
+      detail: '처방 : 혈압조절제 증량\n특이사항 : 원격 진료 통한 상태 확인'
     },
     hr: 82, bp: '128/84', temp: 36.7, spo2: 98,
-    avatar: '/CE.jpeg'
+    avatar: '/CE.jpeg',
+    isEmergency: true
   })
 
   const [emergencyData, setEmergencyData] = useState(null)
@@ -64,7 +68,7 @@ export default function App() {
         isOnline={page !== 'emergency'}
       />
       <div style={{ flex: 1, overflow: 'hidden' }}>
-        {page === 'main'      && <Main patient={activePatient} onNavigate={handleNavigate} />}
+        {page === 'main'      && <Main patient={activePatient} onNavigate={handleNavigate} onSwitchPatient={setActivePatient} />}
         {page === 'crew'      && (
           <CrewManagement onSelectPatient={p => { setActivePatient(p); handleNavigate('chart') }} />
         )}
