@@ -143,8 +143,8 @@ export default function CrewManagement({ onSelectPatient }) {
         <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 10px', padding: '0 20px' }}>
           <thead>
             <tr style={{ background: '#020617', position: 'sticky', top: 0, zIndex: 10 }}>
-              {['선원 프로필', '소속 및 직위', '신체 정보', '기저질환', '알레르기', '긴급 연락망', '상태'].map((h, i) => (
-                <th key={i} style={{ padding: '20px 24px', textAlign: 'left', fontSize: '20px', color: '#64748b', fontWeight: 950 }}>{h}</th>
+              {['선원 프로필', '소속 및 직위', '신체 정보', '기저질환', '알레르기', '긴급 연락망', '환자 관리'].map((h, i) => (
+                <th key={i} style={{ padding: '20px 24px', textAlign: 'center', fontSize: '20px', color: '#64748b', fontWeight: 950 }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -152,37 +152,55 @@ export default function CrewManagement({ onSelectPatient }) {
             {filtered.map((c) => (
               <tr key={c.id} onClick={() => handleSelect(c)} style={{ cursor: 'pointer', transition: '0.2s' }} className="crew-card-row">
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px 0 0 20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
                     <div style={{ width: 56, height: 70, borderRadius: '12px', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', background: '#0a1628' }}>
                       <img src={c.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={c.name} />
                     </div>
-                    <div>
-                      <div style={{ fontSize: '22px', fontWeight: 950, color: '#fff' }}>{c.name}</div>
-                      <span style={{ fontSize: '13px', color: '#0dd9c5', fontWeight: 900 }}>{c.id}</span>
+                    <div style={{ textAlign: 'left', minWidth: '100px' }}>
+                      <div style={{ fontSize: '19px', fontWeight: 950, color: '#fff' }}>{c.name}</div>
+                      <span style={{ fontSize: '19px', color: '#0dd9c5', fontWeight: 900 }}>{c.id}</span>
                     </div>
                   </div>
                 </td>
-                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)' }}>
-                  <div style={{ fontSize: '22px', color: '#fff', fontWeight: 900 }}>{c.role}</div>
-                  <div style={{ fontSize: '16px', color: '#94a3b8', fontWeight: 800 }}>{c.dept}</div>
+                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', textAlign: 'center' }}>
+                  <div style={{ fontSize: '19px', color: '#fff', fontWeight: 900 }}>
+                    {c.dept} <span style={{ color: '#475569', margin: '0 8px', fontWeight: 500 }}>/</span> {c.role}
+                  </div>
                 </td>
-                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)' }}>
-                  <div style={{ fontSize: '24px', fontWeight: 950, color: '#ff4d6d' }}>{c.blood} <span style={{ fontSize: 16, color: '#64748b' }}>/ {c.age}세</span></div>
+                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', textAlign: 'center' }}>
+                  <div style={{ fontSize: '19px', fontWeight: 950, color: '#ff4d6d' }}>{c.blood} <span style={{ fontSize: '19px', color: '#64748b', fontWeight: 800 }}>/ {c.age}세</span></div>
                 </td>
-                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)' }}>
+                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', textAlign: 'center' }}>
                   <span style={{ fontSize: '19px', fontWeight: 800, color: c.chronic ? '#fb923c' : '#475569' }}>{c.chronic || '없음'}</span>
                 </td>
-                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)' }}>
+                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', textAlign: 'center' }}>
                   <span style={{ fontSize: '19px', fontWeight: 800, color: c.allergies ? '#ff708d' : '#475569' }}>{c.allergies || '없음'}</span>
                 </td>
-                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)' }}>
+                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', textAlign: 'center' }}>
                   <div style={{ fontSize: '19px', fontWeight: 800, color: '#cbd5e1' }}>{c.emergency}</div>
                 </td>
-                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: '0 20px 20px 0' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: c.isEmergency ? '#ef4444' : '#22c55e', fontWeight: 900 }}>
-                    {c.isEmergency ? <ShieldAlert size={18}/> : <CheckCircle2 size={18}/>}
-                    {c.isEmergency ? '집중 관리' : '정상'}
-                  </div>
+                <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: '0 20px 20px 0', textAlign: 'center' }}>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleSelect(c); }}
+                    style={{ 
+                      padding: '10px 20px', 
+                      borderRadius: '12px', 
+                      background: c.isEmergency ? 'rgba(239, 68, 68, 0.1)' : 'rgba(13, 217, 197, 0.1)', 
+                      border: `1.5px solid ${c.isEmergency ? '#ef4444' : '#0dd9c5'}`,
+                      color: c.isEmergency ? '#ef4444' : '#0dd9c5',
+                      fontSize: '17px',
+                      fontWeight: 950,
+                      cursor: 'pointer',
+                      transition: '0.3s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      margin: '0 auto'
+                    }}
+                  >
+                    {c.isEmergency ? <ShieldAlert size={16}/> : <Plus size={16}/>}
+                    {c.isEmergency ? '집중 관리 중' : '환자로 전환'}
+                  </button>
                 </td>
               </tr>
             ))}
@@ -261,11 +279,11 @@ export default function CrewManagement({ onSelectPatient }) {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      <label style={{ fontSize: 16, color: '#64748b', fontWeight: 950 }}>과거 병력 및 수술 이력</label>
+                      <label style={{ fontSize: 18, color: '#64748b', fontWeight: 950 }}>과거 병력 및 수술 이력</label>
                       <textarea value={newCrew.pastHistory} onChange={e => setNewCrew({...newCrew, pastHistory: e.target.value})} placeholder="상세 내용 입력..." style={{ width: '100%', minHeight: 100, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '16px 20px', color: '#fff', outline: 'none', fontWeight: 700, fontSize: 18, resize: 'none', fontFamily: 'inherit' }} />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      <label style={{ fontSize: 16, color: '#64748b', fontWeight: 950 }}>관리 특이사항 (메모)</label>
+                      <label style={{ fontSize: 18, color: '#64748b', fontWeight: 950 }}>관리 특이사항 (메모)</label>
                       <textarea value={newCrew.note} onChange={e => setNewCrew({...newCrew, note: e.target.value})} placeholder="주의사항 입력..." style={{ width: '100%', minHeight: 100, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '16px 20px', color: '#fff', outline: 'none', fontWeight: 700, fontSize: 18, resize: 'none', fontFamily: 'inherit' }} />
                     </div>
                   </div>
@@ -297,7 +315,7 @@ function FormGroup({ label, value, type, icon, onDateClick, onChange, placeholde
   const isDate = type === 'date';
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <label style={{ fontSize: 16, color: '#64748b', fontWeight: 950 }}>{label}</label>
+      <label style={{ fontSize: '19px', color: '#64748b', fontWeight: 950 }}>{label}</label>
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center', cursor: isDate ? 'pointer' : 'text' }} onClick={() => isDate && onDateClick()}>
         {icon && <div style={{ position: 'absolute', left: 16, color: '#64748b' }}>{icon}</div>}
         <input 
@@ -305,7 +323,7 @@ function FormGroup({ label, value, type, icon, onDateClick, onChange, placeholde
           value={value} 
           onChange={e => !isDate && onChange(e.target.value)}
           placeholder={placeholder}
-          style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: icon ? '18px 18px 18px 48px' : '18px 20px', color: value ? '#0dd9c5' : '#fff', outline: 'none', fontWeight: 800, fontSize: 18, fontFamily: 'inherit', cursor: 'inherit' }} 
+          style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: icon ? '18px 18px 18px 48px' : '18px 20px', color: value ? '#0dd9c5' : '#fff', outline: 'none', fontWeight: 800, fontSize: '19px', fontFamily: 'inherit', cursor: 'inherit' }} 
         />
       </div>
     </div>
@@ -315,10 +333,10 @@ function FormGroup({ label, value, type, icon, onDateClick, onChange, placeholde
 function SelectGroup({ label, value, onChange, options, icon }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <label style={{ fontSize: 16, color: '#64748b', fontWeight: 950 }}>{label}</label>
+      <label style={{ fontSize: '19px', color: '#64748b', fontWeight: 950 }}>{label}</label>
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
         {icon && <div style={{ position: 'absolute', left: 16, color: '#64748b', pointerEvents: 'none' }}>{icon}</div>}
-        <select value={value} onChange={e => onChange(e.target.value)} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: icon ? '18px 48px 18px 48px' : '18px 20px', color: '#0dd9c5', outline: 'none', fontWeight: 800, fontSize: 18, fontFamily: 'inherit', appearance: 'none', cursor: 'pointer' }}>
+        <select value={value} onChange={e => onChange(e.target.value)} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: icon ? '18px 48px 18px 48px' : '18px 20px', color: '#0dd9c5', outline: 'none', fontWeight: 800, fontSize: '19px', fontFamily: 'inherit', appearance: 'none', cursor: 'pointer' }}>
           {options.map(o => <option key={o} value={o} style={{background: '#0a1224'}}>{o}</option>)}
         </select>
         <ChevronDown size={20} style={{ position: 'absolute', right: 18, color: '#4a6080', pointerEvents: 'none' }} />
