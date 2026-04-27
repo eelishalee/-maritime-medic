@@ -308,7 +308,12 @@ export default function DashboardView({
 
       {/* [Center] Vitals & AI Assistant */}
       <section style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', borderRight: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ padding: '14px 45px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#080b12', position: 'relative' }}>
+        <div style={{ 
+          padding: '14px 45px', 
+          borderBottom: '1px solid rgba(255,255,255,0.05)', 
+          background: '#080b12', 
+          position: 'relative'
+        }}>
           <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 0.9fr 0.9fr 1.15fr 1.15fr', gap: 12 }}>
             <DashboardVital label="심박수" value={hr} unit="bpm" color="#ff4d6d" live />
             <div onClick={toggleSpo2Status} style={{ cursor: 'pointer' }}>

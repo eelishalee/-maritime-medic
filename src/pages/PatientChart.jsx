@@ -3,7 +3,7 @@ import {
   Activity, Heart, Thermometer, Droplets, Clock, AlertTriangle, 
   Stethoscope, ClipboardList, Pill, Camera, ChevronRight, CheckCircle2,
   AlertCircle, Info, Search, User, ChevronDown, ShieldAlert, Zap, ThermometerSnowflake,
-  History, RotateCcw, MapPin, Anchor, Weight, Ruler, HeartPulse, Paperclip, ArrowUp, Sparkles, ShieldCheck, Phone, Pencil
+  History, RotateCcw, MapPin, Anchor, Weight, Ruler, HeartPulse, Paperclip, ArrowUp, Sparkles, ShieldCheck, Phone, Pencil, Plus
 } from 'lucide-react'
 
 // 확장된 선원 데이터 (메인 데이터와 동기화용)
@@ -14,7 +14,7 @@ const ALL_CREW = [
     chronic: '고혈압 (2022~), 고지혈증',
     history: '고혈압 (2022~)\n아스피린 알레르기 있음',
     allergies: '아스피린, 먼지', 
-    vitals: { bp: '158/95', hr: 92, rr: 18, temp: 37.8, spo2: 94 }, 
+    vitals: { bp: '158/95', hr: 92, rr: 18, temp: 37.8, spo2: 98 }, 
     last_visit: '2026-04-10', doctor: '김원격 (화상협진)',
     workLocation: '제2엔진실 (Engine Room B2)',
     emergency_contact: '양정희 (010-8765-4321)', 
@@ -96,8 +96,28 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
   const [minute, setMinute] = useState('00')
   const [occurrenceTime, setOccurrenceTime] = useState('오후 12:00')
 
+  // 환자 변경 시 바이탈 데이터 동기화
+  useEffect(() => {
+    if (patient) {
+      setVitals({
+        bp: patient.vitals?.bp || '',
+        hr: patient.vitals?.hr || '',
+        rr: patient.vitals?.rr || '16',
+        temp: patient.vitals?.temp || '',
+        spo2: patient.vitals?.spo2 || ''
+      })
+      // 기존 선택값 초기화
+      setMainComplaint('')
+      setPainAreas([])
+      setSelectedSymptoms([])
+      setDetailedNote('')
+      setSelectedMeds([])
+      setOtherActions('')
+      setShowPlan(false)
+    }
+  }, [selectedId])
+
   // 증상 및 조치 상태
-  const [patientRole, setPatientRole] = useState(patient.role)
   const [mainComplaint, setMainComplaint] = useState('')
   const [painAreas, setPainAreas] = useState([])
   const [selectedSymptoms, setSelectedSymptoms] = useState([])
@@ -120,8 +140,6 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
       setVitals(prev => ({ ...prev, [editTarget]: finalValue }))
     } else if (editTarget === 'temp') {
       setVitals(prev => ({ ...prev, [editTarget]: finalValue }))
-    } else if (editTarget === 'role') {
-      setPatientRole(finalValue)
     }
     setEditTarget(null)
     setShowPlan(false)
@@ -340,7 +358,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
         <div style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
           <div ref={selectRef} style={{ position: 'relative', width: '360px' }}>
             <div onClick={() => setIsSelectOpen(!isSelectOpen)} style={{ background: 'rgba(56,189,248,0.05)', border: `2px solid ${isSelectOpen ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, borderRadius: '16px', color: '#fff', padding: '12px 20px', fontSize: '22px', fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: '0.3s' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><User size={24} color="#38bdf8" /><span>{patient.name} ({patientRole})</span></div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><User size={24} color="#38bdf8" /><span>{patient.name} ({patient.role})</span></div>
               <ChevronDown size={24} style={{ transform: isSelectOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.3s', color: '#38bdf8' }} />
             </div>
             {isSelectOpen && (
@@ -383,136 +401,134 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
         
         {/* [Left] Patient Info Panel */}
         <aside style={{ borderRight: '1px solid rgba(255,255,255,0.05)', background: '#05070a', display: 'flex', flexDirection: 'column', position: 'relative', minHeight: 0 }}>
-            <div style={{ flexShrink: 0, padding: '24px 28px 20px 28px', borderBottom: '1px solid rgba(56,189,248,0.1)', background: 'rgba(56,189,248,0.03)' }}>
-                <div style={{ display: 'flex', gap: 24, marginBottom: 24 }}>
-                    <div style={{ width: 110, height: 110, borderRadius: 24, background: '#1e293b', border: '3px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
-                        <img src={patient.avatar || '/CE.jpeg'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="P" />
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 6 }}>
-                            <div style={{ fontSize: 40, fontWeight: 950, letterSpacing: '-0.5px', color: '#fff' }}>{patient.name}</div>
-                            <div 
-                              onClick={() => openEdit('role', patientRole)}
-                              style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', background: 'rgba(56,189,248,0.05)', padding: '4px 12px', borderRadius: 10, border: '1px solid rgba(56,189,248,0.2)', transition: '0.2s' }}
-                            >
-                              <div style={{ fontSize: 22, color: '#38bdf8', fontWeight: 800 }}>{patientRole}</div>
-                              <Pencil size={16} color="#38bdf8" />
-                            </div>
-                        </div>
-                        <div style={{ fontSize: 17, color: '#475569', fontWeight: 700 }}>ID : {patient.id}</div>
+          <div style={{ flexShrink: 0, padding: '24px 28px 20px 28px', borderBottom: '1px solid rgba(56,189,248,0.1)', background: 'rgba(56,189,248,0.03)' }}>
+            <div style={{ display: 'flex', gap: 24, marginBottom: 24 }}>
+              <div style={{ width: 110, height: 110, borderRadius: 24, background: '#1e293b', border: '3px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
+                <img 
+                  src={patient?.avatar || '/CE.jpeg'} 
+                  onError={(e) => {
+                    e.target.onerror = null; 
+                    e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(patient?.name || 'User') + '&background=0ea5e9&color=fff&size=128';
+                  }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  alt="Patient Profile"
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 6 }}>
+                  <div style={{ fontSize: 36, fontWeight: 950, letterSpacing: '-0.5px', color: '#fff' }}>{patient?.name || '김항해'}</div>
+                  <div style={{ fontSize: 20, color: '#38bdf8', fontWeight: 800 }}>{patient?.role || '기관장'}</div>
+                </div>
+                <div style={{ fontSize: 16, color: '#475569', fontWeight: 700 }}>ID : {patient?.id || 'S2026-026'}</div>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
+              <InfoItem label="나이/성별" value={`${patient?.age || 55}세 / ${patient?.gender || '남'}`} size="xl_ultra" />
+              <InfoItem label="혈액형" value={patient?.blood || 'A+형'} size="xl_ultra" />
+              <InfoItem label="신장" value={`${patient?.height || 178} cm`} size="xl_ultra" />
+              <InfoItem label="몸무게" value={`${patient?.weight || 82} kg`} size="xl_ultra" />
+            </div>
+          </div>
 
-                        {/* 직업(직책) 전용 플로팅 입력 모달 */}
-                        {editTarget === 'role' && (
-                          <div style={{
-                            position: 'absolute', 
-                            top: 100, left: 140,
-                            zIndex: 1000,
-                            width: 300, background: '#1e293b', border: '2px solid #38bdf8', borderRadius: 24,
-                            padding: 24, boxShadow: '0 20px 50px rgba(0,0,0,0.6)', animation: 'slideDown 0.2s ease'
-                          }}>
-                            <div style={{ fontSize: 16, fontWeight: 900, color: '#38bdf8', marginBottom: 15, display: 'flex', alignItems: 'center', gap: 10 }}>
-                              <Pencil size={18} /> 직책(직업) 직접 입력
-                            </div>
-                            <input 
-                              autoFocus
-                              value={editValue} 
-                              placeholder='예: "기관장", "조리사"'
-                              onChange={e => setEditValue(e.target.value)}
-                              onKeyDown={e => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  saveEdit();
-                                }
-                              }}
-                              style={{
-                                width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)',
-                                borderRadius: 12, padding: '12px 16px', color: '#fff', fontSize: 20, fontWeight: 800,
-                                outline: 'none', marginBottom: 16, textAlign: 'center'
-                              }}
-                            />
-                            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                              <button onClick={() => setEditTarget(null)} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: 'none', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>취소</button>
-                              <button onClick={saveEdit} style={{ flex: 2, padding: '12px', borderRadius: 10, background: '#38bdf8', color: '#000', border: 'none', fontWeight: 950, fontSize: 14, cursor: 'pointer' }}>입력 완료</button>
-                            </div>
-                          </div>
-                        )}
-                    </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
-                    <InfoItem label="나이/성별" value={`${patient.age}세 / ${patient.gender}`} size="xl_ultra" />
-                    <InfoItem label="혈액형" value={`${patient.blood}형`} size="xl_ultra" />
-                    <InfoItem label="신장" value={`${patient.height} cm`} size="xl_ultra" />
-                    <InfoItem label="몸무게" value={`${patient.weight} kg`} size="xl_ultra" />
-                </div>
+          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, padding: '28px 28px 120px 28px', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 32 }}>
+            {/* 과거력 섹션 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
+                <History size={20}/> 과거력 (Past History)
+              </div>
+              <div style={{ fontSize: 19, fontWeight: 750, color: '#e2e8f0', lineHeight: 1.6, background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)' }}>
+                {patient?.history ? patient.history.split('\n').map((line, i) => (
+                  <div key={i}>{line}</div>
+                )) : '기록 없음'}
+              </div>
             </div>
 
-            <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, padding: '28px 28px 120px 28px', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 32 }}>
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-                        <History size={20}/> 과거력 (Past History)
-                    </div>
-                    <div style={{ fontSize: 19, fontWeight: 750, color: '#e2e8f0', lineHeight: 1.6, background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)' }}>
-                        {patient.history ? patient.history.split('\n').map((line, i) => (<div key={i}>{line}</div>)) : '기록 없음'}
-                    </div>
+            {/* 최근 진료 이력 섹션 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#00d2ff', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
+                <RotateCcw size={20}/> 최근 진료 이력
+              </div>
+              <div style={{ background: 'rgba(0, 210, 255, 0.04)', borderRadius: 16, padding: '20px', border: '1px solid rgba(0, 210, 255, 0.15)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <span style={{ fontSize: 17, fontWeight: 850, color: '#00d2ff' }}>{patient?.recentHistory?.date || '2026-03-15'}</span>
+                  <span style={{ fontSize: 15, color: '#4a6080', fontWeight: 700 }}>{patient?.recentHistory?.title || '단순 감기'}</span>
                 </div>
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#00d2ff', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-                        <RotateCcw size={20}/> 최근 진료 이력
-                    </div>
-                    <div style={{ background: 'rgba(0, 210, 255, 0.04)', borderRadius: 16, padding: '20px', border: '1px solid rgba(0, 210, 255, 0.15)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                            <span style={{ fontSize: 17, fontWeight: 850, color: '#00d2ff' }}>{patient.recentHistory?.date}</span>
-                            <span style={{ fontSize: 15, color: '#4a6080', fontWeight: 700 }}>{patient.recentHistory?.title}</span>
-                        </div>
-                        <div style={{ fontSize: 16, color: '#8da2c0', lineHeight: 1.6, whiteSpace: 'pre-line' }}>{patient.recentHistory?.detail}</div>
-                    </div>
+                <div style={{ fontSize: 16, color: '#8da2c0', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
+                  {patient?.recentHistory?.detail || '- 처방 : 타이레놀 500mg\n- 특이사황 : 알레르기 반응 없음'}
                 </div>
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#f43f5e', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-                        <AlertCircle size={20}/> 알레르기 / 주의사항
-                    </div>
-                    <div style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', borderRadius: 16, padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        {patient.allergies?.split(',').map((a, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f43f5e' }} />
-                                <span style={{ fontSize: 17, fontWeight: 750, color: '#fda4af' }}>{a.trim()}</span>
-                            </div>
-                        )) || <span style={{color: '#64748b'}}>없음</span>}
-                    </div>
-                </div>
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-                        <MapPin size={20}/> 환자 작업 위치 (Work Location)
-                    </div>
-                    <div style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 16, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                        <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(56,189,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Anchor size={22} color="#38bdf8" />
-                        </div>
-                        <div>
-                            <div style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{patient.workLocation || '미지정'}</div>
-                            <div style={{ fontSize: 14, color: '#4a6080', fontWeight: 700, marginTop: 2 }}>Main Deck · Sector B-2</div>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#26de81', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-                        <Phone size={20}/> 비상 연락망 (Emergency Contact)
-                    </div>
-                    <div style={{ background: 'rgba(38,222,129,0.06)', border: '1px solid rgba(38,222,129,0.2)', borderRadius: 16, padding: '18px 20px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                            <span style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{patient.emergencyContact?.name || '미지정'}</span>
-                            <span style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, background: 'rgba(38,222,129,0.15)', color: '#26de81', fontWeight: 800 }}>{patient.emergencyContact?.relation || '-'}</span>
-                        </div>
-                        <div style={{ fontSize: 20, fontWeight: 900, color: '#26de81', letterSpacing: '0.5px' }}>{patient.emergencyContact?.phone || '-'}</div>
-                    </div>
-                </div>
+              </div>
             </div>
-            
-            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '20px 28px 24px 28px', borderTop: '1px solid rgba(255,77,109,0.2)', background: 'linear-gradient(to top, #05070a 85%, transparent)', zIndex: 10 }}>
-                <button onClick={(e) => { e.stopPropagation(); if(confirm('응급 상황을 선포하고 처치 가이드 화면으로 이동하시겠습니까?')) onNavigate?.('emergency') }} style={{ width: '100%', height: 72, borderRadius: 20, background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, fontSize: 22, boxShadow: '0 8px 25px rgba(244, 63, 94, 0.3)' }}>
-                    <AlertTriangle size={28} /> 응급 처치 액션 시작
-                </button>
+
+            {/* 알레르기 및 주의사항 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#f43f5e', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
+                <AlertCircle size={20}/> 알레르기 / 주의사항
+              </div>
+              <div style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', borderRadius: 16, padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {(patient?.allergies || '없음').split(',').map((a, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f43f5e' }} />
+                    <span style={{ fontSize: 17, fontWeight: 750, color: '#fda4af' }}>{a.trim()}</span>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {/* 복용 약물 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#fb923c', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
+                <Pill size={20}/> 복용 중인 약물
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[{ name: '혈압약 (암로디핀)', purpose: '고혈압' }, { name: '고지혈증약', purpose: '고지혈증' }].map((drug, i) => (
+                  <div key={i} style={{ background: 'rgba(251,146,60,0.05)', border: '1px solid rgba(251,146,60,0.15)', borderRadius: 14, padding: '14px 18px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 17, fontWeight: 850, color: '#fed7aa' }}>{drug.name}</span>
+                      <span style={{ fontSize: 14, color: '#fb923c', fontWeight: 800 }}>{drug.purpose}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 작업 위치 섹션 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
+                <MapPin size={20}/> 환자 작업 위치 (Work Location)
+              </div>
+              <div style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 16, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(56,189,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Anchor size={22} color="#38bdf8" />
+                </div>
+                <div>
+                  <div style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{patient?.workLocation || '미지정'}</div>
+                  <div style={{ fontSize: 14, color: '#4a6080', fontWeight: 700, marginTop: 2 }}>Main Deck · Sector B-2</div>
+                </div>
+              </div>
+            </div>
+
+            {/* 비상 연락망 섹션 */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#26de81', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
+                <Phone size={20}/> 비상 연락망 (Emergency Contact)
+              </div>
+              <div style={{ background: 'rgba(38,222,129,0.06)', border: '1px solid rgba(38,222,129,0.2)', borderRadius: 16, padding: '18px 20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <span style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{patient?.emergencyContact?.name || '미지정'}</span>
+                  <span style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, background: 'rgba(38,222,129,0.15)', color: '#26de81', fontWeight: 800 }}>{patient?.emergencyContact?.relation || '-'}</span>
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#26de81', letterSpacing: '0.5px' }}>
+                  {patient?.emergencyContact?.phone || '-'}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '20px 28px 24px 28px', borderTop: '1px solid rgba(255,77,109,0.2)', background: 'linear-gradient(to top, #05070a 85%, transparent)', zIndex: 10 }}>
+            <button onClick={(e) => { e.stopPropagation(); if(confirm('응급 상황을 선포하고 처치 가이드 화면으로 이동하시겠습니까?')) onNavigate?.('emergency') }} style={{ width: '100%', height: 72, borderRadius: 20, background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, fontSize: 22, boxShadow: '0 8px 25px rgba(244, 63, 94, 0.3)' }}>
+              <AlertTriangle size={28} /> 응급 처치 액션 시작
+            </button>
+          </div>
         </aside>
 
         {/* [Right] Main Panel */}
@@ -520,11 +536,11 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
           {/* 활력 징후 입력 확인 섹션 */}
           <SectionCard title="현재 활력 징후 확인 (실시간 센서 데이터)" icon={<HeartPulse size={36} color="#ff4d6d"/>}>
             <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 25, background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: 24, border: '1.5px solid rgba(255,255,255,0.05)' }}>
-                <VitalField label="혈압(BP)" value={vitals.bp || '-'} status={getVitalStatus('bp', vitals.bp)} editable onEdit={() => openEdit('bp', vitals.bp)} />
-                <VitalField label="맥박(PR)" value={`${vitals.hr || patient.vitals?.hr || '-'} bpm`} status={getVitalStatus('hr', vitals.hr || patient.vitals?.hr)} />
+                <VitalField label="혈압(BP)" value={vitals.bp || ''} status={getVitalStatus('bp', vitals.bp)} editable onEdit={() => openEdit('bp', vitals.bp)} />
+                <VitalField label="맥박(PR)" value={vitals.hr || patient.vitals?.hr ? `${vitals.hr || patient.vitals?.hr} bpm` : ''} status={getVitalStatus('hr', vitals.hr || patient.vitals?.hr)} live />
                 <VitalField label="호흡(RR)" value={`${vitals.rr || 16} /min`} status={{ label: '정상', color: '#26de81', bg: 'rgba(38,222,129,0.15)' }} />
-                <VitalField label="체온(BT)" value={`${vitals.temp || '-'} °C`} status={getVitalStatus('temp', vitals.temp)} editable onEdit={() => openEdit('temp', vitals.temp)} />
-                <VitalField label="산소(SpO2)" value={`${vitals.spo2 || patient.vitals?.spo2 || '-'} %`} status={getVitalStatus('spo2', vitals.spo2 || patient.vitals?.spo2)} />
+                <VitalField label="체온(BT)" value={vitals.temp ? `${vitals.temp} °C` : ''} status={getVitalStatus('temp', vitals.temp)} editable onEdit={() => openEdit('temp', vitals.temp)} />
+                <VitalField label="산소포화도(SpO2)" value={vitals.spo2 || patient.vitals?.spo2 ? `${vitals.spo2 || patient.vitals?.spo2} %` : ''} status={getVitalStatus('spo2', vitals.spo2 || patient.vitals?.spo2)} live />
 
                 {/* 인라인 플로팅 입력 모달 (메인 페이지 스타일) */}
                 {editTarget && editTarget !== 'role' && (
@@ -757,20 +773,20 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
                       <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.1 }}><Sparkles size={120} color="#38bdf8" /></div>
                       
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-                        <div style={{ width: 44, height: 44, borderRadius: 12, background: '#38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 15px rgba(56, 189, 248, 0.5)' }}>
-                          <Sparkles size={24} color="#0f172a" />
+                        <div style={{ width: 50, height: 50, borderRadius: 12, background: '#38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 15px rgba(56, 189, 248, 0.5)' }}>
+                          <Sparkles size={28} color="#0f172a" />
                         </div>
-                        <div style={{ fontSize: '22px', fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ fontSize: '28px', fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
                           AI 실시간 증상 분석 리포트
-                          <span style={{ fontSize: '13px', padding: '2px 8px', borderRadius: 6, background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }}>BETA v2.0</span>
+                          <span style={{ fontSize: '15px', padding: '2px 8px', borderRadius: 6, background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }}>BETA v2.0</span>
                         </div>
                       </div>
 
                       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 20 }}>
                         {/* 분석 브리핑 */}
                         <div style={{ background: 'rgba(15, 23, 42, 0.4)', padding: '20px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <div style={{ fontSize: '15px', color: '#38bdf8', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><ShieldCheck size={18}/> 분석 브리핑</div>
-                          <div style={{ fontSize: '18px', color: '#e2e8f0', fontWeight: 700, lineHeight: 1.6 }}>
+                          <div style={{ fontSize: '20px', color: '#38bdf8', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><ShieldCheck size={22}/> 분석 브리핑</div>
+                          <div style={{ fontSize: '24px', color: '#e2e8f0', fontWeight: 700, lineHeight: 1.6 }}>
                             {painAreas.length > 0 || selectedSymptoms.length > 0 ? (
                               <>선택된 <span style={{ color: '#38bdf8' }}>{painAreas[0] || selectedSymptoms[0]}</span> 증상은 초기 대응이 중요합니다. 활력 징후가 안정적이므로 가이드에 따른 처치 후 경과를 관찰하십시오.</>
                             ) : (
@@ -781,8 +797,8 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
 
                         {/* 권장 처치 가이드 */}
                         <div style={{ background: 'rgba(15, 23, 42, 0.4)', padding: '20px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <div style={{ fontSize: '15px', color: '#26de81', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Activity size={18}/> 비의료진 권장 처치</div>
-                          <ul style={{ margin: 0, padding: '0 0 0 20px', fontSize: '16.5px', color: '#cbd5e1', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          <div style={{ fontSize: '20px', color: '#26de81', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Activity size={22}/> 비의료진 권장 처치</div>
+                          <ul style={{ margin: 0, padding: '0 0 0 24px', fontSize: '22px', color: '#cbd5e1', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 10 }}>
                             <li>환부를 높게 유지하고 안정</li>
                             <li>15분 간격 아이싱 (부종 완화)</li>
                             <li>심리적 안정 유도</li>
@@ -791,14 +807,15 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
 
                         {/* 제안 상비약 */}
                         <div style={{ background: 'rgba(15, 23, 42, 0.4)', padding: '20px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <div style={{ fontSize: '15px', color: '#fb923c', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Pill size={18}/> AI 추천 상비약</div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                          <div style={{ fontSize: '20px', color: '#fb923c', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Pill size={22}/> AI 추천 상비약</div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                             {['타이레놀', '소염진통제'].map(m => (
-                              <span key={m} style={{ fontSize: '14px', padding: '5px 12px', borderRadius: 8, background: 'rgba(251, 146, 60, 0.15)', color: '#fb923c', border: '1px solid rgba(251, 146, 60, 0.3)', fontWeight: 800 }}>{m}</span>
+                              <span key={m} style={{ fontSize: '18px', padding: '6px 14px', borderRadius: 8, background: 'rgba(251, 146, 60, 0.15)', color: '#fb923c', border: '1px solid rgba(251, 146, 60, 0.3)', fontWeight: 800 }}>{m}</span>
                             ))}
                           </div>
                         </div>
-                      </div>                    </div>
+                      </div>
+                    </div>
                   )}
 
                   <div>
@@ -843,10 +860,11 @@ export default function PatientChart({ patient: activePatientProp, onNavigate })
 }
 
 function InfoItem({ label, value, size }) {
+    const valueSize = size === 'xl_ultra' ? 32 : (size === 'xl_max' ? 28 : (size === 'xl_plus' ? 25 : (size === 'xl' ? 22 : (size === 'large' ? 18 : 13))))
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ fontSize: '13px', color: '#475569', fontWeight: 800 }}>{label}</span>
-            <span style={{ fontSize: size === 'xl_ultra' ? '24px' : '19px', fontWeight: 950, color: '#fff' }}>{value}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <span style={{ fontSize: '18px', color: '#64748b', fontWeight: 700 }}>{label}</span>
+            <span style={{ fontSize: valueSize, fontWeight: 800, color: '#fff' }}>{value}</span>
         </div>
     )
 }
@@ -894,12 +912,33 @@ function InputBox({ label, placeholder, isTextArea, value, onChange }) {
   return (<div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}><label style={{ fontSize: '24px', color: '#94a3b8', fontWeight: 800 }}>{label}</label>{isTextArea ? (<textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', minHeight: 120, background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '22px', color: '#fff', fontSize: '23px', outline: 'none', resize: 'none', lineHeight: 1.5 }} />) : (<input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '20px 28px', color: '#fff', fontSize: '23px', outline: 'none' }} />)}</div>)
 }
 
-function VitalField({ label, value, status, editable, onEdit }) {
+function VitalField({ label, value, status, editable, onEdit, live }) {
+    const valStr = String(value || '').trim();
+    // 숫자가 하나라도 포함되어 있으면 데이터가 있는 것으로 간주
+    const isNoData = !/[0-9]/.test(valStr) || valStr.startsWith('-');
+    
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '5px', position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, width: '100%' }}>
-                <span style={{ fontSize: '23px', color: '#94a3b8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</span>
-                <span style={{ padding: '4px 14px', borderRadius: 8, background: status.bg, color: status.color, fontSize: '16px', fontWeight: 900, border: `1px solid ${status.color}40`, whiteSpace: 'nowrap' }}>{status.label}</span>
+        <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: 12, 
+            padding: '15px', 
+            position: 'relative',
+            background: isNoData ? 'rgba(255,255,255,0.01)' : 'rgba(56,189,248,0.02)',
+            borderRadius: '20px',
+            border: `1.5px solid ${isNoData ? 'rgba(255,255,255,0.05)' : 'rgba(56,189,248,0.1)'}`,
+            transition: 'all 0.3s'
+        }}>
+            {live && !isNoData && (
+                <div style={{ position: 'absolute', top: 15, right: 15, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#26de81', animation: 'pulse 1.5s infinite' }} />
+                    <span style={{ fontSize: '11px', fontWeight: 900, color: '#26de81', letterSpacing: '0.5px' }}>LIVE</span>
+                </div>
+            )}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
+                <span style={{ fontSize: '20px', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</span>
+                {!isNoData && <span style={{ padding: '2px 10px', borderRadius: 6, background: status.bg, color: status.color, fontSize: '13px', fontWeight: 900, border: `1px solid ${status.color}40` }}>{status.label}</span>}
                 {editable && (
                   <button 
                     onClick={(e) => { e.stopPropagation(); onEdit(); }}
@@ -909,10 +948,26 @@ function VitalField({ label, value, status, editable, onEdit }) {
                   </button>
                 )}
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontSize: '37px', fontWeight: 950, color: status.color, letterSpacing: '-1px', lineHeight: 1 }}>{value.split(' ')[0]}</span>
-                {value.includes(' ') && <span style={{ fontSize: '18.5px', color: '#64748b', fontWeight: 800 }}>{value.split(' ')[1]}</span>}
+
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minHeight: '44px' }}>
+                {isNoData ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, animation: 'pulse 2s infinite' }}>
+                        <div style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #38bdf8', borderTopColor: 'transparent', animation: 'spin 1s infinite linear' }} />
+                        <span style={{ fontSize: '22px', fontWeight: 800, color: '#475569', letterSpacing: '-0.5px' }}>센서 연결 대기 중...</span>
+                    </div>
+                ) : (
+                    <>
+                        <span style={{ fontSize: '37px', fontWeight: 950, color: status.color, letterSpacing: '-1px', lineHeight: 1 }}>{value.split(' ')[0]}</span>
+                        {value.includes(' ') && <span style={{ fontSize: '18.5px', color: '#64748b', fontWeight: 800 }}>{value.split(' ')[1]}</span>}
+                    </>
+                )}
             </div>
+            
+            {isNoData && editable && (
+                <div onClick={onEdit} style={{ marginTop: '8px', fontSize: '17px', color: '#38bdf8', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(56,189,248,0.1)', padding: '6px 12px', borderRadius: '10px', width: 'fit-content', border: '1px solid rgba(56,189,248,0.2)' }}>
+                    <Plus size={16}/> 직접 입력하기
+                </div>
+            )}
         </div>
     )
 }

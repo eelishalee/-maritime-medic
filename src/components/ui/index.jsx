@@ -15,12 +15,12 @@ export function DashboardVital({ label, value, unit, color, editable, onEdit, li
   return (
     <div style={{
       background: isConnected 
-        ? 'rgba(255,255,255,0.03)' 
+        ? 'rgba(255,255,255,0.02)' 
         : 'rgba(251, 191, 36, 0.03)',
-      borderRadius: 18, padding: '16px 14px',
+      borderRadius: 24, padding: '16px 14px',
       border: isConnected 
-        ? '1px solid rgba(255,255,255,0.07)' 
-        : '1px solid rgba(251, 191, 36, 0.3)',
+        ? '3px solid #38bdf8' 
+        : '3px solid #fbbf24',
       textAlign: 'center', position: 'relative',
       transition: 'all 0.3s ease',
       overflow: 'hidden'
