@@ -11,10 +11,10 @@ const ACTION_GUIDES = {
     protocol: 'SOP-CPR-01',
     hasMetronome: true,
     steps: [
-      { title: '의식 및 호흡 확인', desc: '어깨를 두드리며 "괜찮으세요?"라고 묻고, 가슴이 오르내리는지 10초간 확인하십시오.', tip: '숨을 안 쉬면 즉시 시작합니다.', stepImage: '/assets/CPR1.jpeg' },
-      { title: '도움 및 AED 요청', desc: '주변 사람 중 한 명을 지목해 "비상 상황 전파" 및 "AED(심장충격기)"를 가져와 달라고 지시하십시오.', stepImage: '/assets/CPR2.jpeg' },
-      { title: '가슴 압박 시행', desc: '가슴 중앙에 깍지 낀 손을 대고, 팔꿈치를 펴서 수직으로 5~6cm 깊이로 강하게 누르십시오.', tip: '분당 100~120회 속도를 유지하세요.', stepImage: '/assets/CPR3.jpeg' },
-      { title: 'AED 패드 부착', desc: '전원을 켜고 패드 하나는 오른쪽 쇄골 아래, 다른 하나는 왼쪽 옆구리에 붙인 뒤 음성 지시에 따르십시오.', tip: '분석 중에는 환자에게서 떨어지십시오.', stepImage: '/assets/CPR4.jpeg' }
+      { title: '의식 및 호흡 확인', desc: '어깨를 두드리며 "괜찮으세요?"라고 묻고, 가슴이 오르내리는지 10초간 확인하십시오.', tip: '숨을 안 쉬면 즉시 시작합니다.', stepImage: '/assets/Fracture_Dislocation/CPR-01.png' },
+      { title: '도움 및 AED 요청', desc: '주변 사람 중 한 명을 지목해 "비상 상황 전파" 및 "AED(심장충격기)"를 가져와 달라고 지시하십시오.', stepImage: '/assets/Fracture_Dislocation/CPR-02.png' },
+      { title: '가슴 압박 시행', desc: '가슴 중앙에 깍지 낀 손을 대고, 팔꿈치를 펴서 수직으로 5~6cm 깊이로 강하게 누르십시오.', tip: '분당 100~120회 속도를 유지하세요.', stepImage: '/assets/Fracture_Dislocation/CPR-03.png' },
+      { title: 'AED 패드 부착', desc: '전원을 켜고 패드 하나는 오른쪽 쇄골 아래, 다른 하나는 왼쪽 옆구리에 붙인 뒤 음성 지시에 따르십시오.', tip: '분석 중에는 환자에게서 떨어지십시오.', stepImage: '/assets/Fracture_Dislocation/CPR-04.png' }
     ],
     dos: ['1초당 2번 속도로 강하게 압박하세요', '압박 후 가슴이 완전히 올라오게 하세요', 'AED의 음성 지시에 따라 행동하십시오'],
     donts: ['환자가 의식이 있다면 하지 마세요', '맥박 확인을 위해 시간을 허비하지 마세요', '압박 중 팔꿈치를 굽히지 마세요'],
@@ -27,10 +27,10 @@ const ACTION_GUIDES = {
     riskLevel: '4',
     protocol: 'SOP-HEI-07',
     steps: [
-      { title: '의식 및 상태 확인', desc: '환자 뒤로 가서 말을 걸어보세요. 목을 감싸고 말을 전혀 못 하면 즉시 처치를 시작합니다.', tip: '환자가 기침을 할 수 있다면 계속하게 하세요.', stepImage: 'assets/Heimlich1.jpeg' },
-      { title: '자세 잡고 지탱하기', desc: '환자 뒤에 서서 양팔로 허리를 감싸고, 내 한쪽 다리를 환자 다리 사이에 넣어 환자가 쓰러질 때를 대비해 지탱하세요.', stepImage: 'assets/Heimlich2.jpeg' },
-      { title: '손 모양과 위치 잡기', desc: '한쪽 주먹의 엄지손가락 쪽 면을 배꼽과 명치 사이에 대고, 다른 손으로 그 주먹을 꽉 움켜쥐십시오.', stepImage: 'assets/Heimlich3.jpeg' },
-      { title: '강하게 밀어 올리기', desc: '환자의 배를 안쪽 위 방향(J자 모양)으로 강하게 들어 올리듯 반복해서 당기십시오.', tip: '이물질이 나오거나 환자가 의식을 잃을 때까지 반복하세요.', stepImage: 'assets/Heimlich4.jpeg' }
+      { title: '의식 및 상태 확인', desc: '환자 뒤로 가서 말을 걸어보세요. 목을 감싸고 말을 전혀 못 하면 즉시 처치를 시작합니다.', tip: '환자가 기침을 할 수 있다면 계속하게 하세요.', stepImage: '/assets/Fracture_Dislocation/Heimlich_Maneuver-01.png' },
+      { title: '자세 잡고 지탱하기', desc: '환자 뒤에 서서 양팔로 허리를 감싸고, 내 한쪽 다리를 환자 다리 사이에 넣어 환자가 쓰러질 때를 대비해 지탱하세요.', stepImage: '/assets/Fracture_Dislocation/Heimlich_Maneuver-02.png' },
+      { title: '손 모양과 위치 잡기', desc: '한쪽 주먹의 엄지손가락 쪽 면을 배꼽과 명치 사이에 대고, 다른 손으로 그 주먹을 꽉 움켜쥐십시오.', stepImage: '/assets/Fracture_Dislocation/Heimlich_Maneuver-03.png' },
+      { title: '강하게 밀어 올리기', desc: '환자의 배를 안쪽 위 방향(J자 모양)으로 강하게 들어 올리듯 반복해서 당기십시오.', tip: '이물질이 나오거나 환자가 의식을 잃을 때까지 반복하세요.', stepImage: '/assets/Fracture_Dislocation/Heimlich_Maneuver-04.png' }
     ],
     dos: ['이물질이 튀어나올 때까지 최대한 강하게 하세요', '환자가 의식을 잃으면 즉시 바닥에 눕히고 심폐소생술을 시작하세요'],
     donts: ['입안에 이물질이 보이지 않는데 손가락을 넣어 쑤시지 마세요', '임산부는 복부가 아닌 가슴 부위를 압박하세요'],
@@ -43,9 +43,9 @@ const ACTION_GUIDES = {
     riskLevel: '3',
     protocol: 'SOP-AIR-03',
     steps: [
-      { title: '머리 기울이기-턱 올리기', desc: '한 손을 이마에 대고 머리를 뒤로 젖히며, 다른 손가락으로 턱뼈를 들어 올려 기도를 확보하십시오.', stepImage: 'assets/Unconscious1.jpeg' },
-      { title: '입안 이물질 제거', desc: '눈에 보이는 구토물이나 이물질이 있다면 머리를 옆으로 돌려 손가락으로 가볍게 제거하십시오.', stepImage: 'assets/Unconscious2.jpeg' },
-      { title: '산소 마스크 공급', desc: '산소 마스크를 코와 입에 완전히 밀착시키고, 유량을 15L/min 이상으로 높게 설정하십시오.', stepImage: 'assets/Unconscious3.jpeg' }
+      { title: '머리 기울이기-턱 올리기', desc: '한 손을 이마에 대고 머리를 뒤로 젖히며, 다른 손가락으로 턱뼈를 들어 올려 기도를 확보하십시오.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-01.png' },
+      { title: '입안 이물질 제거', desc: '눈에 보이는 구토물이나 이물질이 있다면 머리를 옆으로 돌려 손가락으로 가볍게 제거하십시오.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-02.png' },
+      { title: '산소 마스크 공급', desc: '산소 마스크를 코와 입에 완전히 밀착시키고, 유량을 15L/min 이상으로 높게 설정하십시오.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-03.png' }
     ],
     dos: ['환자가 자가 호흡 중이면 옆으로 눕히세요', '구토 시 즉시 몸 전체를 옆으로 돌리세요'],
     donts: ['의식이 없는 환자에게 물을 먹이지 마세요', '머리 밑에 베개를 넣어 기도를 꺾지 마세요'],
@@ -58,9 +58,9 @@ const ACTION_GUIDES = {
     riskLevel: '3',
     protocol: 'SOP-BLD-02',
     steps: [
-      { title: '상처 노출 및 확인', desc: '옷을 가위로 잘라 상처 부위를 완전히 드러내고 정확한 출혈 지점을 확인하십시오.', stepImage: 'assets/Trauma1.jpeg' },
-      { title: '직접 압박 시행', desc: '멸균 거즈나 깨끗한 천을 대고 손바닥 전체로 체중을 실어 강하게 누르십시오.', tip: '거즈가 피에 젖어도 떼지 말고 위에 계속 덧대세요.', stepImage: 'assets/Trauma2.jpeg' },
-      { title: '지혈대(T-kit) 적용', desc: '대량 출혈이 멈추지 않는 팔/다리 상처 시, 상처 5~10cm 위쪽에 지혈대를 감고 막대를 돌려 고정하십시오.', stepImage: 'assets/Trauma3.jpeg' }
+      { title: '상처 노출 및 확인', desc: '옷을 가위로 잘라 상처 부위를 완전히 드러내고 정확한 출혈 지점을 확인하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-01.png' },
+      { title: '직접 압박 시행', desc: '멸균 거즈나 깨끗한 천을 대고 손바닥 전체로 체중을 실어 강하게 누르십시오.', tip: '거즈가 피에 젖어도 떼지 말고 위에 계속 덧대세요.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-02.png' },
+      { title: '지혈대(T-kit) 적용', desc: '대량 출혈이 멈추지 않는 팔/다리 상처 시, 상처 5~10cm 위쪽에 지혈대를 감고 막대를 돌려 고정하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-03.png' }
     ],
     dos: ['출혈 부위를 심장보다 높게 유지하세요', '지혈대 사용 시 착용 시각을 환자의 몸에 기록하세요'],
     donts: ['상처에 박힌 칼 등을 억지로 뽑지 마세요', '가루약, 된장 등 이물질을 바르지 마세요'],
@@ -73,9 +73,9 @@ const ACTION_GUIDES = {
     riskLevel: '2',
     protocol: 'SOP-BRN-08',
     steps: [
-      { title: '즉시 흐르는 물 냉각', desc: '흐르는 찬물에 20분 이상 외상 부위의 열을 식히십시오. 얼음물은 피하십시오.', stepImage: 'assets/Burn1.jpeg' },
-      { title: '의복 및 장신구 제거', desc: '상처 부위 옷을 가위로 자르고, 부종이 생기기 전 반지나 시계를 신속히 제거하십시오.', tip: '피부에 붙은 옷은 억지로 떼지 마세요.', stepImage: 'assets/Burn2.jpeg' },
-      { title: '외상 부위 보호', desc: '연고를 바르지 말고, 깨끗한 거즈나 비닐 랩으로 외상 부위를 느슨하게 덮어 외부 오염을 차단하십시오.', stepImage: 'assets/Burn3.jpeg' }
+      { title: '즉시 흐르는 물 냉각', desc: '흐르는 찬물에 20분 이상 외상 부위의 열을 식히십시오. 얼음물은 피하십시오.', stepImage: '/assets/Fracture_Dislocation/Burn-01.png' },
+      { title: '의복 및 장신구 제거', desc: '상처 부위 옷을 가위로 자르고, 부종이 생기기 전 반지나 시계를 신속히 제거하십시오.', tip: '피부에 붙은 옷은 억지로 떼지 마세요.', stepImage: '/assets/Fracture_Dislocation/Burn-02.png' },
+      { title: '외상 부위 보호', desc: '연고를 바르지 말고, 깨끗한 거즈나 비닐 랩으로 외상 부위를 느슨하게 덮어 외부 오염을 차단하십시오.', stepImage: '/assets/Fracture_Dislocation/Burn-03.png' }
     ],
     dos: ['물집이 있다면 터뜨리지 말고 보호하세요', '통증이 심하면 시원한 물수건으로 계속 덮으세요'],
     donts: ['얼음을 외상 부위에 직접 대지 마세요', '버터, 치약, 간장 등을 바르는 민간요법은 금물입니다'],
@@ -88,9 +88,9 @@ const ACTION_GUIDES = {
     riskLevel: '2',
     protocol: 'SOP-HYP-05',
     steps: [
-      { title: '젖은 의복 제거', desc: '바람이 없는 따뜻하고 건조한 곳으로 이동하고, 젖은 옷을 가위로 잘라 제거한 뒤 마른 수건으로 몸을 닦으십시오.', stepImage: 'assets/Hypothermia1.jpeg' },
-      { title: '중심 체온 가온', desc: '담요로 몸을 감싸고, 온팩을 겨드랑이, 사타구니, 목 등 굵은 혈관 부위에 대십시오.', stepImage: 'assets/Hypothermia2.jpeg' },
-      { title: '안정 및 수평 이동', desc: '환자를 갑자기 일으키거나 팔다리를 주무르지 마십시오. 차가운 피가 심장으로 흘러가면 위험합니다.', stepImage: 'assets/Hypothermia3.jpeg' }
+      { title: '젖은 의복 제거', desc: '바람이 없는 따뜻하고 건조한 곳으로 이동하고, 젖은 옷을 가위로 잘라 제거한 뒤 마른 수건으로 몸을 닦으십시오.', stepImage: '/assets/Fracture_Dislocation/Drowning_Hypothermia-01.png' },
+      { title: '중심 체온 가온', desc: '담요로 몸을 감싸고, 온팩을 겨드랑이, 사타구니, 목 등 굵은 혈관 부위에 대십시오.', stepImage: '/assets/Fracture_Dislocation/Drowning_Hypothermia-02.png' },
+      { title: '안정 및 수평 이동', desc: '환자를 갑자기 일으키거나 팔다리를 주무르지 마십시오. 차가운 피가 심장으로 흘러가면 위험합니다.', stepImage: '/assets/Fracture_Dislocation/Drowning_Hypothermia-03.png' }
     ],
     dos: ['의식이 있다면 따뜻하고 단 음료를 주십시오', '환자를 아주 조심스럽게(수평으로) 옮기십시오'],
     donts: ['팔다리를 문지르거나 주무르지 마세요', '뜨거운 물에 환자를 직접 담그지 마세요'],
@@ -103,9 +103,9 @@ const ACTION_GUIDES = {
     riskLevel: '1',
     protocol: 'SOP-FRC-04',
     steps: [
-      { title: '골절 부위 안정화', desc: '다친 부위를 고정하고, 환자가 통증을 가장 적게 느끼는 자세를 손으로 받쳐주거나 유지하게 하십시오.', stepImage: 'assets/Fracture1.jpeg' },
-      { title: '부목 적용', desc: '나무판자나 종이박스로 다친 관절의 위아래를 포함하도록 대고 끈으로 묶어 고정하십시오.', stepImage: 'assets/Fracture2.jpeg' },
-      { title: '말단 순환 확인', desc: '고정 후 손가락이나 발가락 끝을 눌러 혈색이 돌아오는지 확인하고 감각을 체크하십시오.', stepImage: 'assets/Fracture3.jpeg' }
+      { title: '골절 부위 안정화', desc: '다친 부위를 고정하고, 환자가 통증을 가장 적게 느끼는 자세를 손으로 받쳐주거나 유지하게 하십시오.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-01.png' },
+      { title: '부목 적용', desc: '나무판자나 종이박스로 다친 관절의 위아래를 포함하도록 대고 끈으로 묶어 고정하십시오.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-02.png' },
+      { title: '말단 순환 확인', desc: '고정 후 손가락이나 발가락 끝을 눌러 혈색이 돌아오는지 확인하고 감각을 체크하십시오.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-03.png' }
     ],
     dos: ['뼈가 튀어나왔다면 멸균 거즈로 먼저 덮으세요', '외상 부위를 심장보다 높게 올리세요'],
     donts: ['부러진 뼈를 맞추려 하거나 밀어 넣지 마세요', '환자를 일으켜 세우거나 걷게 하지 마세요'],
@@ -118,8 +118,8 @@ const ACTION_GUIDES = {
     riskLevel: '1',
     protocol: 'SOP-WND-06',
     steps: [
-      { title: '이물질 세척', desc: '멸균 식염수나 흐르는 수돗물로 상처 부위의 흙이나 이물질을 충분히 씻어내십시오.', stepImage: 'assets/Wound1.jpeg' },
-      { title: '멸균 드레싱', desc: '상처에 달라붙지 않는 멸균 거즈로 덮고, 반창고나 붕대로 고정하십시오.', stepImage: 'assets/Wound2.jpeg' }
+      { title: '이물질 세척', desc: '멸균 식염수나 흐르는 수돗물로 상처 부위의 흙이나 이물질을 충분히 씻어내십시오.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-01.png' },
+      { title: '멸균 드레싱', desc: '상처에 달라붙지 않는 멸균 거즈로 덮고, 반창고나 붕대로 고정하십시오.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-02.png' }
     ],
     dos: ['처치 전 위생 장갑을 반드시 착용하세요', '거즈가 없다면 깨끗한 손수건을 사용하세요'],
     donts: ['상처에 솜(탈지면)을 직접 대지 마세요', '입으로 상처를 빨아내지 마세요'],
@@ -159,8 +159,8 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
 
   const [selectedTriage, setSelectedTriage] = useState(null)
   const [completedSteps, setCompletedSteps] = useState([])
+  const [selectedStepIndex, setSelectedStepIndex] = useState(null)
   const [sessionLogs, setSessionLogs] = useState([])
-  const [hoveredStepIndex, setHoveredStepIndex] = useState(null)
   const [showCompletionPanel, setShowCompletionPanel] = useState(false)
   const [startTime] = useState(new Date())
   const [endTime, setEndTime] = useState(null)
@@ -239,6 +239,10 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const handleStepToggle = (index) => {
     const isDone = completedSteps.includes(index)
     const now = new Date().toLocaleTimeString('ko-KR', { hour12: false })
+    
+    // 마지막 클릭한 번호 고정
+    setSelectedStepIndex(index)
+
     if (activeAction && ACTION_GUIDES[activeAction] && !isDone) {
       const stepTitle = ACTION_GUIDES[activeAction].steps[index].title
       setSessionLogs([{ time: now, text: `${stepTitle} 완료`, type: 'SUCCESS' }, ...sessionLogs])
@@ -261,6 +265,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     setCompletedSteps([])
     setSelectedTriage(null)
     setShowCompletionPanel(false)
+    setSelectedStepIndex(null)
     setTriageStep('CHECK')
   }
 
@@ -361,7 +366,12 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   }
 
   const currentActionData = activeAction ? ACTION_GUIDES[activeAction] : null
-  const activeDisplayIndex = hoveredStepIndex !== null ? hoveredStepIndex : (currentActionData?.steps.findIndex((_, i) => !completedSteps.includes(i)) ?? 0)
+  
+  // 이미지 표시 우선순위 : 마지막으로 클릭한 인덱스 > 첫 번째 미완료 단계
+  const activeDisplayIndex = selectedStepIndex !== null 
+    ? selectedStepIndex 
+    : (currentActionData?.steps.findIndex((_, i) => !completedSteps.includes(i)) ?? 0)
+  
   const stepNum = activeDisplayIndex + 1
 
   return (
@@ -379,8 +389,22 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         <section style={{ gridRow: '1', display: 'flex', flexDirection: 'column' }}>
           <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}><div style={{ fontSize: 18, fontWeight: 950 }}>처치 동작 시각 가이드</div></div>
-            <div style={{ flex: 1, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-              <IllustrationSelector action={activeAction} step={stepNum} />
+            <div style={{ flex: 1, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+              {currentActionData?.steps[activeDisplayIndex]?.stepImage ? (
+                <img 
+                  src={currentActionData.steps[activeDisplayIndex].stepImage} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    objectPosition: (activeAction === '심폐소생술' && activeDisplayIndex === 0) ? '20% 20%' : 'center center'
+                  }} 
+                  alt={currentActionData.steps[activeDisplayIndex].title}
+                  key={`${activeAction}-${activeDisplayIndex}`}
+                />
+              ) : (
+                <IllustrationSelector action={activeAction} step={stepNum} />
+              )}
               
               {activeAction === '심폐소생술' && stepNum >= 3 && (
                 <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', background: beat ? '#ef4444' : '#b91c1c', borderRadius: '0 0 24px 24px', padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 12, transition: '0.1s', zIndex: 20 }}>
@@ -407,9 +431,9 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                 <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444', borderRadius: 20, padding: 18 }}><div style={{ color: '#ef4444', fontSize: 20, fontWeight: 900, marginBottom: 10 }}>절대 금기</div>{currentActionData.donts.map((d, i) => <div key={i} style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginBottom: 6 }}>• {d}</div>)}</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>{currentActionData.steps.map((step, i) => (
-                <div key={i} onClick={() => handleStepToggle(i)} onMouseEnter={() => setHoveredStepIndex(i)} onMouseLeave={() => setHoveredStepIndex(null)} style={{ display: 'flex', gap: 20, padding: '20px 24px', borderRadius: 24, cursor: 'pointer', background: completedSteps.includes(i) ? 'rgba(56,189,248,0.1)' : 'rgba(255,255,255,0.03)', border: `2px solid ${completedSteps.includes(i) ? '#38bdf8' : 'rgba(255,255,255,0.06)'}`, transition: '0.2s' }}>
-                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: completedSteps.includes(i) ? '#38bdf8' : 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center', fontWeight: 950, fontSize: 24, flexShrink: 0, color: completedSteps.includes(i) ? '#000' : '#fff', display: 'flex' }}>{i+1}</div>
-                  <div><div style={{ fontSize: 30, fontWeight: 950, marginBottom: 4, color: completedSteps.includes(i) ? '#fff' : '#e2e8f0', letterSpacing: '-1px' }}>{step.title}</div><div style={{ fontSize: 22, color: completedSteps.includes(i) ? '#fff' : '#94a3b8', fontWeight: 600, lineHeight: 1.4 }}>{step.desc}</div></div>
+                <div key={i} onClick={() => handleStepToggle(i)} style={{ display: 'flex', gap: 20, padding: '20px 24px', borderRadius: 24, cursor: 'pointer', background: selectedStepIndex === i ? 'rgba(56,189,248,0.15)' : completedSteps.includes(i) ? 'rgba(56,189,248,0.05)' : 'rgba(255,255,255,0.03)', border: `2px solid ${selectedStepIndex === i ? '#38bdf8' : completedSteps.includes(i) ? 'rgba(56,189,248,0.3)' : 'rgba(255,255,255,0.06)'}`, transition: '0.2s' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: selectedStepIndex === i ? '#38bdf8' : completedSteps.includes(i) ? 'rgba(56,189,248,0.4)' : 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center', fontWeight: 950, fontSize: 24, flexShrink: 0, color: (selectedStepIndex === i || completedSteps.includes(i)) ? '#000' : '#fff', display: 'flex' }}>{i+1}</div>
+                  <div><div style={{ fontSize: 30, fontWeight: 950, marginBottom: 4, color: (selectedStepIndex === i || completedSteps.includes(i)) ? '#fff' : '#e2e8f0', letterSpacing: '-1px' }}>{step.title}</div><div style={{ fontSize: 22, color: (selectedStepIndex === i || completedSteps.includes(i)) ? '#fff' : '#94a3b8', fontWeight: 600, lineHeight: 1.4 }}>{step.desc}</div></div>
                 </div>
               ))}</div>
               {showCompletionPanel && (
@@ -470,7 +494,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         </aside>
         <section style={{ gridColumn: '1 / 4', gridRow: '2', display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '8px', marginTop: '4px' }}>
           {Object.keys(ACTION_GUIDES).map(key => (
-            <button key={key} onClick={() => {setActiveAction(key); setCompletedSteps([]); setSelectedTriage(null); setShowCompletionPanel(false);}} style={{ background: activeAction === key ? `linear-gradient(135deg, ${ACTION_GUIDES[key].color}, ${ACTION_GUIDES[key].color}dd)` : `${ACTION_GUIDES[key].color}15`, border: '2px solid', borderColor: activeAction === key ? 'transparent' : `${ACTION_GUIDES[key].color}30`, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><div style={{ color: activeAction === key ? '#fff' : ACTION_GUIDES[key].color }}><ActionButtonIcon label={key} size={26} /></div><div style={{ fontSize: 28, fontWeight: 950, color: '#fff', letterSpacing: '-1px' }}>{key}</div></button>
+            <button key={key} onClick={() => {setActiveAction(key); setCompletedSteps([]); setSelectedTriage(null); setShowCompletionPanel(false); setSelectedStepIndex(null);}} style={{ background: activeAction === key ? `linear-gradient(135deg, ${ACTION_GUIDES[key].color}, ${ACTION_GUIDES[key].color}dd)` : `${ACTION_GUIDES[key].color}15`, border: '2px solid', borderColor: activeAction === key ? 'transparent' : `${ACTION_GUIDES[key].color}30`, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><div style={{ color: activeAction === key ? '#fff' : ACTION_GUIDES[key].color }}><ActionButtonIcon label={key} size={26} /></div><div style={{ fontSize: 28, fontWeight: 950, color: '#fff', letterSpacing: '-1px' }}>{key}</div></button>
           ))}
         </section>
       </div>
