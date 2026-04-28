@@ -397,7 +397,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                     width: '100%', 
                     height: '100%', 
                     objectFit: 'cover',
-                    objectPosition: (activeAction === '심폐소생술' && activeDisplayIndex === 0) ? '20% 20%' : 'center center'
+                    objectPosition: (activeAction === '심폐소생술' && activeDisplayIndex === 0) ? '20% 20%' : (activeAction === '심폐소생술' && (activeDisplayIndex === 2 || activeDisplayIndex === 3)) ? 'center 70%' : 'center center'
                   }} 
                   alt={currentActionData.steps[activeDisplayIndex].title}
                   key={`${activeAction}-${activeDisplayIndex}`}
@@ -407,8 +407,8 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
               )}
               
               {activeAction === '심폐소생술' && stepNum >= 3 && (
-                <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', background: beat ? '#ef4444' : '#b91c1c', borderRadius: '0 0 24px 24px', padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 12, transition: '0.1s', zIndex: 20 }}>
-                  <Heart size={18} fill="#fff" color="#fff" /><div style={{ fontSize: 18, fontWeight: 950, color: '#fff' }}>박자에 맞춰 가슴을 힘껏 누르세요</div>
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', background: beat ? '#ef4444' : '#b91c1c', borderRadius: '0 0 32px 32px', padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, transition: '0.1s', zIndex: 50, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', border: '2px solid rgba(255,255,255,0.2)', borderTop: 'none' }}>
+                  <Zap size={36} fill="#fff" color="#fff" /><div style={{ fontSize: 32, fontWeight: 950, color: '#fff', whiteSpace: 'nowrap', textShadow: '0 2px 10px rgba(0,0,0,0.3)', letterSpacing: '-1px' }}>박자에 맞춰 가슴을 힘껏 누르세요</div>
                 </div>
               )}
             </div>
