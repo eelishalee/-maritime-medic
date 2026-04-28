@@ -126,7 +126,7 @@ const GUIDES = {
     title: '화상 긴급 냉각 및 보호', color: '#ff9f43',
     desc: '즉각적인 냉각이 조직 손상을 최소화합니다.',
     steps: [
-      { icon: '💧', title: '흐르는 물에 15분 냉각', desc: '15~20°C 찬물에 최소 15분 이상 노출시켜 열기를 식힙니다.', tip: '얼음물 절대 금지 — 저체온증·혈관 수축 위험.', tipColor: '#ff4d6d', timer: 900, hasCPR: false },
+      { icon: '💧', title: '흐르는 물에 20분 냉각', desc: '12~25°C 찬물에 최소 20분 이상 노출시켜 열기를 식힙니다. 수압은 약하게 유지하십시오.', tip: '얼음물 절대 금지 — 저체온증·혈관 수축 위험.', tipColor: '#ff4d6d', timer: 1200, hasCPR: false },
       { icon: '💍', title: '의복 및 장신구 제거', desc: '피부가 붓기 전 반지·시계 등 신속 제거. 피부에 붙은 옷은 억지로 떼지 않음.', tip: '무리하게 당기면 피부가 함께 벗겨질 수 있습니다.', tipColor: '#ff9f43', timer: null, hasCPR: false },
       { icon: '🩹', title: '멸균 드레싱 보호', desc: '냉각 후 거즈로 느슨하게 덮습니다. 물집은 절대 터뜨리지 않습니다.', tip: '연고·치약·된장 도포 금지 — 감염 유발.', tipColor: '#ff4d6d', timer: null, hasCPR: false },
     ],
@@ -153,6 +153,14 @@ export default function AnalysisEmergency({ patient }) {
   const [protocolId, setProtocolId] = useState(recommended || 'cpr')
   const [stepIdx, setStepIdx] = useState(0)
 
+  // 환자 실데이터로 바이탈 구성
+  const patientVitals = [
+    { label: '심박수',      value: patient?.hr   ?? 96,   unit: 'bpm',  normal: '60–100',    status: (patient?.hr ?? 96) > 100 || (patient?.hr ?? 96) < 60 ? 'critical' : 'warn',     trend: 'up',   Icon: Heart,       color: (patient?.hr ?? 96) > 100 ? '#ff4d6d' : '#ff9f43' },
+    { label: '수축기 혈압', value: patient?.sbp  ?? 158,  unit: 'mmHg', normal: '< 120',     status: (patient?.sbp ?? 158) > 140 ? 'critical' : 'warn', trend: 'up',   Icon: Activity,    color: (patient?.sbp ?? 158) > 140 ? '#ff4d6d' : '#ff9f43' },
+    { label: '산소포화도',  value: patient?.spo2 ?? 94,   unit: '%',    normal: '95–100',    status: (patient?.spo2 ?? 94) < 95 ? 'critical' : 'warn',  trend: 'down', Icon: Droplets,    color: (patient?.spo2 ?? 94) < 95 ? '#ff4d6d' : '#ff9f43' },
+    { label: '체온',        value: patient?.temp ?? 37.6, unit: '°C',   normal: '36.5–37.5', status: (patient?.temp ?? 37.6) > 37.8 ? 'warn' : 'normal', trend: 'up',   Icon: Thermometer, color: '#ff9f43' },
+  ]
+
   const selectProtocol = (id) => { setProtocolId(id); setStepIdx(0) }
   const goStep = (i) => setStepIdx(Math.max(0, Math.min(i, GUIDES[protocolId].steps.length - 1)))
 
@@ -165,7 +173,7 @@ export default function AnalysisEmergency({ patient }) {
       />
       {/* Divider */}
       <div style={{ background: 'linear-gradient(180deg, transparent, #0dd9c5, transparent)', opacity: 0.3 }} />
-      <AIPanel patient={patient} diagIdx={diagIdx} setDiagIdx={setDiagIdx} />
+      <AIPanel patient={patient} diagIdx={diagIdx} setDiagIdx={setDiagIdx} patientVitals={patientVitals} />
     </div>
   )
 }
@@ -258,7 +266,8 @@ function StatusDot({ color, blink = false }) {
 //  AI ANALYSIS PANEL  —  Bento Grid
 // ═══════════════════════════════════════════════
 
-function AIPanel({ patient, diagIdx, setDiagIdx }) {
+function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals }) {
+  const VITALS = patientVitals
   const diag = DIAGNOSES[diagIdx]
   const riskColor = RISK_SCORE >= 70 ? '#ff4d6d' : RISK_SCORE >= 40 ? '#ff9f43' : '#26de81'
 

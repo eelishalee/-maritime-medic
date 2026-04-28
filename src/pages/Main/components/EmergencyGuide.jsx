@@ -1,4 +1,5 @@
 import { Timer } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { StepItem, SymptomTab } from '../../../components/ui'
 import { CardiacIllustration, TraumaIllustration, UnconsciousIllustration, RespiratoryIllustration } from '../../../components/EmergencyIllustrations'
 
@@ -12,6 +13,22 @@ const Anim3D = ({ activeEmergencyGuide, activeStep }) => {
 }
 
 export default function EmergencyGuide({ activeEmergencyGuide, setActiveEmergencyGuide, activeStep, setActiveStep }) {
+  const GOLDEN_TIME = 42 * 60 + 15 // 42분 15초 (초 단위)
+  const [remaining, setRemaining] = useState(GOLDEN_TIME)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRemaining(r => (r > 0 ? r - 1 : 0))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60)
+    const s = secs % 60
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  }
+  const isUrgent = remaining < 10 * 60 // 10분 미만이면 빨간색 강조
   const GUIDES = {
     CARDIAC: {
       steps: [
@@ -72,9 +89,11 @@ export default function EmergencyGuide({ activeEmergencyGuide, setActiveEmergenc
     <div className="fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ fontSize: 32, fontWeight: 900 }}>증상별 응급 처치 가이드</h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 24px', background: 'rgba(251,113,133,0.1)', borderRadius: 18, border: '1px solid rgba(251,113,133,0.2)' }}>
-          <Timer size={24} color="#fb7185" />
-          <span style={{ fontSize: 20, fontWeight: 800, color: '#fb7185' }}>골든타임 : 42:15</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 24px', background: isUrgent ? 'rgba(239,68,68,0.15)' : 'rgba(251,113,133,0.1)', borderRadius: 18, border: `1px solid ${isUrgent ? 'rgba(239,68,68,0.5)' : 'rgba(251,113,133,0.2)'}`, animation: isUrgent ? 'pulse 0.8s infinite' : 'none' }}>
+          <Timer size={24} color={isUrgent ? '#ef4444' : '#fb7185'} />
+          <span style={{ fontSize: 20, fontWeight: 800, color: isUrgent ? '#ef4444' : '#fb7185' }}>
+            골든타임 : {formatTime(remaining)}{remaining === 0 ? ' — 초과!' : ''}
+          </span>
         </div>
       </div>
       <div style={{ display: 'flex', gap: 18, marginBottom: 20 }}>
