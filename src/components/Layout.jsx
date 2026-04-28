@@ -89,16 +89,25 @@ export default function Layout({ activePage, onNavigate, auth, onLogout, isOnlin
         </div>
 
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 5,
-          padding: '4px 10px', borderRadius: 6,
-          background: isOnline ? 'rgba(38,222,129,0.1)' : 'rgba(255,77,109,0.1)',
-          border: `1px solid ${isOnline ? 'rgba(38,222,129,0.3)' : 'rgba(255,77,109,0.3)'}`,
+          display: 'flex', alignItems: 'center', gap: 10,
+          padding: '10px 24px', borderRadius: 12,
+          background: isOnline ? 'rgba(38,222,129,0.1)' : 'rgba(244,63,94,0.15)',
+          border: `2px solid ${isOnline ? 'rgba(38,222,129,0.4)' : 'rgba(244,63,94,0.5)'}`,
+          animation: isOnline ? 'none' : 'blink 4s infinite',
+          boxShadow: isOnline ? 'none' : '0 0 15px rgba(244,63,94,0.3)'
         }}>
-          {isOnline ? <Wifi size={11} color="var(--green-400)" /> : <WifiOff size={11} color="var(--red-400)" />}
-          <span style={{ fontSize: 11, fontWeight: 600, color: isOnline ? 'var(--green-400)' : 'var(--red-400)' }}>
-            {isOnline ? 'ON LINE' : 'OFF LINE'}
+          {isOnline ? <Wifi size={24} color="#26de81" /> : <WifiOff size={24} color="#f43f5e" />}
+          <span style={{ fontSize: '20px', fontWeight: 900, color: isOnline ? '#26de81' : '#f43f5e', letterSpacing: '0.5px' }}>
+            {isOnline ? '네트워크 온라인' : '오프라인 모드 작동 중'}
           </span>
         </div>
+        <style>{`
+          @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+          }
+        `}</style>
         {auth && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderLeft: '1px solid var(--border)', paddingLeft: 12 }}>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>

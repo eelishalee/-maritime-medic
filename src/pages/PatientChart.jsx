@@ -184,13 +184,29 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
   // 환자 변경 시 바이탈 데이터 동기화
   useEffect(() => {
     if (patient) {
-      setVitals({
-        bp: patient.vitals?.bp || '',
-        hr: patient.vitals?.hr || '',
-        rr: patient.vitals?.rr || '16',
-        temp: patient.vitals?.temp || '',
-        spo2: patient.vitals?.spo2 || ''
-      })
+      const isS3 = patient.id === 'S26-003';
+      
+      // 박기관 외 환자들을 위한 1인 1센서 할당 로직
+      const getInitialVitals = () => {
+        if (isS3) return {
+          bp: '158/95', hr: '92', rr: '18', temp: '37.8', spo2: '98'
+        };
+
+        const v = { bp: '', hr: '', rr: '', temp: '', spo2: '' };
+        const idNum = parseInt(patient.id.split('-')[1]) || 0;
+        const sensorType = idNum % 5; // 0:HR, 1:SpO2, 2:Temp, 3:BP, 4:RR
+
+        if (sensorType === 0) v.hr = '72';
+        else if (sensorType === 1) v.spo2 = '98';
+        else if (sensorType === 2) v.temp = '36.5';
+        else if (sensorType === 3) v.bp = '120/80';
+        else if (sensorType === 4) v.rr = '16';
+        
+        return v;
+      };
+
+      setVitals(getInitialVitals());
+
       // 기존 선택값 초기화
       setMainComplaint('')
       setPainAreas([])
@@ -202,6 +218,38 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
       setShowPlan(false)
     }
   }, [selectedId])
+
+  // 실시간 센서 데이터 시뮬레이션 (박기관 및 기타 환자 통합)
+  useEffect(() => {
+    let interval;
+    if (patient) {
+      interval = setInterval(() => {
+        setVitals(prev => {
+          const next = { ...prev };
+          const idNum = parseInt(patient.id.split('-')[1]) || 0;
+          const sensorType = idNum % 5;
+
+          if (patient.id === 'S26-003') {
+            // 박기관은 전체 데이터 시뮬레이션
+            next.hr = (92 + Math.floor(Math.random() * 5) - 2).toString();
+            next.spo2 = (98 + Math.floor(Math.random() * 2) - 1).toString();
+            next.rr = (18 + Math.floor(Math.random() * 3) - 1).toString();
+            next.temp = (37.8 + (Math.random() * 0.2 - 0.1)).toFixed(1);
+            next.bp = `158/${95 + Math.floor(Math.random() * 4) - 2}`;
+          } else {
+            // 그 외 환자들은 할당된 1개 센서만 시뮬레이션
+            if (sensorType === 0) next.hr = (72 + Math.floor(Math.random() * 4) - 2).toString();
+            else if (sensorType === 1) next.spo2 = (97 + Math.floor(Math.random() * 3)).toString();
+            else if (sensorType === 2) next.temp = (36.5 + (Math.random() * 0.2 - 0.1)).toFixed(1);
+            else if (sensorType === 3) next.bp = `120/${80 + Math.floor(Math.random() * 4) - 2}`;
+            else if (sensorType === 4) next.rr = (16 + Math.floor(Math.random() * 2) - 1).toString();
+          }
+          return next;
+        });
+      }, 3000);
+    }
+    return () => clearInterval(interval);
+  }, [patient?.id]);
 
   // 증상 및 조치 상태
   const [mainComplaint, setMainComplaint] = useState('')
@@ -343,36 +391,74 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
     }
   }
 
-  // AI 동적 진단 로직
+  // AI 동적 진단 로직 (비의료진 처치 가이드 강화)
   const getAIDiagnosis = () => {
     const allKey = [...selectedSymptoms, ...painAreas]
-    if (allKey.length === 0) return null
+    if (allKey.length === 0) return { 
+      briefing: "증상을 선택하면 AI 분석이 시작됩니다.", 
+      guide: ["활력 징후 모니터링", "환자 안정 유지"], 
+      meds: ["상비약 확인"] 
+    }
 
     let briefing = "입력된 데이터를 바탕으로 분석 중입니다. 활력 징후를 지속적으로 모니터링하십시오."
-    let guide = ["환자를 편안한 자세로 안정", "수분 섭취 제한 및 경과 관찰", "추가 증상 발생 시 즉시 보고"]
+    let guide = ["환자를 편안한 자세로 안정", "추가 증상 발생 시 즉시 보고", "원격 의료진 연결 대기"]
     let meds = ["해열·진통·소염제"]
 
     // 특정 증상별 맞춤형 로직
     if (allKey.some(s => s.includes('머리') || s.includes('두통') || s.includes('얼굴'))) {
-      briefing = "두부 통증은 뇌압 상승이나 단순 피로일 수 있습니다. 빛을 차단하고 안정을 취하게 하십시오."
-      guide = ["조명을 어둡게 하고 절대 안정", "머리에 찬 수건으로 냉찜질", "의식 상태(말 어눌함 등) 수시 확인"]
-      meds = ["해열·진통·소염제", "종합감기약"]
+      briefing = "두부 통증 및 관련 증상은 뇌압 변화 또는 신경계 피로일 수 있습니다. 의식 상태 변화를 주의 깊게 살피십시오."
+      guide = [
+        "조명을 어둡게 하고 조용한 환경에서 절대 안정",
+        "머리를 30도 정도 높게 유지하여 뇌압 상승 방지",
+        "말이 어눌해지거나 팔다리 힘 빠짐이 있는지 10분 간격 확인",
+        "자극적인 음식이나 카페인 섭취 금지"
+      ]
+      meds = ["타이레놀(아세트아미노펜)", "진통제"]
     } else if (allKey.some(s => s.includes('복부') || s.includes('구토') || s.includes('설사'))) {
-      briefing = "위장관 염증 또는 식중독 의심 증상입니다. 탈수 방지가 중요하며 복부 압박을 피하십시오."
-      guide = ["증상 호전 시까지 금식 권장", "따뜻한 물로 소량씩 수분 보충", "복부를 따뜻하게 유지"]
-      meds = ["소화제/제산제", "지사제"]
+      briefing = "급성 위장염 또는 식중독 의심 증상입니다. 탈수 방지와 복부 압박 완화가 우선입니다."
+      guide = [
+        "증상 호전 시까지 음식 섭취를 제한(금식 권장)",
+        "미지근한 물 또는 이온음료를 소량씩 자주 섭취",
+        "복부를 따뜻하게 유지하고 왼쪽으로 눕혀 가스 배출 유도",
+        "심한 통증 시 복부를 누르지 말고 구부린 자세 유지"
+      ]
+      meds = ["소화제", "제산제", "지사제(설사 시)"]
     } else if (allKey.some(s => s.includes('발열') || s.includes('감기') || s.includes('목'))) {
-      briefing = "감염성 질환으로 인한 고열 증세가 의심됩니다. 체온 조절과 격리 조치를 검토하십시오."
-      guide = ["실내 환기 및 적정 습도 유지", "미온수로 몸을 닦아 체온 조절", "충분한 휴식과 비타민 섭취"]
-      meds = ["해열·진통·소염제", "종합감기약", "콧물/기침약"]
-    } else if (allKey.some(s => s.includes('어깨') || s.includes('다리') || s.includes('무릎') || s.includes('허리') || s.includes('손목'))) {
-      briefing = "근골격계 손상 또는 염좌가 의심됩니다. 해당 부위의 움직임을 최소화하고 고정하십시오."
-      guide = ["환부를 높게 올리고 이동 제한", "초기 24시간 냉찜질 권장", "압박 붕대로 환부 고정"]
-      meds = ["해열·진통·소염제", "파스/근육통약", "연고/소독액"]
+      briefing = "감염성 질환으로 인한 고열 및 전신 증상입니다. 체온 조절과 교차 감염 예방이 필요합니다."
+      guide = [
+        "실내 온도를 20-22도로 유지하고 가습기 사용",
+        "미온수를 적신 수건으로 겨드랑이, 사타구니를 닦아 체온 하강 유도",
+        "충분한 수분 보충과 함께 고단백 위주의 가벼운 식사",
+        "다른 선원들과의 접촉을 피하고 마스크 착용"
+      ]
+      meds = ["해열진통제", "종합감기약", "기침/콧물약"]
+    } else if (allKey.some(s => s.includes('어깨') || s.includes('다리') || s.includes('무릎') || s.includes('허리') || s.includes('손목') || s.includes('팔'))) {
+      briefing = "근골격계 손상 또는 염좌가 의심됩니다. 추가 손상 방지를 위한 RICE 원칙을 적용하십시오."
+      guide = [
+        "Rest(안정) : 환부를 움직이지 않게 고정 및 휴식",
+        "Ice(냉찜질) : 15분 간격으로 냉찜질 시행 (부종/통증 완화)",
+        "Compression(압박) : 압박 붕대로 환부를 적당한 강도로 고정",
+        "Elevation(거상) : 환부를 심장보다 높게 유지하여 부종 감소"
+      ]
+      meds = ["파스/근육통약", "소염진통제", "연고/소독액"]
     } else if (allKey.some(s => s.includes('발진') || s.includes('가려움') || s.includes('피부'))) {
-      briefing = "알레르기 반응 또는 접촉성 피부염 의심. 원인 물질(음식, 약물, 화학물)을 차단하십시오."
-      guide = ["환부를 긁지 않도록 주의", "미온수로 가볍게 세척", "호흡 곤란 발생 시 즉시 보고"]
+      briefing = "알레르기 반응 또는 접촉성 피부염입니다. 원인 물질 차단과 환부 자극 최소화가 중요합니다."
+      guide = [
+        "환부를 긁지 않도록 주의 (2차 감염 방지)",
+        "비누 없이 미온수로 가볍게 씻어내고 물기만 제거",
+        "증상 부위에 차가운 수건을 대어 가려움증 완화",
+        "호흡 곤란이나 입술 부어오름 발생 시 즉시 응급 보고"
+      ]
       meds = ["항히스타민제", "스테로이드 연고"]
+    } else if (allKey.some(s => s.includes('흉통') || s.includes('가슴') || s.includes('호흡'))) {
+      briefing = "흉부 통증 및 호흡 곤란은 심폐기관의 이상 징후일 수 있습니다. 즉각적인 의료진 연결이 필수입니다."
+      guide = [
+        "상의 단추나 벨트를 풀고 호흡이 편한 자세(반좌위) 유지",
+        "지속적으로 의식을 확인하고 말을 시키지 않음",
+        "주변에 AED(자동심장충격기) 위치 확인 및 비치",
+        "산소 공급이 가능할 경우 저농도 산소 투여 검토"
+      ]
+      meds = ["의사 지시 전 약물 투여 금지"]
     }
 
     return { briefing, guide, meds }
@@ -477,7 +563,7 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
               <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(20px)', border: '1.5px solid rgba(56,189,248,0.3)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', zIndex: 1000 }}>
                 {dynamicCrewList.map(c => (
                   <div key={c.id} onClick={() => { setSelectedId(c.id); setIsSelectOpen(false); }} style={{ padding: '16px 20px', fontSize: '20px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: selectedId === c.id ? 'rgba(56,189,248,0.2)' : 'transparent' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><div style={{ width: 10, height: 12, borderRadius: '50%', background: c.isEmergency ? '#ff4d6d' : '#26de81' }} />{c.name} ({c.role})</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><div style={{ width: 12, height: 12, borderRadius: '50%', background: c.isEmergency ? '#ff4d6d' : '#26de81' }} />{c.name} ({c.role})</div>
                     {c.isEmergency && <AlertTriangle size={18} color="#ff4d6d" />}
                   </div>
                 ))}
@@ -917,39 +1003,34 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
                         </div>
                         <div style={{ fontSize: '28px', fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
                           AI 실시간 증상 분석 리포트
-                          <span style={{ fontSize: '15px', padding: '2px 8px', borderRadius: 6, background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }}>베타 버전</span>
                         </div>
                       </div>
 
                       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 20 }}>
                         {/* 분석 브리핑 */}
                         <div style={{ background: 'rgba(15, 23, 42, 0.4)', padding: '20px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <div style={{ fontSize: '20px', color: '#38bdf8', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><ShieldCheck size={22}/> 분석 브리핑</div>
-                          <div style={{ fontSize: '24px', color: '#e2e8f0', fontWeight: 700, lineHeight: 1.6 }}>
-                            {painAreas.length > 0 || selectedSymptoms.length > 0 ? (
-                              <>선택된 <span style={{ color: '#38bdf8' }}>{painAreas[0] || selectedSymptoms[0]}</span> 증상은 초기 대응이 중요합니다. 활력 징후가 안정적이므로 가이드에 따른 처치 후 경과를 관찰하십시오.</>
-                            ) : (
-                              <span style={{ color: '#64748b' }}>증상을 선택하면 AI 분석이 시작됩니다.</span>
-                            )}
+                          <div style={{ fontSize: '24px', color: '#38bdf8', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><ShieldCheck size={24}/> 분석 브리핑</div>
+                          <div style={{ fontSize: '28px', color: '#e2e8f0', fontWeight: 700, lineHeight: 1.5 }}>
+                            {aiResult.briefing}
                           </div>
                         </div>
 
                         {/* 권장 처치 가이드 */}
                         <div style={{ background: 'rgba(15, 23, 42, 0.4)', padding: '20px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <div style={{ fontSize: '20px', color: '#26de81', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Activity size={22}/> 비의료진 권장 처치</div>
-                          <ul style={{ margin: 0, padding: '0 0 0 24px', fontSize: '22px', color: '#cbd5e1', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                            <li>환부를 높게 유지하고 안정</li>
-                            <li>15분 간격 아이싱 (부종 완화)</li>
-                            <li>심리적 안정 유도</li>
+                          <div style={{ fontSize: '24px', color: '#26de81', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Activity size={24}/> 비의료진 권장 처치</div>
+                          <ul style={{ margin: 0, padding: '0 0 0 28px', fontSize: '26px', color: '#cbd5e1', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            {aiResult.guide.map((item, idx) => (
+                              <li key={idx}>{item}</li>
+                            ))}
                           </ul>
                         </div>
 
                         {/* 제안 상비약 */}
                         <div style={{ background: 'rgba(15, 23, 42, 0.4)', padding: '20px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <div style={{ fontSize: '20px', color: '#fb923c', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Pill size={22}/> AI 추천 상비약</div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                            {['타이레놀', '소염진통제'].map(m => (
-                              <span key={m} style={{ fontSize: '18px', padding: '6px 14px', borderRadius: 8, background: 'rgba(251, 146, 60, 0.15)', color: '#fb923c', border: '1px solid rgba(251, 146, 60, 0.3)', fontWeight: 800 }}>{m}</span>
+                          <div style={{ fontSize: '24px', color: '#fb923c', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Pill size={24}/> AI 추천 상비약</div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                            {aiResult.meds.map((m, idx) => (
+                              <span key={idx} style={{ fontSize: '21px', padding: '8px 18px', borderRadius: 10, background: 'rgba(251, 146, 60, 0.15)', color: '#fb923c', border: '1px solid rgba(251, 146, 60, 0.3)', fontWeight: 800 }}>{m}</span>
                             ))}
                           </div>
                         </div>
@@ -964,8 +1045,24 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
                         <AlertTriangle size={14} /> 처방약 투여 시 반드시 기록
                       </span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12, marginBottom: 20 }}>
-                      {OTC_MEDS.map(m => (<button key={m.id} onClick={() => toggleMed(m.name)} style={{ padding: '15px 10px', borderRadius: 15, textAlign: 'center', cursor: 'pointer', background: selectedMeds.includes(m.name) ? 'rgba(38,222,129,0.15)' : 'rgba(255,255,255,0.02)', border: `1.5px solid ${selectedMeds.includes(m.name) ? '#26de81' : 'rgba(255,255,255,0.1)'}`, transition: '0.2s' }}><div style={{ fontSize: '18.5px', fontWeight: 900, color: selectedMeds.includes(m.name) ? '#26de81' : '#fff' }}>{m.name}</div></button>))}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 16, marginBottom: 25 }}>
+                      {OTC_MEDS.map(m => (
+                        <button 
+                          key={m.id} 
+                          onClick={() => toggleMed(m.name)} 
+                          style={{ 
+                            padding: '20px 10px', 
+                            borderRadius: 20, 
+                            textAlign: 'center', 
+                            cursor: 'pointer', 
+                            background: selectedMeds.includes(m.name) ? 'rgba(38,222,129,0.15)' : 'rgba(255,255,255,0.02)', 
+                            border: `1.5px solid ${selectedMeds.includes(m.name) ? '#26de81' : 'rgba(255,255,255,0.1)'}`, 
+                            transition: '0.2s' 
+                          }}
+                        >
+                          <div style={{ fontSize: '24px', fontWeight: 900, color: selectedMeds.includes(m.name) ? '#26de81' : '#fff' }}>{m.name}</div>
+                        </button>
+                      ))}
                     </div>
                     <InputBox label="" placeholder={selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? "초응급 처치 수행 내역과 원격 지시 사항을 상세히 기록하십시오." : "AI 제안 사항 중 수행한 내용이나, 원격 의사의 추가 지시 사항을 기록하세요."} isTextArea value={otherActions} onChange={(v) => { setOtherActions(v); }} />
                   </div>

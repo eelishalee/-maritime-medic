@@ -65,7 +65,7 @@ export default function App() {
         onNavigate={handleNavigate}
         auth={{ shipNo: auth.ship || 'MV KOREA STAR', deviceNo: auth.device || 'MED-001' }}
         onLogout={() => setAuth(null)}
-        isOnline={page !== 'emergency'}
+        isOnline={false}
       />
       <div style={{ flex: 1, overflow: 'hidden' }}>
         {page === 'main'      && <Main patient={activePatient} onNavigate={handleNavigate} onSwitchPatient={setActivePatient} />}
