@@ -45,7 +45,9 @@ const ACTION_GUIDES = {
     steps: [
       { title: '머리 기울이기-턱 올리기', desc: '한 손을 이마에 대고 머리를 뒤로 젖히며, 다른 손가락으로 턱뼈를 들어 올려 기도를 확보하십시오.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-01.png' },
       { title: '입안 이물질 제거', desc: '눈에 보이는 구토물이나 이물질이 있다면 머리를 옆으로 돌려 손가락으로 가볍게 제거하십시오.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-02.png' },
-      { title: '산소 마스크 공급', desc: '산소 마스크를 코와 입에 완전히 밀착시키고, 유량을 15L/min 이상으로 높게 설정하십시오.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-03.png' }
+      { title: '의복 이완 및 조임 해제', desc: '넥타이, 벨트, 상의 단추 등 환자의 호흡을 방해하는 조이는 의복을 신속히 풀어주십시오.', tip: '흉부 팽창을 자유롭게 하여 자가 호흡을 돕습니다.' },
+      { title: '회복 자세 유지', desc: '환자가 스스로 숨을 쉰다면 몸을 옆으로 돌려 눕혀 기도가 막히지 않도록 조치하십시오.', tip: '혀가 뒤로 말리거나 구토물에 의한 질식을 예방합니다.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-03.png' },
+      { title: '지속적 상태 관찰', desc: '의료진이 도착할 때까지 환자의 호흡 상태와 의식 변화를 정기적으로 확인하십시오.', tip: '호흡이 멈추면 즉시 심폐소생술(CPR)로 전환하세요.' }
     ],
     dos: ['환자가 자가 호흡 중이면 옆으로 눕히세요', '구토 시 즉시 몸 전체를 옆으로 돌리세요'],
     donts: ['의식이 없는 환자에게 물을 먹이지 마세요', '머리 밑에 베개를 넣어 기도를 꺾지 마세요'],
@@ -60,11 +62,11 @@ const ACTION_GUIDES = {
     steps: [
       { title: '상처 노출 및 확인', desc: '옷을 가위로 잘라 상처 부위를 완전히 드러내고 정확한 출혈 지점을 확인하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-01.png' },
       { title: '직접 압박 시행', desc: '멸균 거즈나 깨끗한 천을 대고 손바닥 전체로 체중을 실어 강하게 누르십시오.', tip: '거즈가 피에 젖어도 떼지 말고 위에 계속 덧대세요.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-02.png' },
-      { title: '지혈대(T-kit) 적용', desc: '대량 출혈이 멈추지 않는 팔/다리 상처 시, 상처 5~10cm 위쪽에 지혈대를 감고 막대를 돌려 고정하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-03.png' }
+      { title: '지혈대(T-kit) 적용', desc: '대량 출혈이 직접 압박으로 멈추지 않을 때만 상처 5~10cm 위쪽(심장 방향)에 지혈대를 감고 막대를 돌려 고정하십시오.', tip: '최종 수단이며, 착용 시각을 환자의 이마 등에 반드시 기록하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-03.png' }
     ],
-    dos: ['출혈 부위를 심장보다 높게 유지하세요', '지혈대 사용 시 착용 시각을 환자의 몸에 기록하세요'],
-    donts: ['상처에 박힌 칼 등을 억지로 뽑지 마세요', '가루약, 된장 등 이물질을 바르지 마세요'],
-    warning: '지혈대는 최후의 수단이며, 한 번 조이면 의료진이 올 때까지 절대 풀지 마십시오.',
+    dos: ['출혈 부위를 심장보다 높게 유지하세요', '지혈대 사용 시 착용 시각을 환자의 몸에 기록하세요', '피부에 직접 닿게 꽉 조이십시오'],
+    donts: ['상처에 박힌 칼 등을 억지로 뽑지 마세요', '가루약, 된장 등 이물질을 바르지 마세요', '지혈대를 옷 위에 감지 마세요'],
+    warning: '지혈대는 최후의 수단이며, 한 번 조이면 의료진의 지시 없이 절대 풀지 마십시오.',
     color: '#ff3b5c'
   },
   '화상': {
@@ -365,6 +367,24 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     )
   }
 
+  const [burnTimer, setBurnTimer] = useState(1200)
+  
+  useEffect(() => {
+    let interval;
+    if (activeAction === '화상' && stepNum === 1 && burnTimer > 0) {
+      interval = setInterval(() => {
+        setBurnTimer(prev => prev - 1)
+      }, 1000)
+    }
+    return () => clearInterval(interval)
+  }, [activeAction, stepNum, burnTimer])
+
+  const formatBurnTime = (seconds) => {
+    const m = Math.floor(seconds / 60)
+    const s = seconds % 60
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  }
+
   const currentActionData = activeAction ? ACTION_GUIDES[activeAction] : null
   
   // 이미지 표시 우선순위 : 마지막으로 클릭한 인덱스 > 첫 번째 미완료 단계
@@ -397,7 +417,9 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                     width: '100%', 
                     height: '100%', 
                     objectFit: 'cover',
-                    objectPosition: (activeAction === '심폐소생술' && activeDisplayIndex === 0) ? '20% 20%' : (activeAction === '심폐소생술' && (activeDisplayIndex === 2 || activeDisplayIndex === 3)) ? 'center 70%' : 'center center'
+                    objectPosition: (activeAction === '심폐소생술' && activeDisplayIndex === 0) ? '20% 20%' : (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? '50% 0%' : (activeAction === '심폐소생술' && activeDisplayIndex === 3) ? 'center 60%' : 'center center',
+                    transform: (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? 'scale(1.2) translateY(-10%)' : 'none',
+                    transition: 'transform 0.3s ease-out'
                   }} 
                   alt={currentActionData.steps[activeDisplayIndex].title}
                   key={`${activeAction}-${activeDisplayIndex}`}
@@ -406,9 +428,32 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                 <IllustrationSelector action={activeAction} step={stepNum} />
               )}
               
-              {activeAction === '심폐소생술' && stepNum >= 3 && (
-                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', background: beat ? '#ef4444' : '#b91c1c', borderRadius: '0 0 32px 32px', padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, transition: '0.1s', zIndex: 50, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', border: '2px solid rgba(255,255,255,0.2)', borderTop: 'none' }}>
-                  <Zap size={36} fill="#fff" color="#fff" /><div style={{ fontSize: 32, fontWeight: 950, color: '#fff', whiteSpace: 'nowrap', textShadow: '0 2px 10px rgba(0,0,0,0.3)', letterSpacing: '-1px' }}>박자에 맞춰 가슴을 힘껏 누르세요</div>
+              {activeAction === '심폐소생술' && stepNum === 3 && (
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', background: beat ? '#ef4444' : '#b91c1c', borderRadius: '0 0 32px 32px', padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: '0.1s', zIndex: 50, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', border: '2px solid rgba(255,255,255,0.2)', borderTop: 'none' }}>
+                  <Zap size={36} fill="#fff" color="#fff" /><div style={{ fontSize: 32, fontWeight: 950, color: '#fff', whiteSpace: 'nowrap', textShadow: '0 2px 10px rgba(0,0,0,0.3)', letterSpacing: '-1px' }}>깜빡임 속도에 맞춰 압박하세요</div>
+                </div>
+              )}
+
+              {activeAction === '화상' && stepNum === 1 && (
+                <div style={{ 
+                  position: 'absolute', 
+                  bottom: '8%', 
+                  right: '3%', 
+                  width: '180px', 
+                  height: '180px', 
+                  borderRadius: '50%', 
+                  background: 'rgba(2, 6, 23, 0.9)', 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  zIndex: 60,
+                  border: '8px solid #ef4444',
+                  boxShadow: '0 15px 40px rgba(0,0,0,0.6)',
+                  animation: burnTimer > 0 ? 'pulse 1.5s infinite' : 'none'
+                }}>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: '#ef4444', marginBottom: 4 }}>냉각 시간</div>
+                  <div style={{ fontSize: 48, fontWeight: 950, color: '#fff', lineHeight: 1, fontFamily: 'monospace' }}>{formatBurnTime(burnTimer)}</div>
                 </div>
               )}
             </div>
@@ -427,8 +472,8 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 24 }}>
-                <div style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 20, padding: 18 }}><div style={{ color: '#22c55e', fontSize: 20, fontWeight: 900, marginBottom: 10 }}>권고 사항</div>{currentActionData.dos.map((d, i) => <div key={i} style={{ fontSize: 20, fontWeight: 700, marginBottom: 6, color: '#e2e8f0' }}>• {d}</div>)}</div>
-                <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444', borderRadius: 20, padding: 18 }}><div style={{ color: '#ef4444', fontSize: 20, fontWeight: 900, marginBottom: 10 }}>절대 금기</div>{currentActionData.donts.map((d, i) => <div key={i} style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginBottom: 6 }}>• {d}</div>)}</div>
+                <div style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 20, padding: 18 }}><div style={{ color: '#22c55e', fontSize: 20, fontWeight: 900, marginBottom: 10 }}>권고 사항</div>{currentActionData.dos.map((d, i) => <div key={i} style={{ fontSize: 20, fontWeight: 700, marginBottom: 6, color: '#e2e8f0', display: 'flex', gap: '8px' }}><span style={{ flexShrink: 0 }}>•</span><span>{d}</span></div>)}</div>
+                <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444', borderRadius: 20, padding: 18 }}><div style={{ color: '#ef4444', fontSize: 20, fontWeight: 900, marginBottom: 10 }}>절대 금기</div>{currentActionData.donts.map((d, i) => <div key={i} style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginBottom: 6, display: 'flex', gap: '8px' }}><span style={{ flexShrink: 0 }}>•</span><span>{d}</span></div>)}</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>{currentActionData.steps.map((step, i) => (
                 <div key={i} onClick={() => handleStepToggle(i)} style={{ display: 'flex', gap: 20, padding: '20px 24px', borderRadius: 24, cursor: 'pointer', background: selectedStepIndex === i ? 'rgba(56,189,248,0.15)' : completedSteps.includes(i) ? 'rgba(56,189,248,0.05)' : 'rgba(255,255,255,0.03)', border: `2px solid ${selectedStepIndex === i ? '#38bdf8' : completedSteps.includes(i) ? 'rgba(56,189,248,0.3)' : 'rgba(255,255,255,0.06)'}`, transition: '0.2s' }}>
