@@ -170,7 +170,7 @@ export default function Settings() {
     offline_sec: true 
   })
   const [signal, setSignal] = useState(genSignal())
-  const [coords, setCoords] = useState({ lat: '35.1028° N', lng: '129.0403° E' })
+  const [coords, setCoords] = useState({ lat: '34.3415° N', lng: '129.0403° E' })
   const [isEditingCoords, setIsEditingCoords] = useState(false)
   const [tempCoords, setTempCoords] = useState({ lat: '', lng: '' })
   const [activities, setActivities] = useState([...SYS_LOGS_INITIAL].reverse())
