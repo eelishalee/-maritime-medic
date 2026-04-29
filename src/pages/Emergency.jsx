@@ -237,12 +237,24 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
 
   const handleSaveVital = () => {
     if (!editTarget) return
+    const val = inputValue.trim()
+    if (!val) return
+    if (editTarget.key === 'bp') {
+      const parts = val.split('/')
+      if (parts.length !== 2 || isNaN(parseInt(parts[0])) || isNaN(parseInt(parts[1]))) {
+        alert('혈압 형식이 올바르지 않습니다. 예: 120/80')
+        return
+      }
+    } else if (isNaN(parseFloat(val))) {
+      alert('숫자를 입력하세요.')
+      return
+    }
     const now = new Date().toLocaleTimeString('ko-KR', { hour12: false })
-    setVitals(prev => ({ ...prev, [editTarget.key]: inputValue }))
-    setSessionLogs([{ 
-      time: now, 
-      text: `${editTarget.label} 수동 업데이트 : ${inputValue}${editTarget.unit}`, 
-      type: 'INFO' 
+    setVitals(prev => ({ ...prev, [editTarget.key]: val }))
+    setSessionLogs([{
+      time: now,
+      text: `${editTarget.label} 수동 업데이트 : ${val}${editTarget.unit}`,
+      type: 'INFO'
     }, ...sessionLogs])
     setEditTarget(null)
   }

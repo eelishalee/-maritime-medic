@@ -5,10 +5,17 @@ import logoImg from '../assets/logo.png'
 export default function Login({ onLogin }) {
   const [loginData, setLoginData] = useState({ serial: 'SN-0001', device: 'MED-01', ship: 'KOREA STAR' })
   const [focusedField, setFocusedField] = useState(null)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onLogin(loginData)
+    if (!loginData.serial.trim()) { setError('시리얼 넘버를 입력하세요.'); return }
+    if (!loginData.device.trim()) { setError('기기 번호를 입력하세요.'); return }
+    if (!loginData.ship.trim()) { setError('선박 번호를 입력하세요.'); return }
+    setError('')
+    setLoading(true)
+    setTimeout(() => { setLoading(false); onLogin(loginData) }, 800)
   }
 
   return (
@@ -85,23 +92,30 @@ export default function Login({ onLogin }) {
               </div>
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <LoginInput icon={<Database size={20}/>} placeholder="시리얼 넘버" value={loginData.serial} onChange={v => setLoginData({...loginData, serial: v})} focused={focusedField === 'serial'} onFocus={() => setFocusedField('serial')} onBlur={() => setFocusedField(null)} />
-                <LoginInput icon={<Settings size={20}/>} placeholder="기기 번호" value={loginData.device} onChange={v => setLoginData({...loginData, device: v})} focused={focusedField === 'device'} onFocus={() => setFocusedField('device')} onBlur={() => setFocusedField(null)} />
-                <LoginInput icon={<Ship size={20}/>} placeholder="선박 번호" value={loginData.ship} onChange={v => setLoginData({...loginData, ship: v})} focused={focusedField === 'ship'} onFocus={() => setFocusedField('ship')} onBlur={() => setFocusedField(null)} />
-                
-                <button 
+                <LoginInput icon={<Database size={20}/>} placeholder="시리얼 넘버" value={loginData.serial} onChange={v => { setLoginData({...loginData, serial: v}); setError('') }} focused={focusedField === 'serial'} onFocus={() => setFocusedField('serial')} onBlur={() => setFocusedField(null)} />
+                <LoginInput icon={<Settings size={20}/>} placeholder="기기 번호" value={loginData.device} onChange={v => { setLoginData({...loginData, device: v}); setError('') }} focused={focusedField === 'device'} onFocus={() => setFocusedField('device')} onBlur={() => setFocusedField(null)} />
+                <LoginInput icon={<Ship size={20}/>} placeholder="선박 번호" value={loginData.ship} onChange={v => { setLoginData({...loginData, ship: v}); setError('') }} focused={focusedField === 'ship'} onFocus={() => setFocusedField('ship')} onBlur={() => setFocusedField(null)} />
+
+                {error && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,77,109,0.1)', border: '1px solid rgba(255,77,109,0.3)', borderRadius: 10, padding: '10px 14px', fontSize: 14, color: '#ff4d6d', fontWeight: 700 }}>
+                    ⚠ {error}
+                  </div>
+                )}
+
+                <button
                   type="submit"
+                  disabled={loading}
                   style={{
-                    marginTop: '10px', padding: '22px', borderRadius: '18px', 
-                    background: 'linear-gradient(90deg, #00c9b1, #00a8e8)', color: '#000', 
-                    border: 'none', fontWeight: '900', fontSize: '19px', cursor: 'pointer',
+                    marginTop: '10px', padding: '22px', borderRadius: '18px',
+                    background: loading ? 'rgba(0,200,180,0.4)' : 'linear-gradient(90deg, #00c9b1, #00a8e8)', color: '#000',
+                    border: 'none', fontWeight: '900', fontSize: '19px', cursor: loading ? 'not-allowed' : 'pointer',
                     boxShadow: '0 4px 28px rgba(0, 200, 180, 0.4)',
                     transition: 'all 0.2s ease'
                   }}
-                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseEnter={e => { if (!loading) e.currentTarget.style.transform = 'translateY(-2px)' }}
                   onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
                 >
-                  시스템 접속
+                  {loading ? '접속 중...' : '시스템 접속'}
                 </button>
               </form>
             </div>

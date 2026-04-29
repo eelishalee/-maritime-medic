@@ -367,6 +367,44 @@ export default function Settings() {
   const [newEdu, setNewEdu] = useState({ name:'', id:'', dept:'', type:'기본 CPR (심폐소생술)', date:'', expiry:'' })
   const [dateEditor, setDateEditor] = useState(null)
 
+  // 관리자 등록 현황
+  const MANAGER_ROLES = ['안전책임자', '의료담당자', '응급처치 담당자', '위생관리 책임자']
+  const [managers, setManagers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('mdts_managers')
+      return saved ? JSON.parse(saved) : [
+        { id: 'S26-001', name: '이선장', role: '안전책임자', dept: '항해부' },
+        { id: 'S26-003', name: '박기관', role: '의료담당자', dept: '기관부' },
+      ]
+    } catch { return [] }
+  })
+  const [isManagerModalOpen, setIsManagerModalOpen] = useState(false)
+  const [newManager, setNewManager] = useState({ id: '', name: '', dept: '', role: '안전책임자' })
+
+  const saveManagers = (list) => {
+    setManagers(list)
+    try { localStorage.setItem('mdts_managers', JSON.stringify(list)) } catch {}
+  }
+
+  const addManager = () => {
+    if (!newManager.id) return alert('선원을 선택하세요.')
+    if (managers.find(m => m.id === newManager.id)) return alert('이미 등록된 선원입니다.')
+    const updated = [...managers, { ...newManager }]
+    saveManagers(updated)
+    setIsManagerModalOpen(false)
+    setNewManager({ id: '', name: '', dept: '', role: '안전책임자' })
+    const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
+    setActivities(p => [...p, { t: nowStr, type: 'success', msg: `관리자 등록 : ${newManager.name} (${newManager.role})` }])
+  }
+
+  const removeManager = (id) => {
+    const target = managers.find(m => m.id === id)
+    const updated = managers.filter(m => m.id !== id)
+    saveManagers(updated)
+    const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
+    setActivities(p => [...p, { t: nowStr, type: 'info', msg: `관리자 해제 : ${target?.name}` }])
+  }
+
   const addEdu = () => {
     if (!newEdu.id || !newEdu.date) return alert('선원과 날짜를 선택하세요.')
     setTrainingList([ { ...newEdu }, ...trainingList ])
@@ -497,20 +535,52 @@ export default function Settings() {
               <div style={{ display:'flex', flexDirection:'column', gap:15 }}>
                 {trainingList.map((r,i)=>(
                   <div key={i} style={{ padding:'20px 25px', borderRadius:18, background:C.panel2, border:`1px solid ${C.border}` }}>
-                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:15 }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
                       <div>
                         <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:6 }}><span style={{ fontSize:26, fontWeight:900, color:'#fff' }}>{r.name}</span><Tag color={C.dim} small style={{ fontSize:15, padding:'4px 10px', color:C.text }}>{r.dept}</Tag></div>
                         <div style={{ fontSize:22, fontWeight:850, color:C.info }}>{r.type}</div>
                       </div>
                       <Tag color={getStatusInfo(r.expiry).color}>{getStatusInfo(r.expiry).label}</Tag>
                     </div>
+                    {r.expiry && (
+                      <div style={{ fontSize:17, color:C.sub, fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
+                        <Clock size={14} color={C.sub}/> 만료일 : <span style={{ color: getStatusInfo(r.expiry).color, fontWeight:900 }}>{r.expiry}</span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             </GPanel>
           </div>
           <div style={{ marginTop: 25 }}>
-            <GPanel 
+            <GPanel
+              title="관리자 등록 현황"
+              icon={<ShieldCheck size={22} color={C.purple}/>}
+              right={<Btn color={C.purple} small onClick={()=>setIsManagerModalOpen(true)}>+</Btn>}
+            >
+              {managers.length === 0 ? (
+                <div style={{ textAlign:'center', padding:'30px 0', color:C.sub, fontSize:20, fontWeight:700 }}>등록된 관리자가 없습니다.</div>
+              ) : (
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:15 }}>
+                  {managers.map((m, i) => (
+                    <div key={m.id} style={{ background:C.panel2, border:`1.5px solid ${C.border}`, borderRadius:16, padding:'22px 20px', position:'relative', display:'flex', flexDirection:'column', gap:10 }}>
+                      <button
+                        onClick={() => removeManager(m.id)}
+                        style={{ position:'absolute', top:12, right:12, background:'rgba(255,77,109,0.1)', border:'1px solid rgba(255,77,109,0.3)', borderRadius:8, width:28, height:28, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}
+                      >
+                        <X size={14} color={C.danger} />
+                      </button>
+                      <div style={{ fontSize:13, fontWeight:800, color:C.purple, background:`${C.purple}18`, padding:'3px 10px', borderRadius:6, border:`1px solid ${C.purple}40`, width:'fit-content' }}>{m.role}</div>
+                      <div style={{ fontSize:26, fontWeight:950, color:'#fff' }}>{m.name}</div>
+                      <div style={{ fontSize:18, color:C.sub, fontWeight:700 }}>{m.dept} · {m.id}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </GPanel>
+          </div>
+          <div style={{ marginTop: 25 }}>
+            <GPanel
               title="필수 의료 약품 및 소모품 재고 관리" 
               icon={<Pill size={22} color={C.warning}/>}
               right={<Btn color={C.warning} small onClick={()=>setIsMedModalOpen(true)}>+</Btn>}
@@ -722,6 +792,49 @@ export default function Settings() {
           </div>
         </Section>
       </div>
+
+      {/* ── 관리자 등록 모달 ── */}
+      {isManagerModalOpen && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', backdropFilter:'blur(10px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:2000 }}>
+          <div style={{ background:C.panel, border:`2px solid ${C.purple}`, borderRadius:24, padding:45, width:560 }}>
+            <div style={{ fontSize:32, fontWeight:950, marginBottom:35, color:C.purple, display:'flex', alignItems:'center', gap:15 }}>
+              <ShieldCheck size={36}/> 관리자 등록
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:20, marginBottom:35 }}>
+              <div>
+                <div style={{ fontSize:18, color:C.sub, fontWeight:800, marginBottom:10 }}>선원 선택</div>
+                <select
+                  value={newManager.id}
+                  onChange={e => {
+                    const crew = CREW.find(c => c.id === e.target.value)
+                    setNewManager(p => ({ ...p, id: e.target.value, name: crew?.name || '', dept: crew?.dept || '' }))
+                  }}
+                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                >
+                  <option value="">-- 선원 선택 --</option>
+                  {CREW.filter(c => !managers.find(m => m.id === c.id)).map(c => (
+                    <option key={c.id} value={c.id}>{c.name} ({c.role} · {c.dept})</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <div style={{ fontSize:18, color:C.sub, fontWeight:800, marginBottom:10 }}>담당 역할</div>
+                <select
+                  value={newManager.role}
+                  onChange={e => setNewManager(p => ({ ...p, role: e.target.value }))}
+                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                >
+                  {MANAGER_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+            </div>
+            <div style={{ display:'flex', gap:15 }}>
+              <button onClick={()=>setIsManagerModalOpen(false)} style={{ flex:1, padding:20, borderRadius:15, background:'rgba(255,255,255,0.03)', border:`1px solid ${C.border}`, color:C.sub, fontSize:22, fontWeight:800, cursor:'pointer' }}>취소</button>
+              <button onClick={addManager} style={{ flex:2, padding:20, borderRadius:15, background:C.purple, color:'#000', fontSize:22, fontWeight:950, cursor:'pointer', border:'none' }}>등록</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── 의료 소모품 추가 모달 ── */}
       {isMedModalOpen && (

@@ -77,17 +77,27 @@ export default function CrewManagement({ onSelectPatient }) {
 
   const handleAddCrew = (e) => {
     e.preventDefault()
+    if (!newCrew.name.trim()) { alert('이름을 입력하세요.'); return }
+    if (!newCrew.role.trim()) { alert('직책을 입력하세요.'); return }
+    if (!newCrew.dept.trim()) { alert('부서를 선택하세요.'); return }
     const id = `S26-${String(crew.length + 1).padStart(3, '0')}`
     const finalAvatar = newCrew.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(newCrew.name)}&background=random&color=fff&size=200`
     const entry = { ...newCrew, id, avatar: finalAvatar, age: Number(newCrew.age), isEmergency: false }
     saveCrew([...crew, entry])
     setIsAdding(false)
-    setNewCrew({ 
-      name: '', age: '', dob: '', gender: '남', role: '', dept: '항해부', blood: 'A+', 
+    setNewCrew({
+      name: '', age: '', dob: '', gender: '남', role: '', dept: '항해부', blood: 'A+',
       height: '', weight: '', boardingDate: '', location: '',
       chronic: '', allergies: '', pastHistory: '', lastMed: '', note: '',
       contact: '', emergency: '', avatar: null
     })
+  }
+
+  const handleDeleteCrew = (id) => {
+    const target = crew.find(c => c.id === id)
+    if (!target) return
+    if (!window.confirm(`[${target.id}] ${target.name} 선원을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return
+    saveCrew(crew.filter(c => c.id !== id))
   }
 
   const handleSelect = (c) => {
@@ -231,6 +241,12 @@ export default function CrewManagement({ onSelectPatient }) {
                   >
                     {c.isEmergency ? <ShieldAlert size={20}/> : <Plus size={20}/>}
                     {c.isEmergency ? '집중 관리 중' : '환자로 전환'}
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDeleteCrew(c.id) }}
+                    style={{ marginTop: 8, padding: '8px 16px', borderRadius: 10, background: 'rgba(255,77,109,0.08)', border: '1.5px solid rgba(255,77,109,0.3)', color: '#ff4d6d', fontSize: 18, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, margin: '8px auto 0' }}
+                  >
+                    <X size={16}/> 삭제
                   </button>
                 </td>
               </tr>

@@ -10,7 +10,7 @@ import Settings from './pages/Settings'
 import { SHIP_INFO, DEVICE_INFO } from './utils/constants'
 
 export default function App() {
-  const [auth, setAuth] = useState({ serial: DEVICE_INFO.serial, device: DEVICE_INFO.id, ship: SHIP_INFO.name })
+  const [auth, setAuth] = useState(null)
   const [page, setPage] = useState('main')
 
   const [activePatient, setActivePatient] = useState({

@@ -98,12 +98,14 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
     ? activePatientProp 
     : (dynamicCrewList.find(c => c.id === selectedId) || ALL_CREW.find(c => c.id === selectedId) || ALL_CREW[0])
 
-  // 환자 변경 시 상위 컴포넌트(App)의 상태도 업데이트
+  // 환자 변경 시 상위 컴포넌트(App)의 상태도 업데이트 + 스크롤 리셋
   useEffect(() => {
     if (patient && onSwitchPatient && patient.id !== activePatientProp?.id) {
       onSwitchPatient(patient)
     }
-  }, [patient])
+    const container = document.querySelector('.chart-scroll-container')
+    if (container) container.scrollTop = 0
+  }, [patient?.id])
 
   // 필드명 매핑 (CrewManagement와 PatientChart 간의 차이 해소)
   const displayHistory = patient.pastHistory || patient.history || '과거 이력 없음';
@@ -268,12 +270,18 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
   }
 
   const saveEdit = () => {
-    let finalValue = editValue;
+    const val = editValue.trim()
+    if (!val) return
     if (editTarget === 'bp') {
-      finalValue = editValue.replace(/[^0-9\/]/g, '');
-      setVitals(prev => ({ ...prev, [editTarget]: finalValue }))
+      const parts = val.split('/')
+      if (parts.length !== 2 || isNaN(parseInt(parts[0])) || isNaN(parseInt(parts[1]))) {
+        alert('혈압 형식이 올바르지 않습니다. 예: 120/80')
+        return
+      }
+      setVitals(prev => ({ ...prev, bp: val }))
     } else if (editTarget === 'temp') {
-      setVitals(prev => ({ ...prev, [editTarget]: finalValue }))
+      if (isNaN(parseFloat(val))) { alert('숫자를 입력하세요.'); return }
+      setVitals(prev => ({ ...prev, temp: val }))
     }
     setEditTarget(null)
     setShowPlan(false)
@@ -573,19 +581,19 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
           <div style={{ fontSize: '24px', fontWeight: 950, color: '#38bdf8' }}>환자 경과 기록</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
-            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                <div style={{ fontSize: '14px', color: '#64748b', fontWeight: 600 }}>최근 내원일 : {patient.last_visit || '-'}</div>
-                <div ref={doctorSelectRef} style={{ position: 'relative', marginTop: 2 }}>
-                    <div onClick={() => setIsDoctorOpen(!isDoctorOpen)} style={{ background: 'rgba(255,255,255,0.03)', border: `1.5px solid ${isDoctorOpen ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, borderRadius: '8px', padding: '4px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: '0.2s' }}>
-                        <span style={{ fontSize: '16px', color: '#fff', fontWeight: 800 }}>담당 : {selectedDoctor.name}</span>
-                        <ChevronDown size={14} style={{ transform: isDoctorOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s', color: '#64748b' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ fontSize: '18px', color: '#64748b', fontWeight: 700 }}>최근 내원일 : <span style={{ color: '#94a3b8' }}>{patient.last_visit || '-'}</span></div>
+                <div ref={doctorSelectRef} style={{ position: 'relative' }}>
+                    <div onClick={() => setIsDoctorOpen(!isDoctorOpen)} style={{ background: 'rgba(255,255,255,0.04)', border: `1.5px solid ${isDoctorOpen ? '#38bdf8' : 'rgba(255,255,255,0.15)'}`, borderRadius: '12px', padding: '10px 18px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, transition: '0.2s' }}>
+                        <span style={{ fontSize: '22px', color: '#fff', fontWeight: 900 }}>담당 : {selectedDoctor.name}</span>
+                        <ChevronDown size={18} style={{ transform: isDoctorOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s', color: '#64748b' }} />
                     </div>
                     {isDoctorOpen && (
-                        <div style={{ position: 'absolute', top: '105%', right: 0, width: '180px', background: 'rgba(15, 23, 42, 0.98)', backdropFilter: 'blur(15px)', border: '1.2px solid rgba(56,189,248,0.3)', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 8px 25px rgba(0,0,0,0.6)', zIndex: 1001, padding: '4px 0' }}>
+                        <div style={{ position: 'absolute', top: '105%', right: 0, width: '220px', background: 'rgba(15, 23, 42, 0.98)', backdropFilter: 'blur(15px)', border: '1.2px solid rgba(56,189,248,0.3)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 8px 25px rgba(0,0,0,0.6)', zIndex: 1001, padding: '6px 0' }}>
                             {managers.map(d => (
-                                <div key={d.id} onClick={() => { setSelectedDoctor(d); setIsDoctorOpen(false); }} style={{ padding: '6px 14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', background: selectedDoctor.id === d.id ? 'rgba(56,189,248,0.15)' : 'transparent', color: selectedDoctor.id === d.id ? '#38bdf8' : '#fff', transition: '0.2s', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div key={d.id} onClick={() => { setSelectedDoctor(d); setIsDoctorOpen(false); }} style={{ padding: '10px 18px', fontSize: '19px', fontWeight: 700, cursor: 'pointer', background: selectedDoctor.id === d.id ? 'rgba(56,189,248,0.15)' : 'transparent', color: selectedDoctor.id === d.id ? '#38bdf8' : '#fff', transition: '0.2s', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span>{d.name}</span>
-                                    <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 800, background: 'rgba(255,255,255,0.03)', padding: '1px 5px', borderRadius: 4 }}>{d.role.substring(0,2)}</span>
+                                    <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 800, background: 'rgba(255,255,255,0.05)', padding: '2px 7px', borderRadius: 5 }}>{d.role.substring(0,3)}</span>
                                 </div>
                             ))}
                         </div>
@@ -734,7 +742,20 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
         {/* [Right] Main Panel */}
         <div className="chart-scroll-container" style={{ display: 'flex', flexDirection: 'column', gap: 35, padding: '40px 60px', overflowY: 'auto' }}>
           {/* 활력 징후 입력 확인 섹션 */}
-          <SectionCard id="vital-section" title="현재 활력 징후 확인 (실시간 센서 데이터)" icon={<HeartPulse size={36} color="#ff4d6d"/>}>
+          <SectionCard id="vital-section" title="현재 활력 징후 확인 (실시간 센서 데이터)" icon={<HeartPulse size={36} color="#ff4d6d"/>} right={
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {[
+                { label: '정상', color: '#26de81' },
+                { label: '관찰', color: '#38bdf8' },
+                { label: '주의', color: '#fb923c' },
+                { label: '위험', color: '#ff4d6d' },
+              ].map(({ label, color }) => (
+                <div key={label} style={{ padding: '6px 16px', borderRadius: 10, background: `${color}12`, border: `1.5px solid ${color}50`, fontSize: 15, fontWeight: 900, color }}>
+                  {label}
+                </div>
+              ))}
+            </div>
+          }>
             <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 25, background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: 24, border: '1.5px solid rgba(255,255,255,0.05)' }}>
                 <VitalField label="심박수" value={vitals.hr || patient.vitals?.hr ? `${vitals.hr || patient.vitals?.hr} 회/분` : ''} status={getVitalStatus('hr', vitals.hr || patient.vitals?.hr)} />
                 <VitalField label="산소포화도" value={vitals.spo2 || patient.vitals?.spo2 ? `${vitals.spo2 || patient.vitals?.spo2} %` : ''} status={getVitalStatus('spo2', vitals.spo2 || patient.vitals?.spo2)} />
@@ -1105,8 +1126,8 @@ function InfoItem({ label, value, size }) {
     )
 }
 
-function SectionCard({ title, icon, children }) {
-  return (<div style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1.5px solid rgba(255,255,255,0.05)', borderRadius: 36, padding: '35px' }}><div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 30 }}><div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</div><div style={{ fontSize: '28px', fontWeight: 950 }}>{title}</div></div>{children}</div>)
+function SectionCard({ title, icon, children, right, id }) {
+  return (<div id={id} style={{ background: 'rgba(15, 23, 42, 0.5)', border: '1.5px solid rgba(255,255,255,0.05)', borderRadius: 36, padding: '35px' }}><div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 30 }}><div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</div><div style={{ fontSize: '28px', fontWeight: 950 }}>{title}</div>{right && <div style={{ marginLeft: 'auto' }}>{right}</div>}</div>{children}</div>)
 }
 
 function PainAreaGroup({ label, areas, selectedAreas, onClick, icon }) {
@@ -1165,11 +1186,11 @@ function VitalField({ label, value, status, editable, onEdit }) {
             border: `1.5px solid ${isNoData ? 'rgba(255,255,255,0.05)' : 'rgba(56,189,248,0.1)'}`,
             transition: 'all 0.3s'
         }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
                 <span style={{ fontSize: '20px', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</span>
                 {!isNoData && <span style={{ padding: '2px 10px', borderRadius: 6, background: status.bg, color: status.color, fontSize: '13px', fontWeight: 900, border: `1px solid ${status.color}40` }}>{status.label}</span>}
                 {editable && (
-                  <button 
+                  <button
                     onClick={(e) => { e.stopPropagation(); onEdit(); }}
                     style={{ background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.3)', borderRadius: '6px', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 'auto' }}
                   >
@@ -1178,7 +1199,7 @@ function VitalField({ label, value, status, editable, onEdit }) {
                 )}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minHeight: '44px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 6, minHeight: '44px' }}>
                 {isNoData ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, animation: 'pulse 2s infinite' }}>
                         <div style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #38bdf8', borderTopColor: 'transparent', animation: 'spin 1s infinite linear' }} />
