@@ -1,8 +1,14 @@
 export const SHIP_INFO = {
-  name: '해신-호 (HAESIN-07)',
+  name: 'MV KOREA STAR',
   type: '컨테이너선 (14,000 TEU)',
   id: 'IMO 9876543',
   status: '항해 중 (북태평양)'
+}
+
+export const DEVICE_INFO = {
+  id: 'MED-001',
+  serial: 'SN-10294',
+  warranty: '2027년 11월'
 }
 
 export const INITIAL_CREW = Array.from({ length: 26 }, (_, i) => ({

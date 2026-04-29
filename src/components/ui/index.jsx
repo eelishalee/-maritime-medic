@@ -55,15 +55,25 @@ export function DashboardVital({ label, value, unit, color, editable, onEdit, li
       }}>
         {/* 상단 : 라벨(좌) 및 상태 점/편집 버튼(우) */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
-          <div style={{ 
-            fontSize: 21, fontWeight: 950, 
-            color: isConnected ? 'rgba(255,255,255,0.9)' : '#fbbf24', 
-            letterSpacing: '0.5px',
-            textTransform: 'uppercase',
-            textShadow: isConnected ? '0 0 10px rgba(255,255,255,0.2)' : 'none',
-            marginTop: -2 // 텍스트 상단 여백 미세 조정
-          }}>
-            {label}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ 
+              fontSize: 21, fontWeight: 950, 
+              color: isConnected ? 'rgba(255,255,255,0.9)' : '#fbbf24', 
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase',
+              textShadow: isConnected ? '0 0 10px rgba(255,255,255,0.2)' : 'none',
+              marginTop: -2 // 텍스트 상단 여백 미세 조정
+            }}>
+              {label}
+            </div>
+            {/* 정상 범위 정보 추가 */}
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>
+              {label === '심박수' ? '60-100' : 
+               label === '산소포화도' ? '95-100' : 
+               label === '호흡수' ? '12-20' : 
+               label.includes('혈압') ? '90/60-140/90' : 
+               label.includes('체온') ? '36.1-37.2' : ''}
+            </div>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

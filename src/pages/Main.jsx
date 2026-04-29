@@ -4,8 +4,8 @@ import DashboardView from './Main/components/DashboardView'
 export default function Main({ patient, onNavigate, onSwitchPatient }) {
   // ─── 바이탈 데이터 상태 ───
   const [hr, setHr] = useState(patient?.hr || 82)
-  const [spo2] = useState(patient?.spo2 || 98)
-  const [rr] = useState(17)
+  const [spo2, setSpo2] = useState(patient?.spo2 || 98)
+  const [rr, setRr] = useState(patient?.rr || 17)
   const [bp, setBp] = useState(patient?.bp || '128/84')
   const [bt, setBt] = useState(patient?.temp || '36.7')
 
@@ -16,9 +16,21 @@ export default function Main({ patient, onNavigate, onSwitchPatient }) {
   // ─── 환자 교체 시 상태 초기화 ───
   useEffect(() => {
     if (!patient) return
-    setHr(patient.hr || 82)
-    setBp(patient.bp || '128/84')
-    setBt(patient.temp || '36.7')
+    
+    // 선원별로 고유한 베이스라인 바이탈 설정 (데이터가 없는 경우를 위한 다양성 부여)
+    const seed = patient.id.split('-').pop() || '0'
+    const baseHr = patient.hr || (70 + (parseInt(seed) % 15))
+    const baseSpo2 = patient.spo2 || (96 + (parseInt(seed) % 4))
+    const baseRr = patient.rr || (14 + (parseInt(seed) % 6))
+    const baseBp = patient.bp || `${115 + (parseInt(seed) % 20)}/${75 + (parseInt(seed) % 15)}`
+    const baseBt = patient.temp || (36.4 + (parseInt(seed) % 6) / 10).toFixed(1)
+
+    setHr(baseHr)
+    setSpo2(baseSpo2)
+    setRr(baseRr)
+    setBp(baseBp)
+    setBt(baseBt)
+    
     setChat(getInitialChat(patient))
     setPrompt('')
   }, [patient])
@@ -27,10 +39,15 @@ export default function Main({ patient, onNavigate, onSwitchPatient }) {
   const [isScanning, setIsScanning] = useState(false)
   const [scanError, setScanError] = useState(null)
 
-  // ─── 실시간 바이탈 시뮬레이션 ───
+  // ─── 실시간 바이탈 시뮬레이션 (모든 바이탈에 미세 변화 적용) ───
   useEffect(() => {
     const t = setInterval(() => {
-      setHr(h => Math.max(60, Math.min(120, h + Math.round((Math.random() - 0.5) * 3))))
+      setHr(h => Math.max(60, Math.min(110, h + Math.round((Math.random() - 0.5) * 2))))
+      setSpo2(s => {
+        const val = parseFloat(s)
+        return Math.max(94, Math.min(100, val + (Math.random() - 0.5) * 0.2)).toFixed(1)
+      })
+      setRr(r => Math.max(12, Math.min(22, r + Math.round((Math.random() - 0.5) * 1))))
     }, 3000)
     return () => clearInterval(t)
   }, [])

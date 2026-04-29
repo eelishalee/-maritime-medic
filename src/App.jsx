@@ -7,9 +7,10 @@ import Emergency from './pages/Emergency'
 import Patients from './pages/Patients'
 import PatientChart from './pages/PatientChart'
 import Settings from './pages/Settings'
+import { SHIP_INFO, DEVICE_INFO } from './utils/constants'
 
 export default function App() {
-  const [auth, setAuth] = useState({ serial: 'SN-0001', device: 'MED-01', ship: 'KOREA STAR' })
+  const [auth, setAuth] = useState({ serial: DEVICE_INFO.serial, device: DEVICE_INFO.id, ship: SHIP_INFO.name })
   const [page, setPage] = useState('main')
 
   const [activePatient, setActivePatient] = useState({
