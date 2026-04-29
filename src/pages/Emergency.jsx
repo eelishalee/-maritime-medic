@@ -61,7 +61,7 @@ const ACTION_GUIDES = {
     steps: [
       { title: '상처 노출 및 확인', desc: '옷을 가위로 잘라 상처 부위를 완전히 드러내고 정확한 출혈 지점을 확인하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-01.png' },
       { title: '직접 압박 시행', desc: '멸균 거즈나 깨끗한 천을 대고 손바닥 전체로 체중을 실어 강하게 누르십시오.', tip: '거즈가 피에 젖어도 떼지 말고 위에 계속 덧대세요.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-02.png' },
-      { title: '지혈대(T-kit) 적용', desc: '대량 출혈이 직접 압박으로 멈추지 않을 때만 상처 5~10cm 위쪽(심장 방향)에 지혈대를 감고 막대를 돌려 고정하십시오.', tip: '최종 수단이며, 착용 시각을 환자의 이마 등에 반드시 기록하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-03.png' }    ],
+      { title: '지혈대(T-kit) 적용', desc: '대량 출혈이 직접 압박으로 멈추지 않을 때만 상처 5~10cm 위쪽(심장 방향)에 지혈대를 감고 막대를 돌려 고정하십시오.', tip: '최종 수단이며, 착용 시각을 환자의 이마 등에 반드시 기록하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-03.png?v=2' }    ],
     dos: ['출혈 부위를 심장보다 높게 유지하세요', '지혈대 사용 시 착용 시각을 환자의 몸에 기록하세요', '피부에 직접 닿게 꽉 조이십시오'],
     donts: ['상처에 박힌 칼 등을 억지로 뽑지 마세요', '가루약, 된장 등 이물질을 바르지 마세요', '지혈대를 옷 위에 감지 마세요'],
     warning: '지혈대는 최후의 수단이며, 한 번 조이면 의료진의 지시 없이 절대 풀지 마십시오.',
