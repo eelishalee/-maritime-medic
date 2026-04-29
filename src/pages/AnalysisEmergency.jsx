@@ -136,11 +136,125 @@ const GUIDES = {
 function getRecommended(patient) {
   if (!patient) return null
   const chronic = (patient.chronic || '').toLowerCase()
-  const hr = patient.hr || 0
+  const hr = Number(patient.hr) || 0
+  const spo2 = Number(patient.spo2) || 100
+  const temp = Number(patient.temp) || 36.5
+  const bp = parseInt((patient.bp || patient.vitals?.bp || '120/80').split('/')[0]) || 120
   const loc = (patient.location || '').toLowerCase()
-  if (chronic.includes('고혈압') || hr > 90) return 'cardiac'
-  if (loc.includes('기관') || loc.includes('엔진')) return 'fracture'
+  if (spo2 < 90 || hr > 120) return 'cpr'
+  if (chronic.includes('고혈압') || bp > 150 || hr > 90) return 'cardiac'
+  if (loc.includes('기관') || loc.includes('엔진') || loc.includes('갑판')) return 'fracture'
+  if (temp >= 38.5) return 'shock'
   return null
+}
+
+function calcRiskScore(patient) {
+  if (!patient) return 50
+  let score = 20
+  const hr = Number(patient.hr) || 0
+  const spo2 = Number(patient.spo2) || 100
+  const temp = Number(patient.temp) || 36.5
+  const bp = parseInt((patient.bp || patient.vitals?.bp || '120/80').split('/')[0]) || 120
+  const chronic = (patient.chronic || '')
+  if (bp >= 160) score += 25
+  else if (bp >= 140) score += 15
+  if (hr > 110 || hr < 50) score += 20
+  else if (hr > 90) score += 10
+  if (spo2 < 90) score += 20
+  else if (spo2 < 95) score += 10
+  if (temp >= 39) score += 15
+  else if (temp >= 38) score += 8
+  const chronicCount = chronic === '없음' ? 0 : chronic.split(',').length
+  score += chronicCount * 5
+  if (patient.isEmergency) score += 10
+  return Math.min(score, 99)
+}
+
+function buildDiagnoses(patient) {
+  if (!patient) return DIAGNOSES
+  const hr = Number(patient.hr) || 0
+  const spo2 = Number(patient.spo2) || 100
+  const temp = Number(patient.temp) || 36.5
+  const bp = parseInt((patient.bp || patient.vitals?.bp || '120/80').split('/')[0]) || 120
+  const chronic = (patient.chronic || '').toLowerCase()
+  const allergies = (patient.allergies || '')
+  const loc = (patient.location || '').toLowerCase()
+  const results = []
+
+  // 심근경색 / 심장 관련
+  if (chronic.includes('고혈압') || bp > 150 || hr > 90) {
+    const conf = Math.min(70 + (bp > 155 ? 20 : 0) + (chronic.includes('고지혈') ? 8 : 0) + (hr > 95 ? 5 : 0), 97)
+    results.push({
+      confidence: conf, title: '급성 심근경색', subtitle: '의심', icd: 'I21.9', severity: 'critical', color: '#ff4d6d',
+      desc: `흉통·호흡곤란·혈압 ${bp}mmHg와 ${patient.chronic} 병력 종합 분석 결과 급성 심근경색 가능성 높음.`,
+      actions: [
+        { level: 'critical', text: '즉시 원격 진료 연결' },
+        { level: 'critical', text: '12유도 심전도 측정 시작' },
+        { level: 'critical', text: 'CPR 장비 즉각 준비' },
+        allergies && !allergies.includes('없음') ? { level: 'warn', text: `${allergies} 알레르기 주의 — 투약 전 확인 필수` } : { level: 'normal', text: '아스피린 300mg 즉시 투여 검토' },
+      ],
+    })
+  }
+
+  // 고혈압성 위기
+  if (bp >= 140) {
+    const conf = Math.min(40 + (bp - 140) * 1.5, 80)
+    results.push({
+      confidence: Math.round(conf), title: '고혈압성 위기', subtitle: '', icd: 'I10', severity: 'high', color: '#ff9f43',
+      desc: `수축기 혈압 ${bp}mmHg — 고혈압성 긴급증 범위. 기존 병력 및 미복약 가능성 확인 필요.`,
+      actions: [
+        { level: 'high',   text: '혈압 15분 간격 재측정' },
+        { level: 'high',   text: '반좌위(45°) 안정 유지' },
+        { level: 'normal', text: `${patient.lastMed || '처방 약물'} 복용 여부 확인` },
+        { level: 'normal', text: '신경학적 증상 모니터링' },
+      ],
+    })
+  }
+
+  // 저산소증 / 호흡부전
+  if (spo2 < 95) {
+    const conf = Math.min(50 + (95 - spo2) * 10, 92)
+    results.push({
+      confidence: Math.round(conf), title: '저산소혈증', subtitle: '호흡부전 위험', icd: 'R09.02', severity: spo2 < 90 ? 'critical' : 'high', color: spo2 < 90 ? '#ff4d6d' : '#ff9f43',
+      desc: `산소포화도 ${spo2}% — 정상 범위(95%) 미달. 기도 확보 및 산소 공급이 즉시 필요합니다.`,
+      actions: [
+        { level: 'critical', text: '즉시 산소 마스크 착용 (10L/min)' },
+        { level: 'high',     text: '기도 개방 및 자세 교정' },
+        { level: 'normal',   text: '호흡수·흉부 팽창 확인' },
+      ],
+    })
+  }
+
+  // 발열 / 감염
+  if (temp >= 38.0) {
+    const conf = Math.min(35 + (temp - 38) * 25, 85)
+    results.push({
+      confidence: Math.round(conf), title: temp >= 39 ? '패혈증 의심' : '발열 (감염성)', subtitle: '', icd: temp >= 39 ? 'A41.9' : 'R50.9', severity: temp >= 39 ? 'critical' : 'medium', color: temp >= 39 ? '#ff4d6d' : '#a55eea',
+      desc: `체온 ${temp}°C 상승. ${temp >= 39 ? '패혈증 초기 징후 가능성 — 즉각 처치 필요.' : '감염성 발열 의심, 원인 파악 필요.'}`,
+      actions: [
+        { level: temp >= 39 ? 'critical' : 'high', text: '활력징후 연속 모니터링' },
+        { level: 'high',   text: '해열제 투여 검토 (38.5°C 이상)' },
+        { level: 'normal', text: '수분 공급 및 안정 유지' },
+      ],
+    })
+  }
+
+  // 외상 (위치 기반)
+  if (loc.includes('기관') || loc.includes('엔진') || loc.includes('갑판') || loc.includes('화물')) {
+    results.push({
+      confidence: 45, title: '외상성 손상', subtitle: '위치 기반', icd: 'T14.9', severity: 'medium', color: '#a55eea',
+      desc: `${patient.location} 근무 중 발생. 기계·추락 관련 외상 가능성 고려 필요.`,
+      actions: [
+        { level: 'high',   text: '전신 외상 평가 (ABCDE)' },
+        { level: 'high',   text: '출혈 및 골절 부위 확인' },
+        { level: 'normal', text: '부목 및 압박 드레싱 준비' },
+      ],
+    })
+  }
+
+  // 기본값 (해당 없을 때)
+  if (results.length === 0) return DIAGNOSES
+  return results.sort((a, b) => b.confidence - a.confidence)
 }
 
 // ═══════════════════════════════════════════════
@@ -153,12 +267,17 @@ export default function AnalysisEmergency({ patient }) {
   const [protocolId, setProtocolId] = useState(recommended || 'cpr')
   const [stepIdx, setStepIdx] = useState(0)
 
+  const dynamicDiagnoses = buildDiagnoses(patient)
+  const riskScore = calcRiskScore(patient)
+
   // 환자 실데이터로 바이탈 구성
+  const bpRaw = patient?.bp || patient?.vitals?.bp || '158/95'
+  const sbp = parseInt(bpRaw.split('/')[0]) || 158
   const patientVitals = [
-    { label: '심박수',      value: patient?.hr   ?? 96,   unit: 'bpm',  normal: '60–100',    status: (patient?.hr ?? 96) > 100 || (patient?.hr ?? 96) < 60 ? 'critical' : 'warn',     trend: 'up',   Icon: Heart,       color: (patient?.hr ?? 96) > 100 ? '#ff4d6d' : '#ff9f43' },
-    { label: '수축기 혈압', value: patient?.sbp  ?? 158,  unit: 'mmHg', normal: '< 120',     status: (patient?.sbp ?? 158) > 140 ? 'critical' : 'warn', trend: 'up',   Icon: Activity,    color: (patient?.sbp ?? 158) > 140 ? '#ff4d6d' : '#ff9f43' },
-    { label: '산소포화도',  value: patient?.spo2 ?? 94,   unit: '%',    normal: '95–100',    status: (patient?.spo2 ?? 94) < 95 ? 'critical' : 'warn',  trend: 'down', Icon: Droplets,    color: (patient?.spo2 ?? 94) < 95 ? '#ff4d6d' : '#ff9f43' },
-    { label: '체온',        value: patient?.temp ?? 37.6, unit: '°C',   normal: '36.5–37.5', status: (patient?.temp ?? 37.6) > 37.8 ? 'warn' : 'normal', trend: 'up',   Icon: Thermometer, color: '#ff9f43' },
+    { label: '심박수',      value: Number(patient?.hr   ?? patient?.vitals?.hr   ?? 96),   unit: 'bpm',  normal: '60–100',    status: (Number(patient?.hr ?? 96)) > 100 || (Number(patient?.hr ?? 96)) < 60 ? 'critical' : (Number(patient?.hr ?? 96)) > 90 ? 'warn' : 'normal', trend: 'up',   Icon: Heart,       color: (Number(patient?.hr ?? 96)) > 100 ? '#ff4d6d' : '#ff9f43' },
+    { label: '수축기 혈압', value: sbp,                                                    unit: 'mmHg', normal: '< 120',     status: sbp > 160 ? 'critical' : sbp > 140 ? 'warn' : 'normal', trend: 'up',   Icon: Activity,    color: sbp > 160 ? '#ff4d6d' : '#ff9f43' },
+    { label: '산소포화도',  value: Number(patient?.spo2 ?? patient?.vitals?.spo2 ?? 98),   unit: '%',    normal: '95–100',    status: (Number(patient?.spo2 ?? 98)) < 90 ? 'critical' : (Number(patient?.spo2 ?? 98)) < 95 ? 'warn' : 'normal', trend: 'down', Icon: Droplets,    color: (Number(patient?.spo2 ?? 98)) < 95 ? '#ff4d6d' : '#0dd9c5' },
+    { label: '체온',        value: Number(patient?.temp ?? patient?.vitals?.temp ?? 36.5), unit: '°C',   normal: '36.5–37.5', status: (Number(patient?.temp ?? 36.5)) >= 39 ? 'critical' : (Number(patient?.temp ?? 36.5)) >= 38 ? 'warn' : 'normal', trend: 'up', Icon: Thermometer, color: (Number(patient?.temp ?? 36.5)) >= 38 ? '#ff9f43' : '#0dd9c5' },
   ]
 
   const selectProtocol = (id) => { setProtocolId(id); setStepIdx(0) }
@@ -173,7 +292,7 @@ export default function AnalysisEmergency({ patient }) {
       />
       {/* Divider */}
       <div style={{ background: 'linear-gradient(180deg, transparent, #0dd9c5, transparent)', opacity: 0.3 }} />
-      <AIPanel patient={patient} diagIdx={diagIdx} setDiagIdx={setDiagIdx} patientVitals={patientVitals} />
+      <AIPanel patient={patient} diagIdx={diagIdx} setDiagIdx={setDiagIdx} patientVitals={patientVitals} dynamicDiagnoses={dynamicDiagnoses} riskScore={riskScore} />
     </div>
   )
 }
@@ -266,10 +385,12 @@ function StatusDot({ color, blink = false }) {
 //  AI ANALYSIS PANEL  —  Bento Grid
 // ═══════════════════════════════════════════════
 
-function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals }) {
+function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals, dynamicDiagnoses, riskScore }) {
   const VITALS = patientVitals
-  const diag = DIAGNOSES[diagIdx]
-  const riskColor = RISK_SCORE >= 70 ? '#ff4d6d' : RISK_SCORE >= 40 ? '#ff9f43' : '#26de81'
+  const diagList = dynamicDiagnoses || DIAGNOSES
+  const safeIdx = Math.min(diagIdx, diagList.length - 1)
+  const diag = diagList[safeIdx]
+  const riskColor = riskScore >= 70 ? '#ff4d6d' : riskScore >= 40 ? '#ff9f43' : '#26de81'
 
   return (
     <div style={{
@@ -314,7 +435,7 @@ function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals }) {
               <path d="M 10 65 A 55 55 0 0 1 120 65" stroke="rgba(255,255,255,0.06)" strokeWidth="10" fill="none" strokeLinecap="round" />
               <path d="M 10 65 A 55 55 0 0 1 120 65" stroke={riskColor} strokeWidth="10" fill="none" strokeLinecap="round"
                 strokeDasharray={`${Math.PI * 55}`}
-                strokeDashoffset={`${Math.PI * 55 * (1 - RISK_SCORE / 100)}`}
+                strokeDashoffset={`${Math.PI * 55 * (1 - riskScore / 100)}`}
                 style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)', filter: `drop-shadow(0 0 6px ${riskColor})` }}
               />
             </svg>
@@ -322,7 +443,7 @@ function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals }) {
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 0 }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 32, fontWeight: 950, color: riskColor, lineHeight: 1, animation: 'hudFlicker 8s ease infinite' }}>
-                  {RISK_SCORE}
+                  {riskScore}
                 </div>
                 <div style={{ fontSize: 10, color: '#4a6080', fontWeight: 700 }}>/ 100</div>
               </div>
@@ -330,17 +451,17 @@ function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals }) {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 17, fontWeight: 900, color: riskColor, marginBottom: 6, animation: 'glowPulse 2s ease infinite' }}>
-              {RISK_SCORE >= 70 ? '위험 — 즉각 처치 필요' : '주의 관찰 필요'}
+              {riskScore >= 70 ? '위험 — 즉각 처치 필요' : riskScore >= 40 ? '주의 관찰 필요' : '안정 상태'}
             </div>
             {/* Risk bar segments */}
             <div style={{ display: 'flex', gap: 3, marginBottom: 8 }}>
               {[...Array(10)].map((_, i) => (
                 <div key={i} style={{
                   flex: 1, height: 6, borderRadius: 2,
-                  background: i < Math.floor(RISK_SCORE / 10)
+                  background: i < Math.floor(riskScore / 10)
                     ? (i < 4 ? '#26de81' : i < 7 ? '#ff9f43' : '#ff4d6d')
                     : 'rgba(255,255,255,0.07)',
-                  boxShadow: i < Math.floor(RISK_SCORE / 10) ? `0 0 4px currentColor` : 'none',
+                  boxShadow: i < Math.floor(riskScore / 10) ? `0 0 4px currentColor` : 'none',
                   transition: `background 0.3s ${i * 0.05}s`,
                 }} />
               ))}
@@ -358,10 +479,10 @@ function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals }) {
       </Card>
 
       {/* ── Row 2: 3 Diagnosis Cards ── */}
-      {DIAGNOSES.map((d, i) => (
-        <Card key={i} color={d.color} glow={diagIdx === i}
+      {diagList.map((d, i) => (
+        <Card key={i} color={d.color} glow={safeIdx === i}
           style={{ gridColumn: `${i + 1}`, padding: '14px', cursor: 'pointer', transition: 'all 0.2s' }}
-          brackets={diagIdx === i}
+          brackets={safeIdx === i}
         >
           <div onClick={() => setDiagIdx(i)}>
             <div style={{ display: 'flex', align: 'center', justifyContent: 'space-between', marginBottom: 8 }}>

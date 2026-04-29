@@ -100,6 +100,16 @@ export default function CrewManagement({ onSelectPatient }) {
     saveCrew(crew.filter(c => c.id !== id))
   }
 
+  const [editTarget, setEditTarget] = useState(null)
+
+  const handleEditCrew = (e) => {
+    e.preventDefault()
+    if (!editTarget.name.trim()) { alert('이름을 입력하세요.'); return }
+    if (!editTarget.role.trim()) { alert('직책을 입력하세요.'); return }
+    saveCrew(crew.map(c => c.id === editTarget.id ? { ...editTarget } : c))
+    setEditTarget(null)
+  }
+
   const handleSelect = (c) => {
     if (c.isEmergency) {
       onSelectPatient(c)
@@ -243,8 +253,14 @@ export default function CrewManagement({ onSelectPatient }) {
                     {c.isEmergency ? '집중 관리 중' : '환자로 전환'}
                   </button>
                   <button
+                    onClick={(e) => { e.stopPropagation(); setEditTarget({...c}) }}
+                    style={{ marginTop: 8, padding: '8px 16px', borderRadius: 10, background: 'rgba(56,189,248,0.08)', border: '1.5px solid rgba(56,189,248,0.3)', color: '#38bdf8', fontSize: 18, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, margin: '8px auto 0' }}
+                  >
+                    ✏ 수정
+                  </button>
+                  <button
                     onClick={(e) => { e.stopPropagation(); handleDeleteCrew(c.id) }}
-                    style={{ marginTop: 8, padding: '8px 16px', borderRadius: 10, background: 'rgba(255,77,109,0.08)', border: '1.5px solid rgba(255,77,109,0.3)', color: '#ff4d6d', fontSize: 18, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, margin: '8px auto 0' }}
+                    style={{ marginTop: 6, padding: '8px 16px', borderRadius: 10, background: 'rgba(255,77,109,0.08)', border: '1.5px solid rgba(255,77,109,0.3)', color: '#ff4d6d', fontSize: 18, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, margin: '6px auto 0' }}
                   >
                     <X size={16}/> 삭제
                   </button>
@@ -254,6 +270,51 @@ export default function CrewManagement({ onSelectPatient }) {
           </tbody>
         </table>
       </div>
+
+      {/* 선원 수정 모달 */}
+      {editTarget && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(2,6,23,0.9)', backdropFilter: 'blur(20px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+          <div style={{ background: '#0d1117', border: '1.5px solid rgba(56,189,248,0.3)', borderRadius: 24, padding: 40, width: '100%', maxWidth: 700, position: 'relative' }}>
+            <button onClick={() => setEditTarget(null)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: 8, padding: 8, cursor: 'pointer', color: '#64748b' }}><X size={20}/></button>
+            <div style={{ fontSize: 26, fontWeight: 950, color: '#38bdf8', marginBottom: 28 }}>✏ 선원 정보 수정 — {editTarget.name}</div>
+            <form onSubmit={handleEditCrew}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+                {[
+                  { label: '이름', field: 'name' }, { label: '직책', field: 'role' },
+                  { label: '나이', field: 'age', type: 'number' }, { label: '연락처', field: 'contact' },
+                  { label: '기저질환', field: 'chronic' }, { label: '알레르기', field: 'allergies' },
+                  { label: '복용 약물', field: 'lastMed' }, { label: '위치', field: 'location' },
+                  { label: '비상연락처명', field: 'emergencyName' }, { label: '비상연락처', field: 'emergency' },
+                ].map(({ label, field, type }) => (
+                  <div key={field}>
+                    <div style={{ fontSize: 14, color: '#64748b', fontWeight: 700, marginBottom: 6 }}>{label}</div>
+                    <input
+                      type={type || 'text'}
+                      value={editTarget[field] || ''}
+                      onChange={e => setEditTarget(p => ({ ...p, [field]: e.target.value }))}
+                      style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 16, fontWeight: 600, outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                ))}
+                <div>
+                  <div style={{ fontSize: 14, color: '#64748b', fontWeight: 700, marginBottom: 6 }}>부서</div>
+                  <select value={editTarget.dept || '항해부'} onChange={e => setEditTarget(p => ({ ...p, dept: e.target.value }))} style={{ width: '100%', background: '#161b22', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 16, fontWeight: 600, outline: 'none' }}>
+                    {['항해부', '기관부', '지원부'].map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, color: '#64748b', fontWeight: 700, marginBottom: 6 }}>특이사항</div>
+                  <input value={editTarget.note || ''} onChange={e => setEditTarget(p => ({ ...p, note: e.target.value }))} style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 16, fontWeight: 600, outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <button type="button" onClick={() => setEditTarget(null)} style={{ flex: 1, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#64748b', fontSize: 18, fontWeight: 800, cursor: 'pointer' }}>취소</button>
+                <button type="submit" style={{ flex: 2, padding: '14px', borderRadius: 12, background: '#38bdf8', color: '#000', border: 'none', fontSize: 18, fontWeight: 950, cursor: 'pointer' }}>저장</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {isAdding && (
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(2,6,23,0.85)', backdropFilter: 'blur(20px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
