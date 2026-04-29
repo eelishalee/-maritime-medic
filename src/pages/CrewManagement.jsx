@@ -101,6 +101,7 @@ export default function CrewManagement({ onSelectPatient }) {
   }
 
   const [editTarget, setEditTarget] = useState(null)
+  const [selectedId, setSelectedId] = useState(null)
 
   const handleEditCrew = (e) => {
     e.preventDefault()
@@ -145,9 +146,30 @@ export default function CrewManagement({ onSelectPatient }) {
           <p style={{ fontSize: '15px', color: '#64748b', fontWeight: 700, marginLeft: 36 }}>MV KOREA STAR 소속 선원 명부 (총 {crew.length}명 관리 중)</p>
         </div>
         
-        <button onClick={() => setIsAdding(true)} style={{ padding: '0 24px', height: '52px', background: 'linear-gradient(135deg, #0dd9c5 0%, #00a896 100%)', border: 'none', borderRadius: '16px', cursor: 'pointer', color: '#020617', fontSize: '16px', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 10px 25px rgba(13,217,197,0.2)', transition: '0.3s' }}>
-          <Plus size={20} strokeWidth={3} /> 신규 선원 등록
-        </button>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {selectedId && (() => {
+            const sel = crew.find(c => c.id === selectedId)
+            return sel ? (
+              <>
+                <button
+                  onClick={() => { setEditTarget({...sel}); setSelectedId(null) }}
+                  style={{ padding: '0 20px', height: '52px', background: 'rgba(56,189,248,0.1)', border: '1.5px solid #38bdf8', borderRadius: '16px', cursor: 'pointer', color: '#38bdf8', fontSize: '15px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 8 }}
+                >
+                  ✏ 수정
+                </button>
+                <button
+                  onClick={() => { handleDeleteCrew(sel.id); setSelectedId(null) }}
+                  style={{ padding: '0 20px', height: '52px', background: 'rgba(255,77,109,0.1)', border: '1.5px solid #ff4d6d', borderRadius: '16px', cursor: 'pointer', color: '#ff4d6d', fontSize: '15px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 8 }}
+                >
+                  <X size={16}/> 삭제
+                </button>
+              </>
+            ) : null
+          })()}
+          <button onClick={() => setIsAdding(true)} style={{ padding: '0 24px', height: '52px', background: 'linear-gradient(135deg, #0dd9c5 0%, #00a896 100%)', border: 'none', borderRadius: '16px', cursor: 'pointer', color: '#020617', fontSize: '16px', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 10px 25px rgba(13,217,197,0.2)', transition: '0.3s' }}>
+            <Plus size={20} strokeWidth={3} /> 신규 선원 등록
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 24, flexShrink: 0 }}>
@@ -190,7 +212,7 @@ export default function CrewManagement({ onSelectPatient }) {
           </thead>
           <tbody>
             {filtered.map((c) => (
-              <tr key={c.id} onClick={() => handleSelect(c)} style={{ cursor: 'pointer', transition: '0.2s' }} className="crew-card-row">
+              <tr key={c.id} onClick={() => setSelectedId(prev => prev === c.id ? null : c.id)} style={{ cursor: 'pointer', transition: '0.2s', outline: selectedId === c.id ? '2px solid #0dd9c5' : 'none', borderRadius: 20 }} className="crew-card-row">
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px 0 0 20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
                     <div style={{ width: 64, height: 80, borderRadius: '12px', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', background: '#0a1628' }}>
@@ -231,12 +253,12 @@ export default function CrewManagement({ onSelectPatient }) {
                   <div style={{ fontSize: '20px', fontWeight: 700, color: '#64748b' }}>{c.emergency}</div>
                 </td>
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: '0 20px 20px 0', textAlign: 'center' }}>
-                  <button 
+                  <button
                     onClick={(e) => { e.stopPropagation(); handleSelect(c); }}
-                    style={{ 
-                      padding: '12px 24px', 
-                      borderRadius: '12px', 
-                      background: c.isEmergency ? 'rgba(239, 68, 68, 0.1)' : 'rgba(13, 217, 197, 0.1)', 
+                    style={{
+                      padding: '12px 24px',
+                      borderRadius: '12px',
+                      background: c.isEmergency ? 'rgba(239, 68, 68, 0.1)' : 'rgba(13, 217, 197, 0.1)',
                       border: `1.5px solid ${c.isEmergency ? '#ef4444' : '#0dd9c5'}`,
                       color: c.isEmergency ? '#ef4444' : '#0dd9c5',
                       fontSize: '22px',
@@ -252,20 +274,6 @@ export default function CrewManagement({ onSelectPatient }) {
                     {c.isEmergency ? <ShieldAlert size={20}/> : <Plus size={20}/>}
                     {c.isEmergency ? '집중 관리 중' : '환자로 전환'}
                   </button>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 8 }}>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setEditTarget({...c}) }}
-                      style={{ padding: '8px 0', borderRadius: 10, background: 'rgba(56,189,248,0.08)', border: '1.5px solid rgba(56,189,248,0.3)', color: '#38bdf8', fontSize: 17, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
-                    >
-                      ✏ 수정
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDeleteCrew(c.id) }}
-                      style={{ padding: '8px 0', borderRadius: 10, background: 'rgba(255,77,109,0.08)', border: '1.5px solid rgba(255,77,109,0.3)', color: '#ff4d6d', fontSize: 17, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
-                    >
-                      <X size={15}/> 삭제
-                    </button>
-                  </div>
                 </td>
               </tr>
             ))}
