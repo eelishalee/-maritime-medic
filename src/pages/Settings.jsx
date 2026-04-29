@@ -20,16 +20,22 @@ const C = {
 
 /* ─── 데이터 ─── */
 const CREW = [
-  { id:'S26-001', name:'이선장', role:'선장', dept:'항해부', chronic:'고혈압', allergies:'없음', isEmergency:true, lastMed:'암로디핀 5mg', age:52 },
-  { id:'S26-002', name:'김항해', role:'1등 항해사', dept:'항해부', chronic:'없음', allergies:'페니실린', isEmergency:false, lastMed:'없음', age:45 },
-  { id:'S26-003', name:'박기관', role:'기관장', dept:'기관부', chronic:'고혈압, 고지혈증', allergies:'아스피린', isEmergency:true, lastMed:'암로디핀 5mg', age:55 },
-  { id:'S26-004', name:'최갑판', role:'갑판장', dept:'항해부', chronic:'허리디스크', allergies:'없음', isEmergency:false, lastMed:'없음', age:41 },
-  { id:'S26-005', name:'정조타', role:'조타사', dept:'항해부', chronic:'없음', allergies:'조개류', isEmergency:false, lastMed:'없음', age:38 },
-  { id:'S26-006', name:'한닻별', role:'2등 항해사', dept:'항해부', chronic:'비염', allergies:'먼지', isEmergency:false, lastMed:'항히스타민제', age:35 },
-  { id:'S26-007', name:'윤나침', role:'3등 항해사', dept:'항해부', chronic:'없음', allergies:'없음', isEmergency:false, lastMed:'없음', age:32 },
-  { id:'S26-008', name:'강바다', role:'항해사', dept:'항해부', chronic:'없음', allergies:'복숭아', isEmergency:false, lastMed:'없음', age:29 },
-  { id:'S26-009', name:'조항구', role:'조리장', dept:'지원부', chronic:'당뇨', allergies:'없음', isEmergency:false, lastMed:'메트포르민', age:50 },
-  { id:'S26-010', name:'심망원', role:'갑판원', dept:'항해부', chronic:'없음', allergies:'없음', isEmergency:false, lastMed:'없음', age:27 },
+  { id: 'S26-001', name: '이선장', age: 52, role: '선장', dept: '항해부', chronic: '고혈압', allergies: '없음', isEmergency: false },
+  { id: 'S26-002', name: '김항해', age: 45, role: '1등 항해사', dept: '항해부', chronic: '없음', allergies: '페니실린', isEmergency: false },
+  { id: 'S26-003', name: '박기관', age: 55, role: '기관장', dept: '기관부', chronic: '고혈압, 고지혈증', allergies: '아스피린', isEmergency: true },
+  { id: 'S26-004', name: '최갑판', age: 41, role: '갑판장', dept: '항해부', chronic: '허리디스크', allergies: '없음', isEmergency: false },
+  { id: 'S26-005', name: '정조타', age: 38, role: '조타사', dept: '항해부', chronic: '없음', allergies: '조개류', isEmergency: false },
+  { id: 'S26-006', name: '한통신', age: 43, role: '통신장', dept: '항해부', chronic: '비염', allergies: '먼지', isEmergency: false },
+  { id: 'S26-007', name: '강기계', age: 47, role: '1등 기관사', dept: '기관부', chronic: '없음', allergies: '벌침', isEmergency: false },
+  { id: 'S26-008', name: '윤조리', age: 49, role: '조리장', dept: '지원부', chronic: '당뇨', allergies: '없음', isEmergency: false },
+  { id: 'S26-009', name: '임전기', age: 35, role: '전기사', dept: '기관부', chronic: '없음', allergies: '없음', isEmergency: false },
+  { id: 'S26-010', name: '백보급', age: 32, role: '사무장', dept: '지원부', chronic: '없음', allergies: '먼지', isEmergency: false },
+  { id: 'S26-011', name: '황갑판', age: 28, role: '갑판원', dept: '항해부', chronic: '없음', allergies: '없음', isEmergency: false },
+  { id: 'S26-012', name: '서기관', age: 30, role: '3등 기관사', dept: '기관부', chronic: '없음', allergies: '땅콩', isEmergency: false },
+  { id: 'S26-013', name: '오항해', age: 26, role: '실습 항해사', dept: '항해부', chronic: '없음', allergies: '없음', isEmergency: false },
+  { id: 'S26-014', name: '나위생', age: 31, role: '위생원', dept: '지원부', chronic: '없음', allergies: '없음', isEmergency: false },
+  { id: 'S26-015', name: '고기수', age: 44, role: '기수', dept: '기관부', chronic: '치질', allergies: '없음', isEmergency: false },
+  { id: 'S26-016', name: '문세탁', age: 33, role: '세탁원', dept: '지원부', chronic: '습진', allergies: '세제', isEmergency: false },
 ]
 
 const CHECKLIST = [
@@ -37,17 +43,6 @@ const CHECKLIST = [
   '구급함 잠금 해제 확인','척추고정보드 위치 확인',
   '지혈대(T-kit) 수량 확인','원격의료센터 접속 확인',
   'MDTS 기기 정상 작동 확인','당직 의료 인력 배치 확인',
-]
-
-const SOP_LIST = [
-  { code:'CPR-01', title:'심장 압박 및 전기 충격', cat:'심장 정지', color:C.danger },
-  { code:'HEI-07', title:'목에 걸린 이물질 제거', cat:'음식물 걸림', color:C.warning },
-  { code:'AIR-03', title:'숨길 열기 및 산소 공급', cat:'호흡 곤란', color:C.info },
-  { code:'BLD-02', title:'피나는 곳 누르기(지혈)', cat:'심한 출혈', color:C.danger },
-  { code:'BRN-08', title:'화상 부위 식히기', cat:'불/열 화상', color:C.yellow },
-  { code:'HYP-05', title:'물에 빠진 선원 구조', cat:'체온 저하', color:C.cyan },
-  { code:'FRC-04', title:'뼈 부러진 곳 고정하기', cat:'뼈/관절 다침', color:C.purple },
-  { code:'WND-06', title:'상처 씻기 및 소독', cat:'상처 보호', color:C.success },
 ]
 
 const SYS_LOGS = [
@@ -115,6 +110,116 @@ export default function Settings() {
     },
   ])
   const [newMgrName, setNewMgrName] = useState('')
+  const [selectedSop, setSelectedSop] = useState(null)
+
+  const ACTION_GUIDES_DATA = {
+    'CPR-01': {
+      title: '심폐소생술 및 AED 사용',
+      diagnosis: '심정지(Cardiac Arrest) 의심',
+      riskLevel: '4',
+      steps: [
+        { title: '의식 및 호흡 확인', desc: '어깨를 두드리며 "괜찮으세요?"라고 묻고, 가슴이 오르내리는지 10초간 확인하십시오.' },
+        { title: '도움 및 AED 요청', desc: '주변 사람 중 한 명을 지목해 "비상 상황 전파" 및 "AED(심장충격기)"를 가져와 달라고 지시하십시오.' },
+        { title: '가슴 압박 시행', desc: '가슴 중앙에 깍지 낀 손을 대고, 팔꿈치를 펴서 수직으로 5~6cm 깊이로 강하게 누르십시오.' },
+        { title: 'AED 패드 부착', desc: '전원을 켜고 패드 하나는 오른쪽 쇄골 아래, 다른 하나는 왼쪽 옆구리에 붙인 뒤 음성 지시에 따르십시오.' }
+      ],
+      dos: ['1초당 2번 속도로 강하게 압박하세요', '압박 후 가슴이 완전히 올라오게 하세요', 'AED의 음성 지시에 따라 행동하십시오'],
+      donts: ['환자가 의식이 있다면 하지 마세요', '맥박 확인을 위해 시간을 허비하지 마세요', '압박 중 팔꿈치를 굽히지 마세요'],
+      warning: '환자가 스스로 숨을 쉬거나 의료진이 올 때까지 중단하지 마십시오.'
+    },
+    'HEI-07': {
+      title: '기도 이물질 제거 (하임리히법)',
+      diagnosis: '기도 폐쇄(Airway Obstruction)',
+      riskLevel: '4',
+      steps: [
+        { title: '의식 및 상태 확인', desc: '환자 뒤로 가서 말을 걸어보세요. 목을 감싸고 말을 전혀 못 하면 즉시 처치를 시작합니다.' },
+        { title: '자세 잡고 지탱하기', desc: '환자 뒤에 서서 양팔로 허리를 감싸고, 내 한쪽 다리를 환자 다리 사이에 넣어 환자가 쓰러질 때를 대비해 지탱하세요.' },
+        { title: '손 모양과 위치 잡기', desc: '한쪽 주먹의 엄지손가락 쪽 면을 배꼽과 명치 사이에 대고, 다른 손으로 그 주먹을 꽉 움켜쥐십시오.' },
+        { title: '강하게 밀어 올리기', desc: '환자의 배를 안쪽 위 방향(J자 모양)으로 강하게 들어 올리듯 반복해서 당기십시오.' }
+      ],
+      dos: ['이물질이 튀어나올 때까지 최대한 강하게 하세요', '환자가 의식을 잃으면 즉시 바닥에 눕히고 CPR 시작'],
+      donts: ['입안에 이물질이 보이지 않는데 손가락을 넣어 쑤시지 마세요', '임산부는 복부가 아닌 가슴 부위를 압박하세요'],
+      warning: '환자가 의식을 잃으면 즉시 기도를 확보하고 심폐소생술(CPR)로 전환하십시오.'
+    },
+    'AIR-03': {
+      title: '기도 유지 및 호흡 보조',
+      diagnosis: '호흡 곤란 및 기도 폐쇄 위험',
+      riskLevel: '3',
+      steps: [
+        { title: '머리 기울이기-턱 올리기', desc: '한 손을 이마에 대고 머리를 뒤로 젖히며, 다른 손가락으로 턱뼈를 들어 올려 기도를 확보하십시오.' },
+        { title: '입안 이물질 제거', desc: '눈에 보이는 구토물이나 이물질이 있다면 머리를 옆으로 돌려 손가락으로 가볍게 제거하십시오.' },
+        { title: '의복 이완 및 조임 해제', desc: '넥타이, 벨트, 상의 단추 등 환자의 호흡을 방해하는 조이는 의복을 신속히 풀어주십시오.' },
+        { title: '회복 자세 유지', desc: '환자가 스스로 숨을 쉰다면 몸을 옆으로 돌려 눕혀 기도가 막히지 않도록 조치하십시오.' }
+      ],
+      dos: ['환자가 자가 호흡 중이면 옆으로 눕히세요', '구토 시 즉시 몸 전체를 옆으로 돌리세요'],
+      donts: ['의식이 없는 환자에게 물을 먹이지 마세요', '머리 밑에 베개를 넣어 기도를 꺾지 마세요'],
+      warning: '호흡음이 거칠거나 청색증이 보이면 즉시 심폐소생술을 준비하십시오.'
+    },
+    'BLD-02': {
+      title: '출혈 부위 직접 압박',
+      diagnosis: '외상성 대량 출혈(Hemorrhage)',
+      riskLevel: '3',
+      steps: [
+        { title: '상처 노출 및 확인', desc: '옷을 가위로 잘라 상처 부위를 완전히 드러내고 정확한 출혈 지점을 확인하십시오.' },
+        { title: '직접 압박 시행', desc: '멸균 거즈나 깨끗한 천을 대고 손바닥 전체로 체중을 실어 강하게 누르십시오.' },
+        { title: '지혈대(T-kit) 적용', desc: '대량 출혈이 직접 압박으로 멈추지 않을 때만 상처 5~10cm 위쪽(심장 방향)에 지혈대를 감으십시오.' }
+      ],
+      dos: ['출혈 부위를 심장보다 높게 유지하세요', '지혈대 사용 시 착용 시각을 기록하세요'],
+      donts: ['상처에 박힌 칼 등을 억지로 뽑지 마세요', '된장 등 이물질을 바르지 마세요'],
+      warning: '지혈대는 최후의 수단이며, 한 번 조이면 의료진의 지시 없이 절대 풀지 마십시오.'
+    },
+    'BRN-08': {
+      title: '화상 부위 식히기',
+      diagnosis: '열상성 화상(Burn Injury)',
+      riskLevel: '2',
+      steps: [
+        { title: '흐르는 물 냉각 (20분)', desc: '12~25℃ 찬물에 20분 이상 식히십시오. 수압은 약하게 유지하십시오.' },
+        { title: '의복 및 장신구 제거', desc: '가위로 옷을 자르되, 피부에 달라붙은 옷은 억지로 떼지 마십시오.' },
+        { title: '화상 연고 및 드레싱', desc: '처치 부위의 열감이 사라진 후, 멸균 면봉으로 연고를 얹듯이 바르십시오.' }
+      ],
+      dos: ['물집이 터지지 않도록 최대한 조심하세요', '통증 완화를 위해 수평을 유지하세요'],
+      donts: ['민간요법(된장, 소주 등)은 절대 금물입니다', '얼음을 직접 환부에 대지 마세요'],
+      warning: '안면 화상이나 연기 흡입 시 산소를 공급하십시오.'
+    },
+    'HYP-05': {
+      title: '물에 빠진 선원 구조',
+      diagnosis: '심부 저체온증(Hypothermia)',
+      riskLevel: '2',
+      steps: [
+        { title: '젖은 의복 제거', desc: '바람이 없는 따뜻하고 건조한 곳으로 이동하고, 젖은 옷을 제거한 뒤 몸을 닦으십시오.' },
+        { title: '중심 체온 가온', desc: '담요로 몸을 감싸고, 온팩을 겨드랑이, 사타구니, 목 등 굵은 혈관 부위에 대십시오.' },
+        { title: '안정 및 수평 이동', desc: '환자를 갑자기 일으키거나 팔다리를 주무르지 마십시오.' }
+      ],
+      dos: ['의식이 있다면 따뜻하고 단 음료를 주십시오', '환자를 아주 조심스럽게 옮기십시오'],
+      donts: ['팔다리를 문지르거나 주무르지 마세요', '뜨거운 물에 환자를 직접 담그지 마세요'],
+      warning: '심한 저체온증 환자는 작은 충격에도 심정지가 올 수 있으니 극히 주의하십시오.'
+    },
+    'FRC-04': {
+      title: '뼈 부러진 곳 고정하기',
+      diagnosis: '골절 및 신경 손상 의심',
+      riskLevel: '1',
+      steps: [
+        { title: '상처 확인 및 안정화', desc: '다친 부위를 손으로 받쳐 움직이지 않게 고정하고, 편안한 자세를 유지하게 하십시오.' },
+        { title: '부목 고정', desc: '나무판자나 종이박스로 다친 관절의 위아래를 충분히 포함하도록 대고 고정하십시오.' },
+        { title: '냉찜질 (부종 방지)', desc: '부종과 통증을 줄이기 위해 얼음팩을 수건에 싸서 환부에 15분간 대어 주십시오.' }
+      ],
+      dos: ['뼈가 튀어나왔다면 멸균 거즈로 먼저 덮으세요', '다친 부위를 심장보다 높게 올리십시오'],
+      donts: ['부러진 뼈를 맞추려 하거나 억지로 밀어 넣지 마세요', '환자를 일으켜 세우거나 걷게 하지 마세요'],
+      warning: '척추 손상이 의심되거나 의식이 없는 경우 환자를 절대로 움직이지 마십시오.'
+    },
+    'WND-06': {
+      title: '상처 씻기 및 소독',
+      diagnosis: '국소 외상 및 찰과상',
+      riskLevel: '1',
+      steps: [
+        { title: '충분한 세척 (5~10분)', desc: '흐르는 수돗물이나 멸균 식염수로 5~10분간 상처 속 이물질을 충분히 씻어내십시오.' },
+        { title: '연고 및 멸균 드레싱', desc: '깨끗한 거즈로 주변 물기를 닦고 항생제 연고를 바른 뒤 멸균 거즈로 덮으십시오.' }
+      ],
+      dos: ['처치 전 위생 장갑을 반드시 착용하세요', '거즈가 없다면 깨끗한 손수건을 사용하세요'],
+      donts: ['상처 내부에 소독액을 직접 붓지 마세요', '상처에 솜(탈지면)을 직접 대지 마세요'],
+      warning: '깊은 자상, 동물에 물린 상처는 세척 후 즉시 의료진의 처치를 받으십시오.'
+    }
+  }
 
   const addManager = () => {
     if(!newMgrName.trim()) return;
@@ -179,6 +284,8 @@ export default function Settings() {
   ])
   const [showOnlyAlerts, setShowOnlyAlerts] = useState(false)
   const [editingMedId, setEditingMedId] = useState(null)
+  const [isMedModalOpen, setIsMedModalOpen] = useState(false)
+  const [newMed, setNewMed] = useState({ n:'', c:'', q:0, m:0, e:'-', cat:'pill' })
 
   const updateMed = (id, delta) => {
     setMeds(prev => prev.map(m => m.id === id ? { ...m, q: Math.max(0, m.q + delta) } : m))
@@ -187,6 +294,13 @@ export default function Settings() {
   const updateMedExpiry = (id, newDate) => {
     setMeds(prev => prev.map(m => m.id === id ? { ...m, e: newDate } : m))
     setEditingMedId(null)
+  }
+
+  const addMed = () => {
+    if (!newMed.n.trim() || !newMed.c.trim()) return alert('약품명과 분류를 입력하세요.')
+    setMeds(prev => [...prev, { ...newMed, id: Date.now() }])
+    setIsMedModalOpen(false)
+    setNewMed({ n:'', c:'', q:0, m:0, e:'-', cat:'pill' })
   }
 
   const filteredMeds = useMemo(() => {
@@ -252,9 +366,9 @@ export default function Settings() {
                     if(c) setNewEdu({...newEdu, id:c.id, name:c.name, dept:c.dept});
                   }} 
                   style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none', fontFamily:'inherit', appearance:'none', cursor:'pointer' }}>
-                  <option value="">선원을 선택하세요 (이름 | ID | 부서)</option>
+                  <option value="">선원을 선택하세요 (이름 ⏐ ID ⏐ 부서)</option>
                   {CREW.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} | {c.id} | {c.dept}</option>
+                    <option key={c.id} value={c.id}>{c.name} ⏐ {c.id} ⏐ {c.dept}</option>
                   ))}
                 </select>
               </div>
@@ -305,8 +419,8 @@ export default function Settings() {
 
       {/* 사이드 네비 */}
       <nav style={{ width:86, flexShrink:0, borderRight:`1px solid ${C.border}`, display:'flex', flexDirection:'column', alignItems:'center', paddingTop:28, gap:10, background:C.panel }}>
-        {['현황','건강','SOP','시스템'].map((l, i) => (
-          <button key={i} onClick={() => document.getElementById(`s${i+1===3?4:i+1===4?5:i+1}`)?.scrollIntoView({ behavior:'smooth' })}
+        {['현황','건강','시스템'].map((l, i) => (
+          <button key={i} onClick={() => document.getElementById(`s${i+1===3?5:i+1}`)?.scrollIntoView({ behavior:'smooth' })}
             style={{ width:65, height:65, borderRadius:12, background:'transparent', border:'1px solid transparent', cursor:'pointer', fontSize:17, fontWeight:800, color:C.sub }}>{l}</button>
         ))}
       </nav>
@@ -435,32 +549,32 @@ export default function Settings() {
                     const isLow = m.q <= m.m;
                     const isExpiring = m.e !== '-' && (new Date(m.e) - new Date()) / (1000*60*60*24) < 90;
                     return (
-                      <div key={m.id} style={{ background:C.panel, border:`1.5px solid ${isLow ? C.warning+'66' : isExpiring ? C.danger+'66' : C.border}`, borderRadius:15, padding:'20px', transition:'0.2s', position:'relative' }}>
-                        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:15 }}>
+                      <div key={m.id} style={{ background:C.panel, border:`1.5px solid ${isLow ? C.warning+'66' : isExpiring ? C.danger+'66' : C.border}`, borderRadius:15, padding:'28px', transition:'0.2s', position:'relative' }}>
+                        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
                           <div>
-                            <div style={{ fontSize:14, color:C.sub, fontWeight:800, marginBottom:4, display:'flex', alignItems:'center', gap:5 }}>
-                              {m.cat === 'pill' ? <Pill size={12}/> : m.cat === 'liquid' ? <Activity size={12}/> : <Shield size={12}/>} {m.c}
+                            <div style={{ fontSize:20, color:C.sub, fontWeight:800, marginBottom:6, display:'flex', alignItems:'center', gap:7 }}>
+                              {m.cat === 'pill' ? <Pill size={18}/> : m.cat === 'liquid' ? <Activity size={18}/> : <Shield size={18}/>} {m.c}
                             </div>
-                            <div style={{ fontSize:21, fontWeight:900, color:'#fff' }}>{m.n}</div>
+                            <div style={{ fontSize:30, fontWeight:900, color:'#fff' }}>{m.n}</div>
                           </div>
-                          {isExpiring && <span style={{ background:C.danger, color:'#fff', fontSize:12, padding:'3px 6px', borderRadius:5, fontWeight:900, animation:'blink 2s infinite' }}>기한임박</span>}
+                          {isExpiring && <span style={{ background:C.danger, color:'#fff', fontSize:17, padding:'4px 8px', borderRadius:5, fontWeight:900, animation:'blink 2s infinite' }}>기한임박</span>}
                         </div>
-                        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:C.panel2, padding:'10px 15px', borderRadius:10, marginBottom:12, border:`1px solid ${C.border}` }}>
-                          <button onClick={()=>updateMed(m.id, -1)} style={{ background:'none', border:'none', color:C.info, cursor:'pointer', fontSize:26, fontWeight:900 }}>-</button>
+                        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:C.panel2, padding:'14px 22px', borderRadius:10, marginBottom:18, border:`1px solid ${C.border}` }}>
+                          <button onClick={()=>updateMed(m.id, -1)} style={{ background:'none', border:'none', color:C.info, cursor:'pointer', fontSize:36, fontWeight:900 }}>-</button>
                           <div style={{ textAlign:'center' }}>
-                            <div style={{ fontSize:24, fontWeight:900, color:isLow ? C.warning : C.success }}>{m.q}</div>
-                            <div style={{ fontSize:14, color:C.sub, fontWeight:700 }}>최소 {m.m}</div>
+                            <div style={{ fontSize:34, fontWeight:900, color:isLow ? C.warning : C.success }}>{m.q}</div>
+                            <div style={{ fontSize:20, color:C.sub, fontWeight:700 }}>최소 {m.m}</div>
                           </div>
-                          <button onClick={()=>updateMed(m.id, 1)} style={{ background:'none', border:'none', color:C.info, cursor:'pointer', fontSize:26, fontWeight:900 }}>+</button>
+                          <button onClick={()=>updateMed(m.id, 1)} style={{ background:'none', border:'none', color:C.info, cursor:'pointer', fontSize:36, fontWeight:900 }}>+</button>
                         </div>
-                        <div style={{ fontSize:15, color:C.sub, textAlign:'center', fontWeight:700 }}>
+                        <div style={{ fontSize:21, color:C.sub, textAlign:'center', fontWeight:700 }}>
                           유통기한 : {editingMedId === m.id ? (
                             <input 
                               autoFocus
                               defaultValue={m.e}
                               onBlur={e => updateMedExpiry(m.id, e.target.value)}
                               onKeyDown={e => e.key === 'Enter' && updateMedExpiry(m.id, e.target.value)}
-                              style={{ width:100, background:C.panel2, border:`1px solid ${C.info}`, borderRadius:4, color:'#fff', textAlign:'center', outline:'none', fontSize:14, fontFamily:'monospace' }}
+                              style={{ width:140, background:C.panel2, border:`1px solid ${C.info}`, borderRadius:4, color:'#fff', textAlign:'center', outline:'none', fontSize:20, fontFamily:'monospace' }}
                             />
                           ) : (
                             <span 
@@ -478,44 +592,136 @@ export default function Settings() {
                 )}
               </div>
               <div style={{ marginTop:20, textAlign:'center' }}>
-                <Btn color={C.info} style={{ fontSize:17, padding:'10px 25px' }}>+ 신규 약품/소모품 등록</Btn>
+                <Btn color={C.info} style={{ fontSize:17, padding:'10px 25px' }} onClick={() => setIsMedModalOpen(true)}>+ 신규 약품/소모품 등록</Btn>
               </div>
             </GPanel>
           </div>
         </Section>
 
+        {/* ── 신규 약품 등록 모달 ── */}
+        {isMedModalOpen && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', backdropFilter:'blur(10px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:2000, fontFamily:'"Pretendard",sans-serif' }}>
+            <div style={{ background:C.panel, border:`2px solid ${C.warning}`, borderRadius:24, padding:45, width:650, boxShadow:'0 0 60px rgba(251,146,60,0.2)' }}>
+              <div style={{ fontSize:32, fontWeight:950, marginBottom:35, color:C.warning, display:'flex', alignItems:'center', gap:15, letterSpacing:'-1px' }}>
+                <Pill size={36}/> 신규 의료 소모품 등록
+              </div>
+              
+              <div style={{ display:'flex', flexDirection:'column', gap:24 }}>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+                  <div>
+                    <div style={{ fontSize:18, color:C.sub, marginBottom:10, fontWeight:800 }}>약품/소모품 명칭</div>
+                    <input 
+                      value={newMed.n} 
+                      onChange={e => setNewMed({...newMed, n: e.target.value})}
+                      placeholder="예: 타이레놀 500mg"
+                      style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none', boxSizing:'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ fontSize:18, color:C.sub, marginBottom:10, fontWeight:800 }}>효능/분류</div>
+                    <input 
+                      value={newMed.c} 
+                      onChange={e => setNewMed({...newMed, c: e.target.value})}
+                      placeholder="예: 해열진통제"
+                      style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none', boxSizing:'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+                  <div>
+                    <div style={{ fontSize:18, color:C.sub, marginBottom:10, fontWeight:800 }}>형태 분류</div>
+                    <select 
+                      value={newMed.cat} 
+                      onChange={e => setNewMed({...newMed, cat: e.target.value})}
+                      style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none', appearance:'none', cursor:'pointer' }}>
+                      <option value="pill">알약 (Pill)</option>
+                      <option value="liquid">액체 (Liquid)</option>
+                      <option value="cream">연고 (Cream)</option>
+                      <option value="pad">거즈/패드 (Pad)</option>
+                      <option value="bandage">붕대/고정 (Bandage)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <div style={{ fontSize:18, color:C.sub, marginBottom:10, fontWeight:800 }}>유통기한</div>
+                    <div 
+                      onClick={() => setDateEditor({ field:'e', label:'유통기한', value:newMed.e, medId: null })}
+                      style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, cursor:'pointer', minHeight:60, display:'flex', alignItems:'center', justifyContent:'space-between', boxSizing:'border-box' }}>
+                      {newMed.e === '-' ? <span style={{ color:'rgba(255,255,255,0.15)' }}>기한 없음</span> : newMed.e}
+                      <Clock size={20} color={C.sub} />
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+                  <div>
+                    <div style={{ fontSize:18, color:C.sub, marginBottom:10, fontWeight:800 }}>현재 재고 수량</div>
+                    <input 
+                      type="number"
+                      value={newMed.q} 
+                      onChange={e => setNewMed({...newMed, q: parseInt(e.target.value) || 0})}
+                      style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none', boxSizing:'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ fontSize:18, color:C.sub, marginBottom:10, fontWeight:800 }}>최소 유지 수량 (알림)</div>
+                    <input 
+                      type="number"
+                      value={newMed.m} 
+                      onChange={e => setNewMed({...newMed, m: parseInt(e.target.value) || 0})}
+                      style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none', boxSizing:'border-box' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display:'flex', gap:18, marginTop:45 }}>
+                <button onClick={()=>setIsMedModalOpen(false)} style={{ flex:1, padding:20, borderRadius:15, background:'rgba(255,255,255,0.03)', border:`1px solid ${C.border}`, color:C.sub, fontSize:22, fontWeight:800, cursor:'pointer', fontFamily:'inherit', transition:'0.2s' }}>취소</button>
+                <button onClick={addMed} style={{ flex:2, padding:20, borderRadius:15, background:C.warning, border:'none', color:'#000', fontSize:22, fontWeight:950, cursor:'pointer', fontFamily:'inherit', transition:'0.2s', boxShadow:`0 10px 20px ${C.warning}33` }}>등록 완료</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ══ S2 : 선원 건강 ══ */}
         <Section id="s2" label="선원 건강 모니터링" color={C.success} collapsed={collapsed.s2} onToggle={()=>fold('s2')}>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1.2fr', gap:18, marginBottom:18 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'1.5fr 1fr', gap:18, marginBottom:18 }}>
+            <GPanel title="선원 건강 위험도 히트맵" icon={<Activity size={22} color={C.success}/>}
+              right={
+                <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: C.success }} />
+                    <span style={{ fontSize: 16, fontWeight: 700, color: C.sub }}>정상</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: C.warning }} />
+                    <span style={{ fontSize: 16, fontWeight: 700, color: C.sub }}>주의</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: C.danger }} />
+                    <span style={{ fontSize: 16, fontWeight: 700, color: C.sub }}>고위험</span>
+                  </div>
+                </div>
+              }>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:10 }}>
+                {CREW.map(c => <div key={c.id} title={`${c.name} - ${c.role}`} style={{ width:85, padding:'12px 5px', borderRadius:10, background:`${riskOf(c)}1a`, border:`1px solid ${riskOf(c)}44`, textAlign:'center', cursor:'pointer' }}><div style={{ fontSize:17, fontWeight:800, color:riskOf(c) }}>{c.name}</div><div style={{ width:10, height:10, borderRadius:'50%', background:riskOf(c), margin:'5px auto 0' }}/></div>)}
+              </div>
+            </GPanel>
+
             <GPanel title="건강 위험 분포" icon={<Activity size={22} color={C.danger}/>}>
               <div style={{ height:250, position:'relative' }}>
                 <ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={[{v:70,c:C.success},{v:20,c:C.warning},{v:10,c:C.danger}]} innerRadius={60} outerRadius={90} dataKey="v" stroke="none">{[{v:70,c:C.success},{v:20,c:C.warning},{v:10,c:C.danger}].map((e,idx)=><Cell key={idx} fill={e.c}/>)}</Pie></PieChart></ResponsiveContainer>
                 <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', textAlign:'center' }}><div style={{ fontSize:18, color:C.sub }}>SAFETY</div><div style={{ fontSize:32, fontWeight:900 }}>82%</div></div>
               </div>
             </GPanel>
-            <GPanel title="부서별 상태" icon={<Users size={22} color={C.info}/>}><div style={{ height:250 }}><ResponsiveContainer width="100%" height="100%"><BarChart data={[{n:'항해',v:12},{n:'기관',v:10},{n:'지원',v:4}]}><XAxis dataKey="n" stroke={C.sub} fontSize={16}/><YAxis hide/><Bar dataKey="v" fill={C.info} radius={[6,6,0,0]}/></BarChart></ResponsiveContainer></div></GPanel>
-            <GPanel title="기저 질환 통계" icon={<AlertCircle size={22} color={C.warning}/>}>
-              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                {[{l:'고혈압',v:5,c:C.danger},{l:'당뇨',v:2,c:C.warning},{l:'허리디스크',v:1,c:C.info}].map(d=>(
-                  <div key={d.l} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 18px', background:C.panel2, borderRadius:10 }}>
-                    <span style={{ fontSize:20, fontWeight:700 }}>{d.l}</span><span style={{ fontSize:22, fontWeight:900, color:d.c }}>{d.v}명</span>
-                  </div>
-                ))}
-              </div>
-            </GPanel>
           </div>
-          <GPanel title="선원 건강 위험도 히트맵" icon={<Activity size={22} color={C.success}/>}>
-            <div style={{ display:'flex', flexWrap:'wrap', gap:10 }}>
-              {CREW.map(c => <div key={c.id} title={`${c.name} - ${c.role}`} style={{ width:85, padding:'12px 5px', borderRadius:10, background:`${riskOf(c)}1a`, border:`1px solid ${riskOf(c)}44`, textAlign:'center', cursor:'pointer' }}><div style={{ fontSize:17, fontWeight:800, color:riskOf(c) }}>{c.name}</div><div style={{ width:10, height:10, borderRadius:'50%', background:riskOf(c), margin:'5px auto 0' }}/></div>)}
-            </div>
-          </GPanel>
         </Section>
 
         {/* ══ S4 : SOP ══ */}
         <Section id="s4" label="응급처치 지침 및 SOP" color={C.purple} collapsed={collapsed.s4} onToggle={()=>fold('s4')}>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:18 }}>
             {SOP_LIST.map((s,i)=>(
-              <div key={i} style={{ padding:'25px 20px', borderRadius:15, background:C.panel2, border:`1px solid ${C.border}`, textAlign:'center' }}>
+              <div key={i} onClick={() => setSelectedSop(s.code)} style={{ padding:'25px 20px', borderRadius:15, background:C.panel2, border:`1px solid ${C.border}`, textAlign:'center', cursor:'pointer', transition:'0.2s' }} className="sop-card">
                 <div style={{ fontSize:18, color:s.color, fontWeight:800, marginBottom:10 }}>{s.code}</div>
                 <div style={{ fontSize:22, fontWeight:700, marginBottom:10 }}>{s.title}</div>
                 <Tag color={s.color} small>{s.cat}</Tag>
@@ -524,14 +730,103 @@ export default function Settings() {
           </div>
         </Section>
 
+        {/* ── SOP 상세 뷰어 모달 ── */}
+        {selectedSop && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.9)', backdropFilter:'blur(15px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000, fontFamily:'"Pretendard",sans-serif', padding:40 }}>
+            <div style={{ background:C.panel, border:`2px solid ${C.purple}`, borderRadius:32, width:'100%', maxWidth:1100, maxHeight:'90vh', overflow:'hidden', display:'flex', flexDirection:'column', boxShadow:'0 0 100px rgba(167,139,250,0.2)' }}>
+              {/* 모달 헤더 */}
+              <div style={{ padding:'35px 45px', borderBottom:`1px solid ${C.border}`, display:'flex', justifyContent:'space-between', alignItems:'center', background:'rgba(167,139,250,0.03)' }}>
+                <div>
+                  <div style={{ display:'flex', alignItems:'center', gap:15, marginBottom:10 }}>
+                    <Tag color={C.purple}>{selectedSop}</Tag>
+                    <div style={{ background:ACTION_GUIDES_DATA[selectedSop].riskLevel >= '3' ? C.danger : C.warning, color:'#000', padding:'4px 12px', borderRadius:8, fontSize:15, fontWeight:950 }}>RISK LEVEL {ACTION_GUIDES_DATA[selectedSop].riskLevel}</div>
+                  </div>
+                  <h2 style={{ fontSize:42, fontWeight:950, color:'#fff', margin:0, letterSpacing:'-1.5px' }}>{ACTION_GUIDES_DATA[selectedSop].title}</h2>
+                </div>
+                <button onClick={() => setSelectedSop(null)} style={{ background:'rgba(255,255,255,0.05)', border:'none', color:'#fff', width:64, height:64, borderRadius:20, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}><X size={32}/></button>
+              </div>
+
+              {/* 모달 컨텐츠 */}
+              <div style={{ flex:1, overflowY:'auto', padding:'45px', display:'grid', gridTemplateColumns:'1.2fr 1fr', gap:35 }}>
+                {/* 좌측 : 단계별 절차 */}
+                <div>
+                  <div style={{ fontSize:22, fontWeight:900, color:C.purple, marginBottom:25, display:'flex', alignItems:'center', gap:10 }}><Activity size={24}/> 표준 운영 절차 (Standard Procedures)</div>
+                  <div style={{ display:'flex', flexDirection:'column', gap:15 }}>
+                    {ACTION_GUIDES_DATA[selectedSop].steps.map((step, idx) => (
+                      <div key={idx} style={{ padding:'24px', background:C.panel2, borderRadius:20, border:`1px solid ${C.border}`, display:'flex', gap:20 }}>
+                        <div style={{ width:40, height:40, borderRadius:'50%', background:C.purple, color:'#000', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, fontWeight:950, flexShrink:0 }}>{idx+1}</div>
+                        <div>
+                          <div style={{ fontSize:24, fontWeight:900, color:'#fff', marginBottom:6 }}>{step.title}</div>
+                          <div style={{ fontSize:19, color:C.text, lineHeight:1.5, fontWeight:600 }}>{step.desc}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 우측 : 주의사항 및 지침 */}
+                <div style={{ display:'flex', flexDirection:'column', gap:25 }}>
+                  <div style={{ background:'rgba(34,197,94,0.05)', border:'1px solid rgba(34,197,94,0.2)', borderRadius:24, padding:30 }}>
+                    <div style={{ color:C.success, fontSize:22, fontWeight:900, marginBottom:20, display:'flex', alignItems:'center', gap:10 }}><CheckCircle2 size={24}/> 권고 사항 (Dos)</div>
+                    {ACTION_GUIDES_DATA[selectedSop].dos.map((d, i) => <div key={i} style={{ fontSize:19, fontWeight:700, marginBottom:12, color:'#e2e8f0', display:'flex', gap:10 }}><span style={{ color:C.success }}>•</span>{d}</div>)}
+                  </div>
+
+                  <div style={{ background:'rgba(239,68,68,0.08)', border:`1px solid ${C.danger}44`, borderRadius:24, padding:30 }}>
+                    <div style={{ color:C.danger, fontSize:22, fontWeight:900, marginBottom:20, display:'flex', alignItems:'center', gap:10 }}><AlertCircle size={24}/> 절대 금기 (Don'ts)</div>
+                    {ACTION_GUIDES_DATA[selectedSop].donts.map((d, i) => <div key={i} style={{ fontSize:19, fontWeight:800, color:'#fff', marginBottom:12, display:'flex', gap:10 }}><span style={{ color:C.danger }}>•</span>{d}</div>)}
+                  </div>
+
+                  <div style={{ background:C.panel2, border:`2px solid ${C.warning}66`, borderRadius:24, padding:30, position:'relative', overflow:'hidden' }}>
+                    <div style={{ position:'absolute', top:0, left:0, width:6, height:'100%', background:C.warning }} />
+                    <div style={{ color:C.warning, fontSize:22, fontWeight:900, marginBottom:15, display:'flex', alignItems:'center', gap:10 }}><Sparkles size={24}/> 긴급 경고</div>
+                    <div style={{ fontSize:20, fontWeight:800, color:'#fff', lineHeight:1.5 }}>{ACTION_GUIDES_DATA[selectedSop].warning}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 모달 푸터 */}
+              <div style={{ padding:'30px 45px', background:C.panel2, borderTop:`1px solid ${C.border}`, display:'flex', justifyContent:'center' }}>
+                <button onClick={() => setSelectedSop(null)} style={{ padding:'18px 60px', borderRadius:15, background:'rgba(255,255,255,0.05)', border:`1px solid ${C.border}`, color:'#fff', fontSize:22, fontWeight:900, cursor:'pointer' }}>확인 및 닫기</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ══ S5 : 시스템 관리 (하단) ══ */}
         <Section id="s5" label="시스템 관리 및 장비 건전성" color={C.warning} collapsed={collapsed.s5} onToggle={()=>fold('s5')}>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:18, marginBottom:18 }}>
-            {[{l:'위성 신호',v:'매우 강함',c:C.success,s:'Starlink'},{l:'응답 속도',v:'42ms',c:C.info,s:'STABLE'},{l:'동기화',v:'09:31',c:C.success,s:'COMPLETED'},{l:'AI 버전',v:'v2.4.1',c:C.purple,s:'EDGE'}].map((s,i)=>(
-              <div key={i} style={{ background:C.panel, border:`1px solid ${C.border}`, borderTop:`4px solid ${s.c}`, borderRadius:12, padding:'22px 28px' }}>
-                <div style={{ fontSize:18, color:C.sub, fontWeight:700, marginBottom:10 }}>{s.l}</div>
-                <div style={{ fontSize:32, fontWeight:900, color:s.c }}>{s.v}</div>
-                <div style={{ fontSize:16, color:C.sub, marginTop:5 }}>{s.s}</div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:18, marginBottom:24 }}>
+            {[
+              {l:'위성 신호', v:'매우 강함', c:C.success, s:'Starlink Gen3', i:<Wifi size={24}/>},
+              {l:'응답 속도', v:'42ms', c:C.info, s:'STABLE (Low)', i:<Activity size={24}/>},
+              {l:'DB 동기화', v:'09:31', c:C.success, s:'LAST SYNC', i:<RefreshCw size={24}/>},
+              {l:'AI 엔진', v:'v2.4.1', c:C.purple, s:'STABLE RELEASE', i:<Cpu size={24}/>}
+            ].map((s,i)=>(
+              <div key={i} className="sys-kpi-card" style={{ 
+                background: 'rgba(255, 255, 255, 0.02)', 
+                border: '1.5px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: 20, 
+                padding: '24px 28px',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all 0.3s ease'
+              }}>
+                {/* 배경 디테일 */}
+                <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, background: `${s.c}08`, borderRadius: '50%', filter: 'blur(20px)' }} />
+                
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:15 }}>
+                  <div style={{ fontSize:18, color:C.sub, fontWeight:800, letterSpacing:'0.5px' }}>{s.l}</div>
+                  <div style={{ color:s.c, opacity:0.8 }}>{s.i}</div>
+                </div>
+
+                <div style={{ fontSize:34, fontWeight:950, color:'#fff', marginBottom:8, letterSpacing:'-1px' }}>{s.v}</div>
+                
+                <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                  <div style={{ width:6, height:6, borderRadius:'50%', background:s.c, boxShadow:`0 0 10px ${s.c}` }} />
+                  <div style={{ fontSize:15, color:C.sub, fontWeight:700, textTransform:'uppercase' }}>{s.s}</div>
+                </div>
+
+                {/* 하단 데코 라인 */}
+                <div style={{ position:'absolute', bottom:0, left:0, width:'100%', height:1.5, background:`linear-gradient(90deg, transparent, ${s.c}33, transparent)` }} />
               </div>
             ))}
           </div>
@@ -586,6 +881,7 @@ export default function Settings() {
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
         .kpi-card:hover { transform: translateY(-8px); background: rgba(17, 19, 24, 0.8) !important; border-color: inherit !important; box-shadow: 0 30px 60px -12px rgba(0,0,0,0.6) !important; }
+        .sop-card:hover { background: rgba(167,139,250,0.08) !important; border-color: rgba(167,139,250,0.4) !important; transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
         .premium-btn:hover { background: rgba(255,255,255,0.05) !important; filter: brightness(1.2); }
         ::-webkit-scrollbar { width:6px; }
         ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:10px; }

@@ -106,8 +106,8 @@ const ACTION_GUIDES = {
     protocol: 'SOP-FRC-04',
     steps: [
       { title: '상처 확인 및 안정화', desc: '다친 부위를 손으로 받쳐 움직이지 않게 고정하고, 환자가 통증을 가장 적게 느끼는 편안한 자세를 유지하게 하십시오.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-01.png' },
+      { title: '부목 고정', desc: '나무판자나 종이박스로 다친 관절의 위아래를 충분히 포함하도록 대고 끈이나 붕대로 움직이지 않게 묶으십시오.', tip: '너무 꽉 조여 혈액 순환을 방해하지 않도록 주의하십시오.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-03.png' },
       { title: '냉찜질 (부종 방지)', desc: '부종과 통증을 줄이기 위해 얼음팩을 수건에 싸서 환부에 15분간 대어 주십시오. 얼음이 피부에 직접 닿지 않게 하십시오.', tip: '냉찜질은 혈관을 수축시켜 내부 출혈과 붓기를 완화합니다.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-02.png' },
-      { title: '부목 고정 (Splint)', desc: '나무판자나 종이박스로 다친 관절의 위아래를 충분히 포함하도록 대고 끈이나 붕대로 움직이지 않게 묶으십시오.', tip: '너무 꽉 조여 혈액 순환을 방해하지 않도록 주의하십시오.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-03.png' },
       { title: '순환 확인 및 보고', desc: '손발가락 끝의 혈색과 온도를 확인하며 환부를 고정 상태로 유지하십시오. 즉시 긴급 의료 지원을 요청(육상 의료 지원팀 연계)하십시오.', tip: '감각이 없거나 창백해지면 부목을 즉시 느슨하게 조정하십시오.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-04.png' }
     ],
     dos: ['뼈가 튀어나왔다면 멸균 거즈로 먼저 덮으세요', '다친 부위를 심장보다 높게 올리십시오', '환자가 안정을 취하도록 돕고 체온을 유지하세요'],
@@ -122,8 +122,7 @@ const ACTION_GUIDES = {
     protocol: 'SOP-WND-06',
     steps: [
       { title: '충분한 세척 (5~10분)', desc: '흐르는 수돗물이나 멸균 식염수로 5~10분간 상처 속 이물질을 충분히 씻어내십시오.', tip: '상처 속 흙이나 오염 물질이 남으면 감염의 원인이 됩니다.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-01.png' },
-      { title: '연고 및 멸균 드레싱', desc: '깨끗한 거즈로 주변 물기를 닦고 항생제 연고를 바른 뒤 멸균 거즈로 환부를 덮으십시오.', tip: '상처에 직접 손을 대지 말고 멸균 면봉을 사용하십시오.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-02.png' },
-      { title: '경과 관찰 및 보고', desc: '감염 징후(발열, 고름, 심한 통증)를 관찰하십시오. 즉시 긴급 의료 지원을 요청(육상 의료 지원팀 연계)하십시오.', tip: '상처 부위가 붉게 부어오르는지 주기적으로 확인하십시오.' }
+      { title: '연고 및 멸균 드레싱', desc: '깨끗한 거즈로 주변 물기를 닦고 항생제 연고를 바른 뒤 멸균 거즈로 환부를 덮으십시오.', tip: '상처에 직접 손을 대지 말고 멸균 면봉을 사용하십시오.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-02.png' }
     ],
     dos: ['처치 전 위생 장갑을 반드시 착용하세요', '거즈가 없다면 깨끗한 손수건을 사용하세요', '상처 주변 피부를 청결히 유지하세요'],
     donts: ['상처 내부에 소독액(알코올 등)을 직접 붓지 마세요', '상처에 가루약이나 된장 등을 바르지 마세요', '상처에 솜(탈지면)을 직접 대지 마세요'],
@@ -303,6 +302,14 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     if (activeAction === '화상' && index === 0) {
       setIsBurnTimerActive(true)
     }
+    if (activeAction === '골절 / 탈구' && index === 2) {
+      setColdTimer(900)
+      setIsColdTimerActive(true)
+    }
+    if (activeAction === '상처 세척' && index === 0) {
+      setWashTimer(300)
+      setIsWashTimerActive(true)
+    }
 
     if (activeAction && ACTION_GUIDES[activeAction] && !isDone) {
       const stepTitle = ACTION_GUIDES[activeAction].steps[index].title
@@ -332,17 +339,11 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
 
   const [burnTimer, setBurnTimer] = useState(1200)
   const [isBurnTimerActive, setIsBurnTimerActive] = useState(false)
+  const [coldTimer, setColdTimer] = useState(900)
+  const [isColdTimerActive, setIsColdTimerActive] = useState(false)
+  const [washTimer, setWashTimer] = useState(300)
+  const [isWashTimerActive, setIsWashTimerActive] = useState(false)
 
-  const GOLDEN_TIME = 42 * 60 + 15
-  const [goldenTimer, setGoldenTimer] = useState(GOLDEN_TIME)
-  const goldenIsUrgent = goldenTimer < 10 * 60
-  const formatGolden = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
-
-  useEffect(() => {
-    const interval = setInterval(() => setGoldenTimer(t => (t > 0 ? t - 1 : 0)), 1000)
-    return () => clearInterval(interval)
-  }, [])
-  
   useEffect(() => {
     let interval;
     if (activeAction === '화상' && isBurnTimerActive && burnTimer > 0) {
@@ -350,8 +351,18 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         setBurnTimer(prev => prev - 1)
       }, 1000)
     }
+    if (activeAction === '골절 / 탈구' && isColdTimerActive && coldTimer > 0) {
+      interval = setInterval(() => {
+        setColdTimer(prev => prev - 1)
+      }, 1000)
+    }
+    if (activeAction === '상처 세척' && isWashTimerActive && washTimer > 0) {
+      interval = setInterval(() => {
+        setWashTimer(prev => prev - 1)
+      }, 1000)
+    }
     return () => clearInterval(interval)
-  }, [activeAction, isBurnTimerActive, burnTimer])
+  }, [activeAction, isBurnTimerActive, burnTimer, isColdTimerActive, coldTimer, isWashTimerActive, washTimer])
 
   const formatBurnTime = (seconds) => {
     const m = Math.floor(seconds / 60)
@@ -474,29 +485,14 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   return (
     <div style={{ height: 'calc(100vh - 72px)', width: '100%', background: '#020617', color: '#fff', position: 'relative', overflow: 'hidden', fontFamily: '"Pretendard", sans-serif', display: 'flex', flexDirection: 'column' }}>
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at center, transparent 0%, #020617 98%)' }} />
-      {!selectedTriage && activeAction && (
-        <div style={{ position: 'relative', zIndex: 10, background: 'rgba(251,113,133,0.06)', borderBottom: '1px solid rgba(251,113,133,0.15)', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 20, background: goldenIsUrgent ? 'rgba(239,68,68,0.2)' : 'rgba(251,113,133,0.1)', border: `1px solid ${goldenIsUrgent ? 'rgba(239,68,68,0.6)' : 'rgba(251,113,133,0.3)'}`, animation: goldenIsUrgent ? 'pulse-alert 0.8s infinite' : 'none' }}>
-            <Clock size={15} color={goldenIsUrgent ? '#ef4444' : '#fb7185'} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: goldenIsUrgent ? '#ef4444' : '#fb7185', fontVariantNumeric: 'tabular-nums' }}>
-              골든타임 {goldenTimer === 0 ? '00:00 초과!' : formatGolden(goldenTimer)}
-            </span>
-          </div>
-        </div>
-      )}
+      
       {selectedTriage && (
         <div style={{ position: 'relative', zIndex: 10, background: `${selectedTriage.color}15`, borderBottom: `1px solid ${selectedTriage.color}30`, padding: '12px 24px', display: 'flex', alignItems: 'center', gap: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ fontSize: 14, fontWeight: 800, color: selectedTriage.color, opacity: 0.8 }}>TRIAGE RESULT :</span><span style={{ fontSize: 18, fontWeight: 950, color: '#fff' }}>{selectedTriage.desc} ({selectedTriage.label})</span></div>
           <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ fontSize: 14, fontWeight: 800, color: selectedTriage.color, opacity: 0.8 }}>AI PROTOCOL :</span><span style={{ fontSize: 18, fontWeight: 950, color: selectedTriage.color }}>{currentActionData?.title} 가동 중</span></div>
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 20, background: goldenIsUrgent ? 'rgba(239,68,68,0.2)' : 'rgba(251,113,133,0.1)', border: `1px solid ${goldenIsUrgent ? 'rgba(239,68,68,0.6)' : 'rgba(251,113,133,0.3)'}`, animation: goldenIsUrgent ? 'pulse-alert 0.8s infinite' : 'none' }}>
-              <Clock size={15} color={goldenIsUrgent ? '#ef4444' : '#fb7185'} />
-              <span style={{ fontSize: 15, fontWeight: 900, color: goldenIsUrgent ? '#ef4444' : '#fb7185', fontVariantNumeric: 'tabular-nums' }}>
-                골든타임 {goldenTimer === 0 ? '00:00 초과!' : formatGolden(goldenTimer)}
-              </span>
-            </div>
-            <button onClick={() => {setTriageStep('CHECK'); setSelectedTriage(null)}} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: 13, fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}>재판별</button>
+          <div style={{ marginLeft: 'auto' }}>
+            <button onClick={() => {setTriageStep('CHECK'); setSelectedTriage(null)}} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '6px 16px', borderRadius: 8, color: '#64748b', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>의식 재판별</button>
           </div>
         </div>
       )}
@@ -555,13 +551,107 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                   zIndex: 60,
                   border: `8px solid ${burnTimer === 0 ? '#22c55e' : '#ef4444'}`,
                   boxShadow: `0 15px 40px ${burnTimer === 0 ? 'rgba(34,197,94,0.4)' : 'rgba(0,0,0,0.6)'}`,
-                  animation: burnTimer > 0 ? 'pulse 1.5s infinite' : 'none',
+                  animation: (isBurnTimerActive && burnTimer > 0) ? 'pulse 1.5s infinite' : 'none',
                   transition: 'all 0.5s ease'
                 }}>
                   <div style={{ position: 'absolute', top: '30px', fontSize: 22, fontWeight: 900, color: burnTimer === 0 ? '#22c55e' : '#ef4444', letterSpacing: '-0.5px', transition: 'all 0.5s ease' }}>{burnTimer === 0 ? '냉각 완료' : '냉각 시간'}</div>
                   <div style={{ fontSize: 48, fontWeight: 950, color: '#fff', lineHeight: 1, fontFamily: '"Pretendard", sans-serif', marginTop: '10px' }}>{formatBurnTime(burnTimer)}</div>
                   <button 
                     onClick={(e) => { e.stopPropagation(); setBurnTimer(1200); setIsBurnTimerActive(false); }}
+                    style={{ 
+                      position: 'absolute',
+                      bottom: '15px',
+                      background: 'rgba(255,255,255,0.1)', 
+                      border: 'none', 
+                      borderRadius: '50%', 
+                      width: 32, 
+                      height: 32, 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      cursor: 'pointer',
+                      color: '#fff',
+                      transition: '0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                    title="타이머 리셋"
+                  >
+                    <RefreshCw size={16} />
+                  </button>
+                </div>
+              )}
+
+              {activeAction === '골절 / 탈구' && activeDisplayIndex === 2 && coldTimer >= 0 && (
+                <div style={{ 
+                  position: 'absolute', 
+                  bottom: '8%', 
+                  right: '3%', 
+                  width: '180px', 
+                  height: '180px', 
+                  borderRadius: '50%', 
+                  background: 'rgba(2, 6, 23, 0.9)', 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  zIndex: 60,
+                  border: `8px solid ${coldTimer === 0 ? '#22c55e' : '#38bdf8'}`,
+                  boxShadow: `0 15px 40px ${coldTimer === 0 ? 'rgba(34,197,94,0.4)' : 'rgba(0,0,0,0.6)'}`,
+                  animation: (isColdTimerActive && coldTimer > 0) ? 'pulse 1.5s infinite' : 'none',
+                  transition: 'all 0.5s ease'
+                }}>
+                  <div style={{ position: 'absolute', top: '30px', fontSize: 22, fontWeight: 900, color: coldTimer === 0 ? '#22c55e' : '#38bdf8', letterSpacing: '-0.5px', transition: 'all 0.5s ease' }}>{coldTimer === 0 ? '찜질 완료' : '냉찜질 시간'}</div>
+                  <div style={{ fontSize: 48, fontWeight: 950, color: '#fff', lineHeight: 1, fontFamily: '"Pretendard", sans-serif', marginTop: '10px' }}>{formatBurnTime(coldTimer)}</div>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setColdTimer(900); setIsColdTimerActive(false); }}
+                    style={{ 
+                      position: 'absolute',
+                      bottom: '15px',
+                      background: 'rgba(255,255,255,0.1)', 
+                      border: 'none', 
+                      borderRadius: '50%', 
+                      width: 32, 
+                      height: 32, 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      cursor: 'pointer',
+                      color: '#fff',
+                      transition: '0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                    title="타이머 리셋"
+                  >
+                    <RefreshCw size={16} />
+                  </button>
+                </div>
+              )}
+
+              {activeAction === '상처 세척' && activeDisplayIndex === 0 && washTimer >= 0 && (
+                <div style={{ 
+                  position: 'absolute', 
+                  bottom: '8%', 
+                  right: '3%', 
+                  width: '180px', 
+                  height: '180px', 
+                  borderRadius: '50%', 
+                  background: 'rgba(2, 6, 23, 0.9)', 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  zIndex: 60,
+                  border: `8px solid ${washTimer === 0 ? '#22c55e' : '#10b981'}`,
+                  boxShadow: `0 15px 40px ${washTimer === 0 ? 'rgba(34,197,94,0.4)' : 'rgba(0,0,0,0.6)'}`,
+                  animation: (isWashTimerActive && washTimer > 0) ? 'pulse 1.5s infinite' : 'none',
+                  transition: 'all 0.5s ease'
+                }}>
+                  <div style={{ position: 'absolute', top: '30px', fontSize: 22, fontWeight: 900, color: washTimer === 0 ? '#22c55e' : '#10b981', letterSpacing: '-0.5px', transition: 'all 0.5s ease' }}>{washTimer === 0 ? '세척 완료' : '세척 시간'}</div>
+                  <div style={{ fontSize: 48, fontWeight: 950, color: '#fff', lineHeight: 1, fontFamily: '"Pretendard", sans-serif', marginTop: '10px' }}>{formatBurnTime(washTimer)}</div>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setWashTimer(300); setIsWashTimerActive(false); }}
                     style={{ 
                       position: 'absolute',
                       bottom: '15px',
@@ -674,7 +764,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         </aside>
         <section style={{ gridColumn: '1 / 4', gridRow: '2', display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '8px', marginTop: '4px' }}>
           {Object.keys(ACTION_GUIDES).map(key => (
-            <button key={key} onClick={() => {setActiveAction(key); setCompletedSteps([]); setSelectedTriage(null); setShowCompletionPanel(false); setSelectedStepIndex(null); setIsBurnTimerActive(false); setBurnTimer(1200);}} style={{ background: activeAction === key ? `linear-gradient(135deg, ${ACTION_GUIDES[key].color}, ${ACTION_GUIDES[key].color}dd)` : `${ACTION_GUIDES[key].color}15`, border: '2px solid', borderColor: activeAction === key ? 'transparent' : `${ACTION_GUIDES[key].color}30`, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><div style={{ color: activeAction === key ? '#fff' : ACTION_GUIDES[key].color }}><ActionButtonIcon label={key} size={26} /></div><div style={{ fontSize: 28, fontWeight: 950, color: '#fff', letterSpacing: '-1px' }}>{key}</div></button>
+            <button key={key} onClick={() => {setActiveAction(key); setCompletedSteps([]); setSelectedTriage(null); setShowCompletionPanel(false); setSelectedStepIndex(null); setIsBurnTimerActive(false); setBurnTimer(1200); setIsColdTimerActive(false); setColdTimer(900); setIsWashTimerActive(false); setWashTimer(300);}} style={{ background: activeAction === key ? `linear-gradient(135deg, ${ACTION_GUIDES[key].color}, ${ACTION_GUIDES[key].color}dd)` : `${ACTION_GUIDES[key].color}15`, border: '2px solid', borderColor: activeAction === key ? 'transparent' : `${ACTION_GUIDES[key].color}30`, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><div style={{ color: activeAction === key ? '#fff' : ACTION_GUIDES[key].color }}><ActionButtonIcon label={key} size={26} /></div><div style={{ fontSize: 28, fontWeight: 950, color: '#fff', letterSpacing: '-1px' }}>{key}</div></button>
           ))}
         </section>
       </div>

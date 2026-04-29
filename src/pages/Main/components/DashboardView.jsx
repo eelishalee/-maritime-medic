@@ -441,10 +441,43 @@ export default function DashboardView({
 
       {/* [Right] Timeline */}
       <aside style={{ width: 480, flexShrink: 0, display: 'flex', flexDirection: 'column', background: '#05070a', overflow: 'hidden', position: 'relative', borderLeft: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ flexShrink: 0, padding: '32px 28px 20px 28px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+        <div style={{ flexShrink: 0, padding: '24px 28px 16px 28px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: 10 }}><Clock size={22}/> 상황 대응 타임라인</div>
         </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px 120px 28px', scrollbarWidth: 'none' }}>
+
+        {/* 외상 사진 디스플레이 박스 (오른쪽 상단 배치) */}
+        <div style={{ flexShrink: 0, padding: '0 28px 16px 28px', marginTop: 16 }}>
+          <div style={{ 
+            width: '100%', 
+            height: 240, 
+            background: 'rgba(255,255,255,0.02)', 
+            borderRadius: 24, 
+            border: '1.5px solid rgba(56,189,248,0.2)', 
+            overflow: 'hidden', 
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {activePatient?.id === 'S26-004' ? (
+              <img 
+                src="/assets/test_01.jpg" 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                alt="Trauma" 
+              />
+            ) : (
+              <div style={{ textAlign: 'center', zIndex: 1 }}>
+                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(56,189,248,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                  <Camera size={32} color="#38bdf8" style={{ opacity: 0.6 }} />
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: '#4a6080' }}>분석된 외상 이미지 없음</div>
+                <div style={{ fontSize: 14, color: '#334155', marginTop: 4, fontWeight: 700 }}>AI 분석 시 여기에 사진이 표시됩니다</div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div style={{ flex: 1, overflowY: 'auto', padding: '0 28px 120px 28px', scrollbarWidth: 'none' }}>
            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
              <div style={{ position: 'absolute', left: 7, top: 10, bottom: 10, width: 2, background: 'linear-gradient(to bottom, #f43f5e, #facc15, #38bdf8)' }} />
              {dynamicTimeline.map((item, idx) => (
