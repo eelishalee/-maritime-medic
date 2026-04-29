@@ -252,18 +252,20 @@ export default function CrewManagement({ onSelectPatient }) {
                     {c.isEmergency ? <ShieldAlert size={20}/> : <Plus size={20}/>}
                     {c.isEmergency ? '집중 관리 중' : '환자로 전환'}
                   </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setEditTarget({...c}) }}
-                    style={{ marginTop: 8, padding: '8px 16px', borderRadius: 10, background: 'rgba(56,189,248,0.08)', border: '1.5px solid rgba(56,189,248,0.3)', color: '#38bdf8', fontSize: 18, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, margin: '8px auto 0' }}
-                  >
-                    ✏ 수정
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleDeleteCrew(c.id) }}
-                    style={{ marginTop: 6, padding: '8px 16px', borderRadius: 10, background: 'rgba(255,77,109,0.08)', border: '1.5px solid rgba(255,77,109,0.3)', color: '#ff4d6d', fontSize: 18, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, margin: '6px auto 0' }}
-                  >
-                    <X size={16}/> 삭제
-                  </button>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 8 }}>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setEditTarget({...c}) }}
+                      style={{ padding: '8px 0', borderRadius: 10, background: 'rgba(56,189,248,0.08)', border: '1.5px solid rgba(56,189,248,0.3)', color: '#38bdf8', fontSize: 17, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
+                    >
+                      ✏ 수정
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDeleteCrew(c.id) }}
+                      style={{ padding: '8px 0', borderRadius: 10, background: 'rgba(255,77,109,0.08)', border: '1.5px solid rgba(255,77,109,0.3)', color: '#ff4d6d', fontSize: 17, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
+                    >
+                      <X size={15}/> 삭제
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

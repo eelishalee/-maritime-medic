@@ -339,6 +339,23 @@ export default function Settings() {
 
   const [isMedModalOpen, setIsMedModalOpen] = useState(false)
   const [newMed, setNewMed] = useState({ n: '', c: '', q: 10, m: 5, cat: 'pill' })
+  const [editMed, setEditMed] = useState(null)
+
+  const saveEditMed = () => {
+    if (!editMed.n || !editMed.c) return alert('약품명과 효능을 입력하세요.')
+    setMeds(prev => prev.map(m => m.id === editMed.id ? { ...editMed } : m))
+    const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
+    setActivities(p => [...p, { t: nowStr, type: 'info', msg: `재고 : [${editMed.n}] 정보 수정 완료` }])
+    setEditMed(null)
+  }
+
+  const deleteMed = (id) => {
+    const target = meds.find(m => m.id === id)
+    if (!window.confirm(`[${target?.n}] 약품을 삭제하시겠습니까?`)) return
+    setMeds(prev => prev.filter(m => m.id !== id))
+    const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
+    setActivities(p => [...p, { t: nowStr, type: 'warning', msg: `재고 : [${target?.n}] 삭제됨` }])
+  }
 
   const updateMed = (id, delta) => {
     setMeds(prev => prev.map(m => {
@@ -590,9 +607,15 @@ export default function Settings() {
                   {[...meds].sort((a,b) => a.n.localeCompare(b.n, 'ko')).map(m => {
                     const isLow = m.q <= m.m;
                     return (
-                      <div key={m.id} style={{ background:C.panel, border:`1.5px solid ${isLow ? C.warning+'66' : C.border}`, borderRadius:12, padding:'20px' }}>
-                        <div style={{ fontSize:20, color:C.sub, fontWeight:800, marginBottom:4, display:'flex', alignItems:'center', gap:5 }}>
-                          {m.cat === 'pill' ? <Pill size={17}/> : m.cat === 'liquid' ? <Activity size={17}/> : <Shield size={17}/>} {m.c}
+                      <div key={m.id} style={{ background:C.panel, border:`1.5px solid ${isLow ? C.warning+'66' : C.border}`, borderRadius:12, padding:'20px', position:'relative' }}>
+                        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:4 }}>
+                          <div style={{ fontSize:20, color:C.sub, fontWeight:800, display:'flex', alignItems:'center', gap:5 }}>
+                            {m.cat === 'pill' ? <Pill size={17}/> : m.cat === 'liquid' ? <Activity size={17}/> : <Shield size={17}/>} {m.c}
+                          </div>
+                          <div style={{ display:'flex', gap:4 }}>
+                            <button onClick={()=>setEditMed({...m})} style={{ background:'rgba(56,189,248,0.1)', border:'1px solid rgba(56,189,248,0.3)', borderRadius:6, padding:'3px 8px', color:C.info, fontSize:13, fontWeight:800, cursor:'pointer' }}>수정</button>
+                            <button onClick={()=>deleteMed(m.id)} style={{ background:'rgba(255,77,109,0.1)', border:'1px solid rgba(255,77,109,0.3)', borderRadius:6, padding:'3px 8px', color:C.danger, fontSize:13, fontWeight:800, cursor:'pointer' }}>삭제</button>
+                          </div>
                         </div>
                         <div style={{ fontSize:30, fontWeight:900, color:'#fff', marginBottom:12 }}>{m.n}</div>
                         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:C.panel2, padding:'10px 15px', borderRadius:10, border:`1px solid ${C.border}` }}>
@@ -837,6 +860,49 @@ export default function Settings() {
       )}
 
       {/* ── 의료 소모품 추가 모달 ── */}
+      {/* ── 약품 수정 모달 ── */}
+      {editMed && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', backdropFilter:'blur(10px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:2000 }}>
+          <div style={{ background:C.panel, border:`2px solid ${C.info}`, borderRadius:24, padding:45, width:560 }}>
+            <div style={{ fontSize:28, fontWeight:950, marginBottom:30, color:C.info, display:'flex', alignItems:'center', gap:12 }}>
+              <Pill size={30}/> 약품 정보 수정
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:16, marginBottom:30 }}>
+              {[
+                { label:'약품명', field:'n', placeholder:'예: 타이레놀' },
+                { label:'효능/분류', field:'c', placeholder:'예: 해열진통' },
+                { label:'유통기한', field:'e', placeholder:'예: 2027-05-20 또는 -' },
+              ].map(({ label, field, placeholder }) => (
+                <div key={field}>
+                  <div style={{ fontSize:16, color:C.sub, fontWeight:800, marginBottom:8 }}>{label}</div>
+                  <input value={editMed[field] || ''} onChange={e=>setEditMed(p=>({...p,[field]:e.target.value}))} placeholder={placeholder} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:18, fontWeight:700, outline:'none', boxSizing:'border-box' }} />
+                </div>
+              ))}
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+                <div>
+                  <div style={{ fontSize:16, color:C.sub, fontWeight:800, marginBottom:8 }}>현재 수량</div>
+                  <input type="number" value={editMed.q} onChange={e=>setEditMed(p=>({...p,q:parseInt(e.target.value)||0}))} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:18, fontWeight:700, outline:'none', boxSizing:'border-box' }} />
+                </div>
+                <div>
+                  <div style={{ fontSize:16, color:C.sub, fontWeight:800, marginBottom:8 }}>최소 수량</div>
+                  <input type="number" value={editMed.m} onChange={e=>setEditMed(p=>({...p,m:parseInt(e.target.value)||0}))} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:18, fontWeight:700, outline:'none', boxSizing:'border-box' }} />
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize:16, color:C.sub, fontWeight:800, marginBottom:8 }}>분류</div>
+                <select value={editMed.cat} onChange={e=>setEditMed(p=>({...p,cat:e.target.value}))} style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:18, fontWeight:700, outline:'none' }}>
+                  {[['pill','알약'],['liquid','액체'],['cream','연고'],['pad','패드/거즈'],['bandage','붕대/고정']].map(([v,l])=><option key={v} value={v}>{l}</option>)}
+                </select>
+              </div>
+            </div>
+            <div style={{ display:'flex', gap:15 }}>
+              <button onClick={()=>setEditMed(null)} style={{ flex:1, padding:20, borderRadius:15, background:'rgba(255,255,255,0.03)', border:`1px solid ${C.border}`, color:C.sub, fontSize:20, fontWeight:800, cursor:'pointer' }}>취소</button>
+              <button onClick={saveEditMed} style={{ flex:2, padding:20, borderRadius:15, background:C.info, color:'#000', fontSize:20, fontWeight:950, cursor:'pointer', border:'none' }}>저장</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isMedModalOpen && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', backdropFilter:'blur(10px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:2000 }}>
           <div style={{ background:C.panel, border:`2px solid ${C.warning}`, borderRadius:24, padding:45, width:600 }}>

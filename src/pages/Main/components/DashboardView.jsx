@@ -70,13 +70,15 @@ export default function DashboardView({
   }
 
   // 카메라 스트림 관리
+  const [cameraError, setCameraError] = useState(null)
   useEffect(() => {
     let activeStream = null
     async function startCamera() {
       if (isScanning) {
+        setCameraError(null)
         try {
-          const s = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: 'environment', width: 1280, height: 720 } 
+          const s = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment', width: 1280, height: 720 }
           })
           activeStream = s
           streamRef.current = s
@@ -84,8 +86,14 @@ export default function DashboardView({
           setIsCameraActive(true)
         } catch (err) {
           console.error("카메라 접근 실패:", err)
+          const msg = err.name === 'NotAllowedError' ? '카메라 접근이 거부되었습니다. 브라우저 설정에서 허용해주세요.'
+            : err.name === 'NotFoundError' ? '카메라 장치를 찾을 수 없습니다.'
+            : '카메라를 시작할 수 없습니다. 다른 앱이 사용 중일 수 있습니다.'
+          setCameraError(msg)
+          setIsCameraActive(false)
         }
       } else {
+        setCameraError(null)
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop())
           streamRef.current = null
@@ -186,7 +194,16 @@ export default function DashboardView({
       {isScanning && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#000', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <video ref={videoRef} autoPlay playsInline style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-          
+
+          {/* 카메라 에러 표시 */}
+          {cameraError && (
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 10002, gap: 20 }}>
+              <AlertTriangle size={56} color="#ff4d6d" />
+              <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', textAlign: 'center', maxWidth: 400, lineHeight: 1.6, padding: '20px 30px', background: 'rgba(255,77,109,0.15)', borderRadius: 16, border: '1.5px solid rgba(255,77,109,0.4)' }}>{cameraError}</div>
+              <button onClick={() => { setCameraError(null); setIsScanning(false) }} style={{ padding: '14px 32px', borderRadius: 12, background: '#ff4d6d', color: '#fff', border: 'none', fontSize: 18, fontWeight: 900, cursor: 'pointer' }}>닫기</button>
+            </div>
+          )}
+
           {/* 스캐닝 비네트 및 HUD 오버레이 */}
           <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle, transparent 20%, rgba(0, 10, 20, 0.7) 100%)', pointerEvents: 'none' }} />
           
