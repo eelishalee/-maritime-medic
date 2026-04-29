@@ -236,7 +236,7 @@ export default function Settings() {
     setCoords(tempCoords)
     setIsEditingCoords(false)
     const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
-    setActivities(prev => [...prev, { t: nowStr, type: 'success', msg: `시스템: 선박 항행 좌표 수동 보정 완료 (${tempCoords.lat}, ${tempCoords.lng})` }])
+    setActivities(prev => [...prev, { t: nowStr, type: 'success', msg: `시스템 : 선박 항행 좌표 수동 보정 완료 (${tempCoords.lat}, ${tempCoords.lng})` }])
   }
 
   const handleManualRefresh = () => {
@@ -271,7 +271,7 @@ export default function Settings() {
     const newVal = !sec[key]
     setSec(prev => ({ ...prev, [key]: newVal }))
     const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
-    const newLog = { t: nowStr, type: newVal ? 'success' : 'warning', msg: `보안: ${label} [${newVal ? '활성화' : '해제'}]` }
+    const newLog = { t: nowStr, type: newVal ? 'success' : 'warning', msg: `보안 : ${label} [${newVal ? '활성화' : '해제'}]` }
     setActivities(prev => [...prev, newLog])
   }
 
@@ -284,7 +284,7 @@ export default function Settings() {
     setDeviceInfo(tempDeviceInfo)
     setIsEditingDevice(false)
     const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
-    setActivities(prev => [...prev, { t: nowStr, type: 'info', msg: '시스템: 기기 상세 정보가 성공적으로 업데이트되었습니다.' }])
+    setActivities(prev => [...prev, { t: nowStr, type: 'info', msg: '시스템 : 기기 상세 정보가 성공적으로 업데이트되었습니다.' }])
   }
 
   const cancelEditingDevice = () => {
@@ -299,13 +299,6 @@ export default function Settings() {
     { name: '김항해', id: 'S26-002', dept: '항해부', type: '기본 CPR (심폐소생술)', date: '2024-12-15', expiry: '2026-12-15' },
     { name: '이선장', id: 'S26-001', dept: '항해부', type: '고급 응급처치 (Advanced)', date: '2023-05-20', expiry: '2026-05-20' },
   ])
-  
-  useEffect(() => { 
-    const t = setInterval(() => {
-      setNow(new Date())
-      setCoords(p => ({ lat: (parseFloat(p.lat) + (Math.random()-0.5)*0.0001).toFixed(4)+'° N', lng: (parseFloat(p.lng) + (Math.random()-0.5)*0.0001).toFixed(4)+'° E' }))
-    }, 1000); return () => clearInterval(t) 
-  }, [])
 
   const getStatusInfo = (expiry) => {
     if (!expiry) return { label: '기한없음', color: C.info }
@@ -472,7 +465,7 @@ export default function Settings() {
               { l:'응급 장비 신뢰도', v:checkPct, u:'%', c:C.success, s:'정기 점검 완료', i:<ShieldCheck size={26}/>, p:checkPct },
               { l:'대응 가용 인원', v:trainingList.length, u:'명', c:C.info, s:'즉시 투입 가능', i:<Users size={26}/>, p:Math.min(100, (trainingList.length/10)*100) },
               { l:'의료 소모품 재고', v:'94', u:'%', c:C.cyan, s:'필수 의약품 24종', i:<Pill size={26}/>, p:94 },
-              { l:'최근접 구조 거점', v:'85', u:'km', h:'부산 해양병원', c:C.warning, s:'도착 예정 시간 45분', i:<MapPin size={26}/>, p:30 },
+              { l:'최근접 구조 거점', v:'85', u:'km', h:'부산 해양병원', c:C.warning, s:'도착 예정 시간 2시간 10분', i:<MapPin size={26}/>, p:30 },
             ].map((s,idx)=>(
               <div key={idx} className="kpi-card" style={{ background: `rgba(17, 19, 24, 0.6)`, backdropFilter: 'blur(20px)', border: `1.5px solid ${s.c}44`, borderRadius: 22, padding: '24px 28px', position: 'relative', overflow: 'hidden', cursor: 'pointer' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:15 }}>
@@ -517,7 +510,11 @@ export default function Settings() {
             </GPanel>
           </div>
           <div style={{ marginTop: 25 }}>
-            <GPanel title="필수 의료 약품 및 소모품 재고 관리" icon={<Pill size={22} color={C.warning}/>}>
+            <GPanel 
+              title="필수 의료 약품 및 소모품 재고 관리" 
+              icon={<Pill size={22} color={C.warning}/>}
+              right={<Btn color={C.warning} small onClick={()=>setIsMedModalOpen(true)}>+</Btn>}
+            >
               <div style={{ maxHeight: 380, overflowY: 'auto', paddingRight: 10 }}>
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:15 }}>
                   {[...meds].sort((a,b) => a.n.localeCompare(b.n, 'ko')).map(m => {
@@ -531,7 +528,7 @@ export default function Settings() {
                         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:C.panel2, padding:'10px 15px', borderRadius:10, border:`1px solid ${C.border}` }}>
                           <button onClick={()=>updateMed(m.id, -1)} style={{ background:'none', border:'none', color:C.info, cursor:'pointer', fontSize:36, fontWeight:900 }}>-</button>
                           <div style={{ textAlign:'center' }}>
-                            <div style={{ fontSize:34, fontWeight:900, color:isLow ? C.warning : C.success }}>{m.q}</div>
+                            <div style={{ fontSize:34, fontWeight:950, color:isLow ? C.warning : C.success }}>{m.q}</div>
                             <div style={{ fontSize:20, color:C.sub, fontWeight:700 }}>최소 {m.m}</div>
                           </div>
                           <button onClick={()=>updateMed(m.id, 1)} style={{ background:'none', border:'none', color:C.info, cursor:'pointer', fontSize:36, fontWeight:900 }}>+</button>
@@ -612,13 +609,19 @@ export default function Settings() {
                 </div>
                 <div style={{ fontSize:34, fontWeight:950, color:'#fff', marginBottom:8 }}>{s.v}</div>
                 <div style={{ display:'flex', alignItems:'center', gap:10 }}><div style={{ width:6, height:6, borderRadius:'50%', background:s.c }} /><div style={{ fontSize:15, color:C.sub, fontWeight:700 }}>{s.s}</div></div>
-                {s.f && <div style={{ position:'absolute', bottom:10, right:15, fontSize:12, color:s.c, fontWeight:900, opacity:0.6 }}>CLICK TO SYNC</div>}
+                {s.f && <div style={{ position:'absolute', bottom:10, right:15, fontSize:12, color:s.c, fontWeight:900, opacity:0.6 }}>CLICK TO REFRESH</div>}
               </div>
             ))}
           </div>
 
           <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:18, marginBottom:18 }}>
-            <GPanel title="위성 신호 품질 (24시간)" icon={<Wifi size={22} color={C.info}/>}><div style={{ height:220 }}><ResponsiveContainer width="100%" height="100%"><AreaChart data={signal}><Area type="monotone" dataKey="v" stroke={C.info} fill={C.info} fillOpacity={0.1} strokeWidth={4} dot={false}/></AreaChart></ResponsiveContainer></div></GPanel>
+            <GPanel 
+              title="위성 신호 품질 (24시간)" 
+              icon={<Wifi size={22} color={C.info}/>}
+              right={<Btn color={C.info} small onClick={handleSignalScan}><RefreshCw size={18}/></Btn>}
+            >
+              <div style={{ height:220 }}><ResponsiveContainer width="100%" height="100%"><AreaChart data={signal}><Area type="monotone" dataKey="v" stroke={C.info} fill={C.info} fillOpacity={0.1} strokeWidth={4} dot={false}/></AreaChart></ResponsiveContainer></div>
+            </GPanel>
             <GPanel 
               title="실시간 선박 좌표" 
               icon={<MapPin size={22} color={C.cyan}/>}
@@ -711,7 +714,7 @@ export default function Settings() {
                 </Btn>
               </div>
             </GPanel>
-            <GPanel title="시스템 활동 로그" icon={<Terminal size={22} color={C.sub}/>} right={<Search size={18} color={C.sub}/>}>
+            <GPanel title="시스템 활동 로그" icon={<Terminal size={22} color={C.sub}/>}>
               <div ref={logContainerRef} style={{ height:180, overflowY:'auto', background:'#060809', padding:18, borderRadius:12, fontFamily:'monospace', fontSize:17, border:`1px solid ${C.border}` }}>
                 {activities.map((l,i)=><div key={i} style={{ marginBottom:8 }}><span style={{ color:C.sub }}>[{l.t}]</span> <span style={{ color:l.type==='error'?C.danger:l.type==='warning'?C.warning:C.info }}>{l.msg}</span></div>)}
               </div>
@@ -719,6 +722,41 @@ export default function Settings() {
           </div>
         </Section>
       </div>
+
+      {/* ── 의료 소모품 추가 모달 ── */}
+      {isMedModalOpen && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', backdropFilter:'blur(10px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:2000 }}>
+          <div style={{ background:C.panel, border:`2px solid ${C.warning}`, borderRadius:24, padding:45, width:600 }}>
+            <div style={{ fontSize:32, fontWeight:950, marginBottom:35, color:C.warning, display:'flex', alignItems:'center', gap:15 }}>
+              <Pill size={36}/> 새 의료 소모품 등록
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:28 }}>
+              <div>
+                <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>약품/소모품 명칭</div>
+                <input value={newMed.n} onChange={e=>setNewMed({...newMed, n:e.target.value})} placeholder="예: 항생제 연고" style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }} />
+              </div>
+              <div>
+                <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>주요 효능/분류</div>
+                <input value={newMed.c} onChange={e=>setNewMed({...newMed, c:e.target.value})} placeholder="예: 외상처치" style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }} />
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+                <div>
+                  <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>현재 수량</div>
+                  <input type="number" value={newMed.q} onChange={e=>setNewMed({...newMed, q:parseInt(e.target.value)})} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }} />
+                </div>
+                <div>
+                  <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>최소 재고량</div>
+                  <input type="number" value={newMed.m} onChange={e=>setNewMed({...newMed, m:parseInt(e.target.value)})} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }} />
+                </div>
+              </div>
+            </div>
+            <div style={{ display:'flex', gap:18, marginTop:45 }}>
+              <button onClick={()=>setIsMedModalOpen(false)} style={{ flex:1, padding:20, borderRadius:15, background:'rgba(255,255,255,0.03)', border:`1px solid ${C.border}`, color:C.sub, fontSize:22, fontWeight:800, cursor:'pointer' }}>취소</button>
+              <button onClick={addMed} style={{ flex:2, padding:20, borderRadius:15, background:C.warning, border:'none', color:'#000', fontSize:22, fontWeight:950, cursor:'pointer' }}>재고 등록하기</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
