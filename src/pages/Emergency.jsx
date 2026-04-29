@@ -45,8 +45,8 @@ const ACTION_GUIDES = {
     steps: [
       { title: '머리 기울이기-턱 올리기', desc: '한 손을 이마에 대고 머리를 뒤로 젖히며, 다른 손가락으로 턱뼈를 들어 올려 기도를 확보하십시오.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-01.png' },
       { title: '입안 이물질 제거', desc: '눈에 보이는 구토물이나 이물질이 있다면 머리를 옆으로 돌려 손가락으로 가볍게 제거하십시오.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-02.png' },
-      { title: '의복 이완 및 조임 해제', desc: '넥타이, 벨트, 상의 단추 등 환자의 호흡을 방해하는 조이는 의복을 신속히 풀어주십시오.', tip: '흉부 팽창을 자유롭게 하여 자가 호흡을 돕습니다.' },
-      { title: '회복 자세 유지', desc: '환자가 스스로 숨을 쉰다면 몸을 옆으로 돌려 눕혀 기도가 막히지 않도록 조치하십시오.', tip: '혀가 뒤로 말리거나 구토물에 의한 질식을 예방합니다.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-03.png' }
+      { title: '의복 이완 및 조임 해제', desc: '넥타이, 벨트, 상의 단추 등 환자의 호흡을 방해하는 조이는 의복을 신속히 풀어주십시오.', tip: '흉부 팽창을 자유롭게 하여 자가 호흡을 돕습니다.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-03.png' },
+      { title: '회복 자세 유지', desc: '환자가 스스로 숨을 쉰다면 몸을 옆으로 돌려 눕혀 기도가 막히지 않도록 조치하십시오.', tip: '혀가 뒤로 말리거나 구토물에 의한 질식을 예방합니다.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-04.png' }
     ],
     dos: ['환자가 자가 호흡 중이면 옆으로 눕히세요', '구토 시 즉시 몸 전체를 옆으로 돌리세요'],
     donts: ['의식이 없는 환자에게 물을 먹이지 마세요', '머리 밑에 베개를 넣어 기도를 꺾지 마세요'],
@@ -512,8 +512,18 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                     width: '100%', 
                     height: '100%', 
                     objectFit: 'cover',
-                    objectPosition: (activeAction === '심폐소생술' && activeDisplayIndex === 0) ? '20% 20%' : (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? '50% 0%' : (activeAction === '심폐소생술' && activeDisplayIndex === 3) ? 'center 60%' : 'center center',
-                    transform: (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? 'scale(1.2) translateY(-10%)' : 'none',
+                    objectPosition: 
+                      (activeAction === '심폐소생술' && activeDisplayIndex === 0) ? '20% 20%' : 
+                      (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? '50% 0%' : 
+                      (activeAction === '심폐소생술' && activeDisplayIndex === 3) ? 'center 60%' : 
+                      (activeAction === '기도 확보' && activeDisplayIndex === 1) ? '20% center' :
+                      (activeAction === '기도 확보' && activeDisplayIndex === 3) ? '0% 60%' :
+                      'center center',
+                    transform: 
+                      (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? 'scale(1.2) translateY(-10%)' : 
+                      (activeAction === '기도 확보' && activeDisplayIndex === 1) ? 'scale(1.3)' :
+                      (activeAction === '기도 확보' && activeDisplayIndex === 3) ? 'scale(1.25)' :
+                      'none',
                     transition: 'transform 0.3s ease-out'
                   }} 
                   alt={currentActionData.steps[activeDisplayIndex].title}

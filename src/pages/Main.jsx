@@ -11,28 +11,17 @@ export default function Main({ patient, onNavigate, onSwitchPatient }) {
 
   // ─── AI 어시스턴트 상태 ───
   const [prompt, setPrompt] = useState('')
-  const [chat, setChat] = useState(() => {
-    const initialMsgs = [
-      {
-        role: 'ai',
-        text: `${patient?.name || '김항해'} ${patient?.role || '선원'} (${patient?.age || '45'}세) 환자 데이터가 로드되었습니다.\n\n⚠ 현재 상황 모니터링 중입니다.`
-      }
-    ]
-    
-    // 로컬 스토리지에서 최신 기록 하나 가져와서 추가
-    try {
-      const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
-      const latest = records.find(r => r.patientId === patient?.id)
-      if (latest) {
-        initialMsgs.push({
-          role: 'ai',
-          text: `📋 최근 저장된 차트 기록 요약\n\n• 주요 증상 : ${latest.mainComplaint}\n• 세부 증상 : ${latest.selectedSymptoms.join(', ') || '관찰 중'}\n• 시행 조치 : ${latest.prescribedMeds.join(', ') || '경과 관찰'}\n\n[CONFIDENCE: 100%]\n[EVIDENCE: 사용자 최종 기록 데이터 동기화 완료]\n[GUIDE: SOP-GEN-01]`
-        })
-      }
-    } catch(e) {}
-    
-    return initialMsgs
-  })
+  const [chat, setChat] = useState(() => getInitialChat(patient))
+
+  // ─── 환자 교체 시 상태 초기화 ───
+  useEffect(() => {
+    if (!patient) return
+    setHr(patient.hr || 82)
+    setBp(patient.bp || '128/84')
+    setBt(patient.temp || '36.7')
+    setChat(getInitialChat(patient))
+    setPrompt('')
+  }, [patient])
 
   // ─── 외상 분석 상태 ───
   const [isScanning, setIsScanning] = useState(false)
@@ -136,4 +125,26 @@ function getAiReply(text, patient) {
     return `진단 : 좌측 늑골 다발성 골절 및 쇄골 골절 의심\n\n[CONFIDENCE: 91%]\n[EVIDENCE: 영상 분석상 좌측 쇄골 중위부 Step-off 변형 및 제4,5늑골 피하 기종 양상 포착]\n[GUIDE: SOP-TRA-01]`
 
   return `${patient?.name || '환자'} 선원의 실시간 바이탈을 분석 중입니다.\n구체적인 증상이나 처치 가이드에 대해 질문해 주세요.\n\n[CONFIDENCE: 100%]\n[EVIDENCE: 실시간 센서 데이터 정상 수신 중]\n[GUIDE: SOP-GEN-01]`
+}
+
+function getInitialChat(patient) {
+  const initialMsgs = [
+    {
+      role: 'ai',
+      text: `${patient?.name || '김항해'} ${patient?.role || '선원'} (${patient?.age || '45'}세) 환자 데이터가 로드되었습니다.\n\n⚠ 현재 상황 모니터링 중입니다.`
+    }
+  ]
+  
+  try {
+    const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
+    const latest = records.find(r => r.patientId === patient?.id)
+    if (latest) {
+      initialMsgs.push({
+        role: 'ai',
+        text: `📋 최근 저장된 차트 기록 요약\n\n• 주요 증상 : ${latest.mainComplaint}\n• 세부 증상 : ${latest.selectedSymptoms.join(', ') || '관찰 중'}\n• 시행 조치 : ${latest.prescribedMeds.join(', ') || '경과 관찰'}\n\n[CONFIDENCE: 100%]\n[EVIDENCE: 사용자 최종 기록 데이터 동기화 완료]\n[GUIDE: SOP-GEN-01]`
+      })
+    }
+  } catch(e) {}
+  
+  return initialMsgs
 }
