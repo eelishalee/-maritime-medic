@@ -397,14 +397,22 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
   }
 
+  const [hoveredAction, setHoveredAction] = useState(null)
+
   const currentActionData = activeAction ? ACTION_GUIDES[activeAction] : null
-  
+
   // 이미지 표시 우선순위 : 마지막으로 클릭한 인덱스 > 첫 번째 미완료 단계
   const activeDisplayIndex = selectedStepIndex !== null
     ? selectedStepIndex
     : (currentActionData?.steps.findIndex((_, i) => !completedSteps.includes(i)) ?? 0)
 
   const stepNum = activeDisplayIndex + 1
+
+  // 호버 중인 액션의 이미지 표시 (없으면 현재 액션 기준)
+  const displayAction = hoveredAction || activeAction
+  const displayActionData = displayAction ? ACTION_GUIDES[displayAction] : null
+  const displayImageIndex = hoveredAction && hoveredAction !== activeAction ? 0 : activeDisplayIndex
+  const displayStepImage = displayActionData?.steps[displayImageIndex]?.stepImage
 
 
   if (triageStep === 'CHECK') {
@@ -533,30 +541,30 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
           <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}><div style={{ fontSize: 18, fontWeight: 950 }}>처치 동작 시각 가이드</div></div>
             <div style={{ flex: 1, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-              {currentActionData?.steps[activeDisplayIndex]?.stepImage && (
+              {displayStepImage && (
                 <img
-                  key={`${activeAction}-${activeDisplayIndex}`}
-                  src={currentActionData.steps[activeDisplayIndex].stepImage}
+                  key={`${displayAction}-${displayImageIndex}`}
+                  src={displayStepImage}
                   style={{
                     position: 'absolute', inset: 0,
                     width: '100%', height: '100%',
                     objectFit: 'cover',
                     objectPosition:
-                      (activeAction === '심폐소생술' && activeDisplayIndex === 0) ? '20% 20%' :
-                      (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? '50% 0%' :
-                      (activeAction === '심폐소생술' && activeDisplayIndex === 3) ? 'center 60%' :
-                      (activeAction === '기도 확보' && activeDisplayIndex === 1) ? '20% center' :
-                      (activeAction === '기도 확보' && activeDisplayIndex === 3) ? '0% 60%' :
+                      (displayAction === '심폐소생술' && displayImageIndex === 0) ? '20% 20%' :
+                      (displayAction === '심폐소생술' && displayImageIndex === 2) ? '50% 0%' :
+                      (displayAction === '심폐소생술' && displayImageIndex === 3) ? 'center 60%' :
+                      (displayAction === '기도 확보' && displayImageIndex === 1) ? '20% center' :
+                      (displayAction === '기도 확보' && displayImageIndex === 3) ? '0% 60%' :
                       'center center',
                     transform:
-                      (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? 'scale(1.2) translateY(-10%)' :
-                      (activeAction === '기도 확보' && activeDisplayIndex === 1) ? 'scale(1.3)' :
-                      (activeAction === '기도 확보' && activeDisplayIndex === 3) ? 'scale(1.25)' :
+                      (displayAction === '심폐소생술' && displayImageIndex === 2) ? 'scale(1.2) translateY(-10%)' :
+                      (displayAction === '기도 확보' && displayImageIndex === 1) ? 'scale(1.3)' :
+                      (displayAction === '기도 확보' && displayImageIndex === 3) ? 'scale(1.25)' :
                       'none',
                     animation: 'imgFadeIn 0.18s ease-out forwards',
                     transition: 'transform 0.3s ease-out'
                   }}
-                  alt={currentActionData.steps[activeDisplayIndex].title}
+                  alt={displayActionData.steps[displayImageIndex].title}
                 />
               )}
               
@@ -848,7 +856,15 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         </aside>
         <section style={{ gridColumn: '1 / 4', gridRow: '2', display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '8px', marginTop: '4px' }}>
           {Object.keys(ACTION_GUIDES).map(key => (
-            <button key={key} onClick={() => {setActiveAction(key); setCompletedSteps([]); setSelectedTriage(null); setShowCompletionPanel(false); setSelectedStepIndex(null); setIsBurnTimerActive(false); setBurnTimer(1200); setIsColdTimerActive(false); setColdTimer(900); setIsWashTimerActive(false); setWashTimer(300);}} style={{ background: activeAction === key ? `linear-gradient(135deg, ${ACTION_GUIDES[key].color}, ${ACTION_GUIDES[key].color}dd)` : `${ACTION_GUIDES[key].color}15`, border: '2px solid', borderColor: activeAction === key ? 'transparent' : `${ACTION_GUIDES[key].color}30`, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><div style={{ color: activeAction === key ? '#fff' : ACTION_GUIDES[key].color }}><ActionButtonIcon label={key} size={26} /></div><div style={{ fontSize: 28, fontWeight: 950, color: '#fff', letterSpacing: '-1px' }}>{key}</div></button>
+            <button
+              key={key}
+              onClick={() => {setActiveAction(key); setHoveredAction(null); setCompletedSteps([]); setSelectedTriage(null); setShowCompletionPanel(false); setSelectedStepIndex(null); setIsBurnTimerActive(false); setBurnTimer(1200); setIsColdTimerActive(false); setColdTimer(900); setIsWashTimerActive(false); setWashTimer(300);}}
+              onMouseEnter={() => setHoveredAction(key)}
+              onMouseLeave={() => setHoveredAction(null)}
+              style={{ background: activeAction === key ? `linear-gradient(135deg, ${ACTION_GUIDES[key].color}, ${ACTION_GUIDES[key].color}dd)` : `${ACTION_GUIDES[key].color}15`, border: '2px solid', borderColor: activeAction === key ? 'transparent' : `${ACTION_GUIDES[key].color}30`, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <div style={{ color: activeAction === key ? '#fff' : ACTION_GUIDES[key].color }}><ActionButtonIcon label={key} size={26} /></div>
+              <div style={{ fontSize: 28, fontWeight: 950, color: '#fff', letterSpacing: '-1px' }}>{key}</div>
+            </button>
           ))}
         </section>
       </div>
