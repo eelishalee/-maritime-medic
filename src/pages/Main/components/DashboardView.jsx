@@ -18,7 +18,7 @@ function getPatientTimeline(patient) {
       { time: '11:19', title: '의식 확인 및 도움 요청', color: '#f43f5e', detail: `• 일시적 의식 혼탁 약 30초 후 자발 회복\n• 보조항해사가 발견, 선의 긴급 호출\n• 뇌진탕 의심 — 이동 금지 조치` },
       { time: '11:25', title: '선의 1차 평가', color: '#fb923c', detail: `• 동공 반응 정상, 복시 없음\n• 두통·오심 호소, 구토 1회\n• 기저 고혈압(암로디핀 복용) 확인` },
       { time: '11:33', title: '지혈 처치 및 모니터링 개시', color: '#facc15', detail: `• 두피 열상 직접 압박 지혈 후 멸균 거즈 고정\n• HR 88 · BP 154/96 · SpO₂ 99%\n• 아세트아미노펜 투여 (아스피린 금기)` },
-      { time: '09:12', title: 'MDTS 모니터링 개시', color: '#64748b', detail: `• 바이탈 센서 연동 완료\n• 두개내압 상승 징후 감시 모드 활성화` },
+      { time: '09:12', title: 'MDTS 모니터링 개시', color: '#64748b', detail: `• 바이탈 센일 연동 완료\n• 두개내압 상승 징후 감시 모드 활성화` },
     ],
     'S26-002': [
       { time: '13:22', title: '상지 외상 사고 발생', color: '#f43f5e', detail: `• 위치: 메인 데크 화물 관리구역\n• 컨테이너 고박 와이어 로프 반동으로 좌측 전완부 강타\n• 심한 부종 및 변형 관찰, 개방 상처 없음` },
@@ -121,7 +121,8 @@ function getExampleQuestions(patient) {
 export default function DashboardView({
   activePatient, hr, spo2, rr, bp, bt, chat, prompt, setPrompt,
   handlePromptAnalysis, startEmergencyAction, handleTraumaAnalysis,
-  isScanning, scanError, setScanError, setIsScanning,
+  isScanning, scanProgress, scanStatus, setScanStatus, scanError,
+  confirmTraumaAnalysis, setIsScanning,
   setBp, setBt, onSwitchPatient
 }) {
   const videoRef = useRef(null)
@@ -144,7 +145,7 @@ export default function DashboardView({
       setDynamicCrewList(activePatients)
     }
     loadPatients()
-  }, [activePatient])
+  }, [activePatient?.id])
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -275,6 +276,10 @@ export default function DashboardView({
   };
   const emergency = getEmergencyDisplay();
 
+  const isCapScanning = scanStatus === 'scanning'
+  const isCapSuccess  = scanStatus === 'success'
+  const isCapError    = scanStatus === 'error'
+
   return (
     <div style={{ flex: 1, display: 'flex', overflow: 'hidden', height: '100%', position: 'relative', background: '#020408' }}>
 
@@ -289,9 +294,13 @@ export default function DashboardView({
             </div>
           )}
           <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle, transparent 20%, rgba(0, 10, 20, 0.7) 100%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', top: 60, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 15, zIndex: 10001 }}>
-            <div style={{ background: 'rgba(0, 20, 30, 0.85)', padding: '20px 60px', borderRadius: '15px', color: '#fff', fontSize: 24, fontWeight: 900, border: '1.5px solid #00e5cc', boxShadow: '0 0 40px rgba(0, 229, 204, 0.4)', backdropFilter: 'blur(10px)' }}>진단 부위를 원형 프레임 내부에 맞춰주세요</div>
-          </div>
+          
+          {isCapScanning && (
+            <div style={{ position: 'absolute', top: 60, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 15, zIndex: 10001 }}>
+              <div style={{ background: 'rgba(0, 20, 30, 0.85)', padding: '20px 60px', borderRadius: '15px', color: '#fff', fontSize: 24, fontWeight: 900, border: '1.5px solid #00e5cc', boxShadow: '0 0 40px rgba(0, 229, 204, 0.4)', backdropFilter: 'blur(10px)' }}>진단 부위를 원형 프레임 내부에 맞춰주세요</div>
+            </div>
+          )}
+
           <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ position: 'relative', width: '600px', height: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ position: 'absolute', top: -10, left: -10, width: 60, height: 60, borderLeft: '4px solid #00e5cc', borderTop: '4px solid #00e5cc' }} />
@@ -300,21 +309,58 @@ export default function DashboardView({
               <div style={{ position: 'absolute', bottom: -10, right: -10, width: 60, height: 60, borderRight: '4px solid #00e5cc', borderBottom: '4px solid #00e5cc' }} />
               <div style={{ position: 'absolute', width: '100%', height: '100%', border: '1px solid rgba(0, 229, 204, 0.3)', borderRadius: '50%' }} />
               <div style={{ position: 'absolute', width: '92%', height: '92%', border: '2px dashed rgba(0, 229, 204, 0.2)', borderRadius: '50%', animation: 'spin 10s infinite linear' }} />
-              {!scanError && (
+              
+              {isCapScanning && (
                 <div style={{ position: 'absolute', top: '15%', left: '15%', width: '70%', height: '2px', background: 'linear-gradient(to right, transparent, #fff, #00e5cc, #fff, transparent)', boxShadow: '0 0 20px #00e5cc', animation: 'scanMoveInner 2.5s infinite ease-in-out', zIndex: 10005 }} />
               )}
+              
               <div style={{ position: 'absolute', width: 40, height: 2, background: '#00e5cc' }} />
               <div style={{ position: 'absolute', width: 2, height: 40, background: '#00e5cc' }} />
             </div>
-            {scanError && (
-              <div style={{ position: 'absolute', width: 560, background: 'rgba(2, 15, 25, 0.98)', padding: '50px', borderRadius: '32px', color: '#fff', textAlign: 'center', zIndex: 10002, border: '3px solid #ff4d6d', boxShadow: '0 0 60px rgba(255, 77, 109, 0.4)', backdropFilter: 'blur(30px)' }}>
-                <div style={{ fontSize: 36, fontWeight: 950, marginBottom: 20, color: '#ff4d6d' }}>스캔 분석 중단됨</div>
-                <button onClick={() => setScanError(null)} style={{ width: '100%', padding: '24px', borderRadius: '16px', border: 'none', background: '#ff4d6d', color: '#fff', fontWeight: 950, fontSize: 24, cursor: 'pointer' }}>다시 시도</button>
+
+            {/* 결과 모달 (Success / Error) */}
+            {(isCapSuccess || isCapError) && (
+              <div style={{ position: 'absolute', width: 560, background: 'rgba(2, 15, 25, 0.98)', padding: '50px', borderRadius: '40px', color: '#fff', textAlign: 'center', zIndex: 10002, border: `3px solid ${isCapSuccess ? '#26de81' : '#ff4d6d'}`, boxShadow: `0 0 80px ${isCapSuccess ? 'rgba(38, 222, 129, 0.4)' : 'rgba(255, 77, 109, 0.4)'}`, backdropFilter: 'blur(40px)', animation: 'slideUp 0.4s ease' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 30 }}>
+                  <div style={{ width: 100, height: 100, borderRadius: '50%', background: isCapSuccess ? 'rgba(38, 222, 129, 0.15)' : 'rgba(255, 77, 109, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${isCapSuccess ? '#26de81' : '#ff4d6d'}` }}>
+                    {isCapSuccess ? <CheckCircle2 size={60} color="#26de81" /> : <AlertCircle size={60} color="#ff4d6d" />}
+                  </div>
+                </div>
+                <div style={{ fontSize: 42, fontWeight: 950, marginBottom: 16, color: isCapSuccess ? '#26de81' : '#ff4d6d' }}>{isCapSuccess ? '스캔 완료' : '스캔 분석 중단'}</div>
+                <div style={{ fontSize: 20, color: '#94a3b8', lineHeight: 1.6, marginBottom: 40, fontWeight: 700 }}>
+                  {isCapSuccess ? <>이미지가 정상적으로 스캔되었습니다.<br/>AI 외상 분석을 시작할 수 있습니다.</> : (scanError || '이미지를 인식하지 못했습니다.')}
+                </div>
+                <div style={{ display: 'flex', gap: 16 }}>
+                  {isCapSuccess ? (
+                    <>
+                      <button onClick={() => { setScanStatus(null); setIsScanning(false); }} style={{ flex: 1, padding: '24px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#94a3b8', fontWeight: 900, fontSize: 22, cursor: 'pointer' }}>닫기</button>
+                      <button onClick={confirmTraumaAnalysis} style={{ flex: 2, padding: '24px', borderRadius: '18px', border: 'none', background: 'linear-gradient(135deg, #26de81, #0dd9c5)', color: '#000', fontWeight: 950, fontSize: 22, cursor: 'pointer', boxShadow: '0 10px 25px rgba(38, 222, 129, 0.3)' }}>AI 분석 시작 →</button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => { setScanStatus(null); setIsScanning(false); }} style={{ flex: 1, padding: '24px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#94a3b8', fontWeight: 900, fontSize: 22, cursor: 'pointer' }}>취소</button>
+                      <button onClick={handleTraumaAnalysis} style={{ flex: 2, padding: '24px', borderRadius: '18px', border: 'none', background: '#ff4d6d', color: '#fff', fontWeight: 950, fontSize: 22, cursor: 'pointer', boxShadow: '0 10px 25px rgba(255, 77, 109, 0.3)' }}>다시 시도</button>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </div>
+
+          {isCapScanning && (
+            <div style={{ position: 'absolute', bottom: 120, left: '50%', transform: 'translateX(-50%)', width: 400, zIndex: 10001 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, color: '#00e5cc', fontSize: 18, fontWeight: 900 }}>
+                <span>AI 이미지 분석 중...</span>
+                <span>{Math.round(scanProgress)}%</span>
+              </div>
+              <div style={{ height: 10, background: 'rgba(255,255,255,0.1)', borderRadius: 5, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${scanProgress}%`, background: 'linear-gradient(90deg, #00e5cc, #38bdf8)', borderRadius: 5, transition: 'width 0.1s' }} />
+              </div>
+            </div>
+          )}
+
           <div style={{ position: 'absolute', bottom: 60, left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 10001 }}>
-            <button onClick={() => setIsScanning(false)} style={{ background: 'rgba(0, 0, 0, 0.6)', padding: '18px 60px', borderRadius: '100px', color: '#fff', fontSize: 18, fontWeight: 900, border: '1px solid rgba(255, 255, 255, 0.2)', cursor: 'pointer', backdropFilter: 'blur(15px)' }}>진단 모드 종료</button>
+            <button onClick={() => { setIsScanning(false); setScanStatus(null); }} style={{ background: 'rgba(0, 0, 0, 0.6)', padding: '18px 60px', borderRadius: '100px', color: '#fff', fontSize: 18, fontWeight: 900, border: '1px solid rgba(255, 255, 255, 0.2)', cursor: 'pointer', backdropFilter: 'blur(15px)' }}>진단 모드 종료</button>
           </div>
         </div>
       )}
@@ -472,7 +518,7 @@ export default function DashboardView({
   )
 }
 
-function ProfileImage({ avatar, name }) {
+function ProfileImage({ avatar }) {
   const [imgError, setImgError] = useState(false)
   return (
     <div style={{ width: 110, height: 110, borderRadius: 24, background: '#1e293b', border: '3px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>

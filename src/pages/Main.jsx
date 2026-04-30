@@ -39,6 +39,8 @@ export default function Main({ patient, onNavigate, onSwitchPatient }) {
 
   // ─── 외상 분석 상태 ───
   const [isScanning, setIsScanning] = useState(false)
+  const [scanProgress, setScanProgress] = useState(0)
+  const [scanStatus, setScanStatus] = useState(null) // 'scanning' | 'success' | 'error'
   const [scanError, setScanError] = useState(null)
 
   // ─── 실시간 바이탈 시뮬레이션 (모든 바이탈에 미세 변화 적용) ───
@@ -82,21 +84,39 @@ export default function Main({ patient, onNavigate, onSwitchPatient }) {
   // ─── 외상 촬영 및 분석 ───
   const handleTraumaAnalysis = () => {
     setIsScanning(true)
+    setScanStatus('scanning')
+    setScanProgress(0)
     setScanError(null)
     
-    setTimeout(() => {
-      if (Math.random() < 0.3) {
-        setScanError('LOW_LIGHT')
-        return
+    let p = 0
+    const timer = setInterval(() => {
+      p += Math.random() * 8 + 4
+      if (p >= 100) {
+        clearInterval(timer)
+        setScanProgress(100)
+        
+        setTimeout(() => {
+          if (Math.random() < 0.2) {
+            setScanStatus('error')
+            setScanError('이미지 해상도가 낮거나 조명이 부족하여 분석을 완료할 수 없습니다.')
+          } else {
+            setScanStatus('success')
+          }
+        }, 600)
+      } else {
+        setScanProgress(p)
       }
+    }, 80)
+  }
 
-      setIsScanning(false)
-      onNavigate && onNavigate('emergency', { 
-        traumaType: 'TRAUMA',
-        analysis: '다발성 늑골 골절 및 기흉 의심',
-        evidence: '좌측 흉부 영상에서 늑골 배열의 불연속성 포착'
-      })
-    }, 1500)
+  const confirmTraumaAnalysis = () => {
+    setIsScanning(false)
+    setScanStatus(null)
+    onNavigate && onNavigate('emergency', { 
+      traumaType: 'TRAUMA',
+      analysis: '다발성 늑골 골절 및 기흉 의심',
+      evidence: '좌측 흉부 영상에서 늑골 배열의 불연속성 포착'
+    })
   }
 
   return (
@@ -115,8 +135,12 @@ export default function Main({ patient, onNavigate, onSwitchPatient }) {
       handleTraumaAnalysis={handleTraumaAnalysis}
       isScanning={isScanning}
       setIsScanning={setIsScanning}
+      scanProgress={scanProgress}
+      scanStatus={scanStatus}
+      setScanStatus={setScanStatus}
       scanError={scanError}
       setScanError={setScanError}
+      confirmTraumaAnalysis={confirmTraumaAnalysis}
       setBp={setBp}
       setBt={setBt}
       onSwitchPatient={onSwitchPatient}
@@ -315,7 +339,9 @@ function getInitialChat(patient) {
         text: `[MDTS 자동 권고]\n• ${chronic !== '없음' ? `${chronic} 관련 정기 점검을 유지하십시오.` : '특별한 기저질환 없음 — 정상 모니터링 중입니다.'}\n• 알레르기(${allergies}) 투약 주의 플래그가 설정되어 있습니다.\n\n[CONFIDENCE: 90%]`
       })
     }
-  } catch {}
+  } catch (e) {
+    console.error("채팅 초기화 오류:", e)
+  }
 
   return msgs
 }
