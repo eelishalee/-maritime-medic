@@ -391,6 +391,19 @@ export default function Settings() {
   const [newEdu, setNewEdu] = useState({ name:'', id:'', dept:'', type:'기본 CPR (심폐소생술)', date:'', expiry:'' })
   const [dateEditor, setDateEditor] = useState(null)
   const [deleteEduTarget, setDeleteEduTarget] = useState(null)
+  const [editEduTarget, setEditEduTarget] = useState(null) // { index, data }
+
+  const openEditEdu = (i) => {
+    setEditEduTarget({ index: i, data: { ...trainingList[i] } })
+  }
+
+  const saveEditEdu = () => {
+    if (!editEduTarget.data.date) return alert('날짜를 선택하세요.')
+    setTrainingList(prev => prev.map((r, i) => i === editEduTarget.index ? { ...editEduTarget.data } : r))
+    const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
+    setActivities(p => [...p, { t: nowStr, type: 'info', msg: `교육이력 수정 : ${editEduTarget.data.name} - ${editEduTarget.data.type}` }])
+    setEditEduTarget(null)
+  }
 
   const confirmDeleteEdu = () => {
     if (deleteEduTarget === null) return
@@ -450,6 +463,51 @@ export default function Settings() {
   return (
     <div style={{ display:'flex', height:'calc(100vh - 72px)', background:C.bg, color:C.text, fontFamily:'"Pretendard",sans-serif', overflow:'hidden', position:'relative' }}>
 
+      {/* ── 교육 이력 수정 모달 ── */}
+      {editEduTarget && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', backdropFilter:'blur(10px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:2000 }}>
+          <div style={{ background:C.panel, border:`2px solid ${C.info}`, borderRadius:24, padding:45, width:650 }}>
+            <div style={{ fontSize:32, fontWeight:950, marginBottom:35, color:C.info, display:'flex', alignItems:'center', gap:15 }}>
+              <BookOpen size={36}/> 교육 이력 수정
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:28 }}>
+              <div>
+                <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>교육 이수 선원</div>
+                <select value={editEduTarget.data.id} onChange={e => {
+                  const c = CREW.find(x => x.id === e.target.value)
+                  if (c) setEditEduTarget(p => ({ ...p, data: { ...p.data, id: c.id, name: c.name, dept: c.dept } }))
+                }} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
+                  <option value="">선원을 선택하세요</option>
+                  {CREW.map(c => <option key={c.id} value={c.id}>{c.name} ⏐ {c.id} ⏐ {c.dept}</option>)}
+                </select>
+              </div>
+              <div>
+                <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>교육 과정</div>
+                <select value={editEduTarget.data.type} onChange={e => setEditEduTarget(p => ({ ...p, data: { ...p.data, type: e.target.value } }))} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
+                  <option>기본 CPR (심폐소생술)</option>
+                  <option>의료 응급 처치 (STCW)</option>
+                  <option>선상 응급 의료 (Advanced)</option>
+                  <option>AED 기기 작동법</option>
+                  <option>원격 의료 장비 운용 교육</option>
+                </select>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+                <div onClick={() => setDateEditor({ field:'date', target:'edit' })} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, cursor:'pointer', minHeight:60, display:'flex', alignItems:'center', justifyContent:'space-between', boxSizing:'border-box' }}>
+                  {editEduTarget.data.date || '이수 날짜'} <Clock size={20} color={C.sub} />
+                </div>
+                <div onClick={() => setDateEditor({ field:'expiry', target:'edit' })} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, cursor:'pointer', minHeight:60, display:'flex', alignItems:'center', justifyContent:'space-between', boxSizing:'border-box' }}>
+                  {editEduTarget.data.expiry || '만료 날짜'} <Clock size={20} color={C.sub} />
+                </div>
+              </div>
+            </div>
+            <div style={{ display:'flex', gap:18, marginTop:45 }}>
+              <button onClick={() => setEditEduTarget(null)} style={{ flex:1, padding:20, borderRadius:15, background:'rgba(255,255,255,0.03)', border:`1px solid ${C.border}`, color:C.sub, fontSize:22, fontWeight:800, cursor:'pointer' }}>취소</button>
+              <button onClick={saveEditEdu} style={{ flex:2, padding:20, borderRadius:15, background:C.info, border:'none', color:'#000', fontSize:22, fontWeight:950, cursor:'pointer' }}>수정 저장하기</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── 교육 이력 삭제 재확인 모달 ── */}
       {deleteEduTarget !== null && (() => {
         const r = trainingList[deleteEduTarget]
@@ -457,12 +515,7 @@ export default function Settings() {
         return (
           <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.88)', backdropFilter:'blur(12px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000 }}>
             <div style={{ background:C.panel, border:`2px solid ${C.danger}`, borderRadius:24, padding:48, width:520, boxShadow:'0 30px 60px rgba(0,0,0,0.6)' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:10 }}>
-                <div style={{ width:48, height:48, borderRadius:14, background:`rgba(255,77,109,0.15)`, border:`1.5px solid ${C.danger}55`, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <X size={26} color={C.danger} />
-                </div>
-                <div style={{ fontSize:26, fontWeight:950, color:'#fff' }}>교육 이력 삭제</div>
-              </div>
+              <div style={{ fontSize:26, fontWeight:950, color:'#fff', marginBottom:10 }}>교육 이력 삭제</div>
               <div style={{ fontSize:17, color:C.sub, fontWeight:700, marginBottom:28 }}>이 교육 이력을 영구적으로 삭제합니다.</div>
               <div style={{ background:C.panel2, border:`1px solid ${C.border}`, borderRadius:16, padding:'22px 26px', marginBottom:32 }}>
                 <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:10 }}>
@@ -508,12 +561,16 @@ export default function Settings() {
 
       {/* ── 캘린더 모달 ── */}
       {dateEditor && (
-        <CalendarModal 
-          onClose={() => setDateEditor(null)} 
+        <CalendarModal
+          onClose={() => setDateEditor(null)}
           onSelect={(val) => {
-            setNewEdu(p => ({ ...p, [dateEditor.field]: val }))
+            if (dateEditor.target === 'edit') {
+              setEditEduTarget(p => ({ ...p, data: { ...p.data, [dateEditor.field]: val } }))
+            } else {
+              setNewEdu(p => ({ ...p, [dateEditor.field]: val }))
+            }
             setDateEditor(null)
-          }} 
+          }}
         />
       )}
 
@@ -641,14 +698,24 @@ export default function Settings() {
                             <Clock size={14} color={C.sub}/> 만료일 : <span style={{ color: status.color, fontWeight:900 }}>{r.expiry}</span>
                           </div>
                         ) : <div />}
-                        <button
-                          onClick={() => setDeleteEduTarget(i)}
-                          style={{ padding:'5px 14px', borderRadius:8, background:`rgba(255,77,109,0.12)`, border:`1px solid rgba(255,77,109,0.35)`, color:C.danger, fontSize:15, fontWeight:800, cursor:'pointer', flexShrink:0, transition:'all 0.15s' }}
-                          onMouseEnter={e => e.currentTarget.style.background='rgba(255,77,109,0.28)'}
-                          onMouseLeave={e => e.currentTarget.style.background='rgba(255,77,109,0.12)'}
-                        >
-                          삭제
-                        </button>
+                        <div style={{ display:'flex', gap:8 }}>
+                          <button
+                            onClick={() => openEditEdu(i)}
+                            style={{ padding:'5px 14px', borderRadius:8, background:`rgba(56,189,248,0.12)`, border:`1px solid rgba(56,189,248,0.35)`, color:C.info, fontSize:15, fontWeight:800, cursor:'pointer', flexShrink:0, transition:'all 0.15s' }}
+                            onMouseEnter={e => e.currentTarget.style.background='rgba(56,189,248,0.28)'}
+                            onMouseLeave={e => e.currentTarget.style.background='rgba(56,189,248,0.12)'}
+                          >
+                            수정
+                          </button>
+                          <button
+                            onClick={() => setDeleteEduTarget(i)}
+                            style={{ padding:'5px 14px', borderRadius:8, background:`rgba(255,77,109,0.12)`, border:`1px solid rgba(255,77,109,0.35)`, color:C.danger, fontSize:15, fontWeight:800, cursor:'pointer', flexShrink:0, transition:'all 0.15s' }}
+                            onMouseEnter={e => e.currentTarget.style.background='rgba(255,77,109,0.28)'}
+                            onMouseLeave={e => e.currentTarget.style.background='rgba(255,77,109,0.12)'}
+                          >
+                            삭제
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )
