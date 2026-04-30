@@ -369,6 +369,9 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const [coldTimer, setColdTimer] = useState(900)
   const [isColdTimerActive, setIsColdTimerActive] = useState(false)
   const [washTimer, setWashTimer] = useState(300)
+  const [imgLoaded, setImgLoaded] = useState(false)
+
+  useEffect(() => { setImgLoaded(false) }, [activeAction, activeDisplayIndex])
   const [isWashTimerActive, setIsWashTimerActive] = useState(false)
 
   useEffect(() => {
@@ -528,32 +531,37 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
           <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}><div style={{ fontSize: 18, fontWeight: 950 }}>처치 동작 시각 가이드</div></div>
             <div style={{ flex: 1, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-              {currentActionData?.steps[activeDisplayIndex]?.stepImage ? (
-                <img 
-                  src={currentActionData.steps[activeDisplayIndex].stepImage} 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
+              {/* SVG 일러스트 — 항상 즉시 표시 (이미지 로드 전 placeholder) */}
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <IllustrationSelector action={activeAction} step={stepNum} />
+              </div>
+              {/* 실제 이미지 — 로드 완료 시 페이드인 */}
+              {currentActionData?.steps[activeDisplayIndex]?.stepImage && (
+                <img
+                  key={`${activeAction}-${activeDisplayIndex}`}
+                  src={currentActionData.steps[activeDisplayIndex].stepImage}
+                  onLoad={() => setImgLoaded(true)}
+                  style={{
+                    position: 'absolute', inset: 0,
+                    width: '100%', height: '100%',
                     objectFit: 'cover',
-                    objectPosition: 
-                      (activeAction === '심폐소생술' && activeDisplayIndex === 0) ? '20% 20%' : 
-                      (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? '50% 0%' : 
-                      (activeAction === '심폐소생술' && activeDisplayIndex === 3) ? 'center 60%' : 
+                    objectPosition:
+                      (activeAction === '심폐소생술' && activeDisplayIndex === 0) ? '20% 20%' :
+                      (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? '50% 0%' :
+                      (activeAction === '심폐소생술' && activeDisplayIndex === 3) ? 'center 60%' :
                       (activeAction === '기도 확보' && activeDisplayIndex === 1) ? '20% center' :
                       (activeAction === '기도 확보' && activeDisplayIndex === 3) ? '0% 60%' :
                       'center center',
-                    transform: 
-                      (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? 'scale(1.2) translateY(-10%)' : 
+                    transform:
+                      (activeAction === '심폐소생술' && activeDisplayIndex === 2) ? 'scale(1.2) translateY(-10%)' :
                       (activeAction === '기도 확보' && activeDisplayIndex === 1) ? 'scale(1.3)' :
                       (activeAction === '기도 확보' && activeDisplayIndex === 3) ? 'scale(1.25)' :
                       'none',
-                    transition: 'transform 0.3s ease-out'
-                  }} 
+                    opacity: imgLoaded ? 1 : 0,
+                    transition: 'opacity 0.3s ease-out, transform 0.3s ease-out'
+                  }}
                   alt={currentActionData.steps[activeDisplayIndex].title}
-                  key={`${activeAction}-${activeDisplayIndex}`}
                 />
-              ) : (
-                <IllustrationSelector action={activeAction} step={stepNum} />
               )}
               
               {activeAction === '심폐소생술' && stepNum === 3 && (
