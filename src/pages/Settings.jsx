@@ -920,7 +920,6 @@ export default function Settings() {
                 </div>
                 <div style={{ fontSize:34, fontWeight:950, color:'#fff', marginBottom:8 }}>{s.v}</div>
                 <div style={{ display:'flex', alignItems:'center', gap:10 }}><div style={{ width:6, height:6, borderRadius:'50%', background:s.c }} /><div style={{ fontSize:15, color:C.sub, fontWeight:700 }}>{s.s}</div></div>
-                {s.f && <div style={{ position:'absolute', bottom:10, right:15, fontSize:12, color:s.c, fontWeight:900, opacity:0.6 }}>CLICK TO REFRESH</div>}
               </div>
             ))}
           </div>
