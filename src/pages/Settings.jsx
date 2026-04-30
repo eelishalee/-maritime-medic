@@ -633,23 +633,23 @@ export default function Settings() {
                           <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:6 }}><span style={{ fontSize:26, fontWeight:900, color:'#fff' }}>{r.name}</span><Tag color={C.dim} small style={{ fontSize:15, padding:'4px 10px', color:C.text }}>{r.dept}</Tag></div>
                           <div style={{ fontSize:22, fontWeight:850, color:C.info }}>{r.type}</div>
                         </div>
-                        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                          <Tag color={status.color}>{status.label}</Tag>
-                          <button
-                            onClick={() => setDeleteEduTarget(i)}
-                            style={{ padding:'5px 12px', borderRadius:8, background:`rgba(255,77,109,0.12)`, border:`1px solid rgba(255,77,109,0.35)`, color:C.danger, fontSize:15, fontWeight:800, cursor:'pointer', flexShrink:0, transition:'all 0.15s' }}
-                            onMouseEnter={e => e.currentTarget.style.background='rgba(255,77,109,0.28)'}
-                            onMouseLeave={e => e.currentTarget.style.background='rgba(255,77,109,0.12)'}
-                          >
-                            삭제
-                          </button>
-                        </div>
+                        <Tag color={status.color}>{status.label}</Tag>
                       </div>
-                      {r.expiry && (
-                        <div style={{ fontSize:17, color:C.sub, fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
-                          <Clock size={14} color={C.sub}/> 만료일 : <span style={{ color: status.color, fontWeight:900 }}>{r.expiry}</span>
-                        </div>
-                      )}
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                        {r.expiry ? (
+                          <div style={{ fontSize:17, color:C.sub, fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
+                            <Clock size={14} color={C.sub}/> 만료일 : <span style={{ color: status.color, fontWeight:900 }}>{r.expiry}</span>
+                          </div>
+                        ) : <div />}
+                        <button
+                          onClick={() => setDeleteEduTarget(i)}
+                          style={{ padding:'5px 14px', borderRadius:8, background:`rgba(255,77,109,0.12)`, border:`1px solid rgba(255,77,109,0.35)`, color:C.danger, fontSize:15, fontWeight:800, cursor:'pointer', flexShrink:0, transition:'all 0.15s' }}
+                          onMouseEnter={e => e.currentTarget.style.background='rgba(255,77,109,0.28)'}
+                          onMouseLeave={e => e.currentTarget.style.background='rgba(255,77,109,0.12)'}
+                        >
+                          삭제
+                        </button>
+                      </div>
                     </div>
                   )
                 })}
