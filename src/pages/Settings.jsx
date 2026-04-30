@@ -1013,8 +1013,9 @@ export default function Settings() {
             </GPanel>
             <GPanel title="AI 분석 모델" icon={<Cpu size={22} color={C.purple}/>}>
               <div style={{ display:'flex', flexDirection:'column', gap:12, fontSize:19 }}>
-                <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ color:C.sub }}>엔진 버전</span><span style={{ color:C.purple, fontWeight:800 }}>v2.4.1</span></div>
-                <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ color:C.sub }}>진단 정확도</span><span style={{ color:C.success, fontWeight:800 }}>98.2%</span></div>
+                {/* TODO: 백엔드 연동 시 API로 엔진 버전 및 진단 정확도 동적 반영 필요 */}
+                <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ color:C.sub }}>엔진 버전</span><span style={{ color:C.sub, fontWeight:800, fontStyle:'italic' }}>백엔드 연동 후 적용</span></div>
+                <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ color:C.sub }}>진단 정확도</span><span style={{ color:C.sub, fontWeight:800, fontStyle:'italic' }}>백엔드 연동 후 적용</span></div>
                 <Btn color={updateStatus === 'NEW' ? C.warning : updateStatus === 'CHECKING' ? C.sub : C.purple} small style={{ marginTop:15, position:'relative', overflow:'hidden' }} onClick={handleUpdateCheck} disabled={updateStatus === 'CHECKING'}>
                   {updateStatus === 'IDLE' && '업데이트 확인'}
                   {updateStatus === 'CHECKING' && '서버 연결 중...'}
