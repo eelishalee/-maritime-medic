@@ -531,11 +531,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
           <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}><div style={{ fontSize: 18, fontWeight: 950 }}>처치 동작 시각 가이드</div></div>
             <div style={{ flex: 1, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-              {/* SVG 일러스트 — 항상 즉시 표시 (이미지 로드 전 placeholder) */}
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IllustrationSelector action={activeAction} step={stepNum} />
-              </div>
-              {/* 실제 이미지 — 로드 완료 시 페이드인 */}
               {currentActionData?.steps[activeDisplayIndex]?.stepImage && (
                 <img
                   key={`${activeAction}-${activeDisplayIndex}`}
