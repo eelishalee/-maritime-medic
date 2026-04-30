@@ -492,14 +492,14 @@ export default function Settings() {
                 <select value={editEduTarget.data.id} onChange={e => {
                   const c = CREW.find(x => x.id === e.target.value)
                   if (c) setEditEduTarget(p => ({ ...p, data: { ...p.data, id: c.id, name: c.name, dept: c.dept } }))
-                }} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
+                }} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
                   <option value="">선원을 선택하세요</option>
                   {CREW.map(c => <option key={c.id} value={c.id}>{c.name} ⏐ {c.id} ⏐ {c.dept}</option>)}
                 </select>
               </div>
               <div>
                 <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>교육 과정</div>
-                <select value={editEduTarget.data.type} onChange={e => setEditEduTarget(p => ({ ...p, data: { ...p.data, type: e.target.value } }))} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
+                <select value={editEduTarget.data.type} onChange={e => setEditEduTarget(p => ({ ...p, data: { ...p.data, type: e.target.value } }))} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
                   <option>기본 CPR (심폐소생술)</option>
                   <option>의료 응급 처치 (STCW)</option>
                   <option>선상 응급 의료 (Advanced)</option>
@@ -567,7 +567,7 @@ export default function Settings() {
                     const crew = CREW.find(c => c.id === e.target.value)
                     setEditManagerTarget(p => ({ ...p, id: e.target.value, name: crew?.name || '', dept: crew?.dept || '' }))
                   }}
-                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
                 >
                   {CREW.map(c => <option key={c.id} value={c.id}>{c.name} ⏐ {c.id} ⏐ {c.role} · {c.dept}</option>)}
                 </select>
@@ -577,7 +577,7 @@ export default function Settings() {
                 <select
                   value={editManagerTarget.role}
                   onChange={e => setEditManagerTarget(p => ({ ...p, role: e.target.value }))}
-                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
                 >
                   {MANAGER_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
@@ -643,14 +643,14 @@ export default function Settings() {
                 <select value={newEdu.id} onChange={e => {
                     const c = CREW.find(x => x.id === e.target.value);
                     if(c) setNewEdu({...newEdu, id:c.id, name:c.name, dept:c.dept});
-                  }} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
+                  }} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
                   <option value="">선원을 선택하세요 (이름 ⏐ ID ⏐ 부서)</option>
                   {CREW.map(c => <option key={c.id} value={c.id}>{c.name} ⏐ {c.id} ⏐ {c.dept}</option>)}
                 </select>
               </div>
               <div>
                 <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>교육 과정</div>
-                <select value={newEdu.type} onChange={e=>setNewEdu({...newEdu, type:e.target.value})} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
+                <select value={newEdu.type} onChange={e=>setNewEdu({...newEdu, type:e.target.value})} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
                   <option>기본 CPR (심폐소생술)</option>
                   <option>의료 응급 처치 (STCW)</option>
                   <option>선상 응급 의료 (Advanced)</option>
@@ -1050,7 +1050,7 @@ export default function Settings() {
                     const crew = CREW.find(c => c.id === e.target.value)
                     setNewManager(p => ({ ...p, id: e.target.value, name: crew?.name || '', dept: crew?.dept || '' }))
                   }}
-                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
                 >
                   <option value="">-- 선원 선택 --</option>
                   {CREW.filter(c => !managers.find(m => m.id === c.id)).map(c => (
@@ -1063,7 +1063,7 @@ export default function Settings() {
                 <select
                   value={newManager.role}
                   onChange={e => setNewManager(p => ({ ...p, role: e.target.value }))}
-                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
                 >
                   {MANAGER_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
@@ -1108,7 +1108,7 @@ export default function Settings() {
               </div>
               <div>
                 <div style={{ fontSize:16, color:C.sub, fontWeight:800, marginBottom:8 }}>분류</div>
-                <select value={editMed.cat} onChange={e=>setEditMed(p=>({...p,cat:e.target.value}))} style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:18, fontWeight:700, outline:'none' }}>
+                <select value={editMed.cat} onChange={e=>setEditMed(p=>({...p,cat:e.target.value}))} style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:18, fontWeight:700, outline:'none' }}>
                   {[['pill','알약'],['liquid','액체'],['cream','연고'],['pad','패드/거즈'],['bandage','붕대/고정']].map(([v,l])=><option key={v} value={v}>{l}</option>)}
                 </select>
               </div>
