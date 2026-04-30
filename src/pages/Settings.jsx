@@ -428,6 +428,15 @@ export default function Settings() {
   const [isManagerModalOpen, setIsManagerModalOpen] = useState(false)
   const [newManager, setNewManager] = useState({ id: '', name: '', dept: '', role: '안전책임자' })
   const [deleteManagerTarget, setDeleteManagerTarget] = useState(null)
+  const [editManagerTarget, setEditManagerTarget] = useState(null) // { ...manager }
+
+  const saveEditManager = () => {
+    const updated = managers.map(m => m.id === editManagerTarget.id ? { ...editManagerTarget } : m)
+    saveManagers(updated)
+    const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
+    setActivities(p => [...p, { t: nowStr, type: 'info', msg: `관리자 수정 : ${editManagerTarget.name} (${editManagerTarget.role})` }])
+    setEditManagerTarget(null)
+  }
 
   const saveManagers = (list) => {
     setManagers(list)
@@ -534,6 +543,46 @@ export default function Settings() {
           </div>
         )
       })()}
+
+      {/* ── 관리자 수정 모달 ── */}
+      {editManagerTarget && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', backdropFilter:'blur(10px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:2000 }}>
+          <div style={{ background:C.panel, border:`2px solid ${C.purple}`, borderRadius:24, padding:45, width:560 }}>
+            <div style={{ fontSize:32, fontWeight:950, marginBottom:35, color:C.purple, display:'flex', alignItems:'center', gap:15 }}>
+              <ShieldCheck size={36}/> 관리자 정보 수정
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:20, marginBottom:35 }}>
+              <div>
+                <div style={{ fontSize:18, color:C.sub, fontWeight:800, marginBottom:10 }}>선원 선택</div>
+                <select
+                  value={editManagerTarget.id}
+                  onChange={e => {
+                    const crew = CREW.find(c => c.id === e.target.value)
+                    setEditManagerTarget(p => ({ ...p, id: e.target.value, name: crew?.name || '', dept: crew?.dept || '' }))
+                  }}
+                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                >
+                  {CREW.map(c => <option key={c.id} value={c.id}>{c.name} ({c.role} · {c.dept})</option>)}
+                </select>
+              </div>
+              <div>
+                <div style={{ fontSize:18, color:C.sub, fontWeight:800, marginBottom:10 }}>담당 역할</div>
+                <select
+                  value={editManagerTarget.role}
+                  onChange={e => setEditManagerTarget(p => ({ ...p, role: e.target.value }))}
+                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                >
+                  {MANAGER_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+            </div>
+            <div style={{ display:'flex', gap:15 }}>
+              <button onClick={() => setEditManagerTarget(null)} style={{ flex:1, padding:20, borderRadius:15, background:'rgba(255,255,255,0.03)', border:`1px solid ${C.border}`, color:C.sub, fontSize:22, fontWeight:800, cursor:'pointer' }}>취소</button>
+              <button onClick={saveEditManager} style={{ flex:2, padding:20, borderRadius:15, background:C.purple, color:'#000', fontSize:22, fontWeight:950, cursor:'pointer', border:'none' }}>수정 저장하기</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── 관리자 삭제 재확인 모달 ── */}
       {deleteManagerTarget && (
@@ -734,18 +783,24 @@ export default function Settings() {
               ) : (
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:15 }}>
                   {managers.map((m, i) => (
-                    <div key={m.id} style={{ background:C.panel2, border:`1.5px solid ${C.border}`, borderRadius:16, padding:'22px 20px', position:'relative', display:'flex', flexDirection:'column', gap:10 }}>
-                      <button
-                        onClick={() => setDeleteManagerTarget(m)}
-                        style={{ position:'absolute', top:12, right:12, background:'rgba(255,77,109,0.1)', border:'1px solid rgba(255,77,109,0.3)', borderRadius:8, padding:'4px 10px', color:C.danger, fontSize:14, fontWeight:800, cursor:'pointer' }}
-                        onMouseEnter={e => e.currentTarget.style.background='rgba(255,77,109,0.28)'}
-                        onMouseLeave={e => e.currentTarget.style.background='rgba(255,77,109,0.1)'}
-                      >
-                        삭제
-                      </button>
+                    <div key={m.id} style={{ background:C.panel2, border:`1.5px solid ${C.border}`, borderRadius:16, padding:'22px 20px', display:'flex', flexDirection:'column', gap:10 }}>
                       <div style={{ fontSize:13, fontWeight:800, color:C.purple, background:`${C.purple}18`, padding:'3px 10px', borderRadius:6, border:`1px solid ${C.purple}40`, width:'fit-content' }}>{m.role}</div>
                       <div style={{ fontSize:26, fontWeight:950, color:'#fff' }}>{m.name}</div>
                       <div style={{ fontSize:18, color:C.sub, fontWeight:700 }}>{m.dept} · {m.id}</div>
+                      <div style={{ display:'flex', gap:8, marginTop:4 }}>
+                        <button
+                          onClick={() => setEditManagerTarget({ ...m })}
+                          style={{ flex:1, padding:'5px 0', borderRadius:8, background:'rgba(56,189,248,0.1)', border:'1px solid rgba(56,189,248,0.3)', color:C.info, fontSize:14, fontWeight:800, cursor:'pointer' }}
+                          onMouseEnter={e => e.currentTarget.style.background='rgba(56,189,248,0.25)'}
+                          onMouseLeave={e => e.currentTarget.style.background='rgba(56,189,248,0.1)'}
+                        >수정</button>
+                        <button
+                          onClick={() => setDeleteManagerTarget(m)}
+                          style={{ flex:1, padding:'5px 0', borderRadius:8, background:'rgba(255,77,109,0.1)', border:'1px solid rgba(255,77,109,0.3)', color:C.danger, fontSize:14, fontWeight:800, cursor:'pointer' }}
+                          onMouseEnter={e => e.currentTarget.style.background='rgba(255,77,109,0.25)'}
+                          onMouseLeave={e => e.currentTarget.style.background='rgba(255,77,109,0.1)'}
+                        >삭제</button>
+                      </div>
                     </div>
                   ))}
                 </div>
