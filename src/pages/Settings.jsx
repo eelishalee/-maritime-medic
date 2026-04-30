@@ -1000,11 +1000,11 @@ export default function Settings() {
             </GPanel>
           </div>
 
-          <div style={{ display:'grid', gridTemplateColumns:'1.5fr 1fr 1.5fr', gap:18 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 2fr', gap:18 }}>
             <GPanel title="보안 설정" icon={<Lock size={22} color={C.success}/>}>
-              <div style={{ display:'flex', flexDirection:'column', gap:15 }}>
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
                 {[{l:'데이터베이스 암호화', k:'db_enc'},{l:'이미지 데이터 보안 관리', k:'img_sec'},{l:'전송 구간 암호화', k:'tls_sync'},{l:'네트워크 분리 설정', k:'net_iso'},{l:'로그 위변조 방지 시스템', k:'log_audit'},{l:'오프라인 데이터 보호', k:'offline_sec'}].map(s=>(
-                  <div key={s.k} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:20 }}>
+                  <div key={s.k} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:18 }}>
                     <span style={{ color:C.sub, fontWeight:700 }}>{s.l}</span>
                     <Toggle on={sec[s.k]} color={C.success} onChange={() => handleToggleSec(s.k, s.l)}/>
                   </div>
@@ -1025,7 +1025,7 @@ export default function Settings() {
               </div>
             </GPanel>
             <GPanel title="시스템 활동 로그" icon={<Terminal size={22} color={C.sub}/>}>
-              <div ref={logContainerRef} style={{ height:180, overflowY:'auto', background:'#060809', padding:18, borderRadius:12, fontFamily:'monospace', fontSize:17, border:`1px solid ${C.border}` }}>
+              <div ref={logContainerRef} style={{ height:300, overflowY:'auto', background:'#060809', padding:18, borderRadius:12, fontFamily:'monospace', fontSize:17, border:`1px solid ${C.border}` }}>
                 {activities.map((l,i)=><div key={i} style={{ marginBottom:8 }}><span style={{ color:C.sub }}>[{l.t}]</span> <span style={{ color:l.type==='error'?C.danger:l.type==='warning'?C.warning:C.info }}>{l.msg}</span></div>)}
               </div>
             </GPanel>
