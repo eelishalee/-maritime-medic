@@ -783,20 +783,20 @@ export default function Settings() {
               ) : (
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:15 }}>
                   {managers.map((m, i) => (
-                    <div key={m.id} style={{ background:C.panel2, border:`1.5px solid ${C.border}`, borderRadius:16, padding:'22px 20px', display:'flex', flexDirection:'column', gap:10 }}>
+                    <div key={m.id} style={{ background:C.panel2, border:`1.5px solid ${C.border}`, borderRadius:16, padding:'22px 20px', display:'flex', flexDirection:'column', gap:10, position:'relative' }}>
                       <div style={{ fontSize:13, fontWeight:800, color:C.purple, background:`${C.purple}18`, padding:'3px 10px', borderRadius:6, border:`1px solid ${C.purple}40`, width:'fit-content' }}>{m.role}</div>
                       <div style={{ fontSize:26, fontWeight:950, color:'#fff' }}>{m.name}</div>
                       <div style={{ fontSize:18, color:C.sub, fontWeight:700 }}>{m.dept} · {m.id}</div>
-                      <div style={{ display:'flex', gap:8, marginTop:4 }}>
+                      <div style={{ display:'flex', gap:6, justifyContent:'flex-end', marginTop:2 }}>
                         <button
                           onClick={() => setEditManagerTarget({ ...m })}
-                          style={{ flex:1, padding:'5px 0', borderRadius:8, background:'rgba(56,189,248,0.1)', border:'1px solid rgba(56,189,248,0.3)', color:C.info, fontSize:14, fontWeight:800, cursor:'pointer' }}
+                          style={{ padding:'4px 10px', borderRadius:7, background:'rgba(56,189,248,0.1)', border:'1px solid rgba(56,189,248,0.3)', color:C.info, fontSize:13, fontWeight:800, cursor:'pointer' }}
                           onMouseEnter={e => e.currentTarget.style.background='rgba(56,189,248,0.25)'}
                           onMouseLeave={e => e.currentTarget.style.background='rgba(56,189,248,0.1)'}
                         >수정</button>
                         <button
                           onClick={() => setDeleteManagerTarget(m)}
-                          style={{ flex:1, padding:'5px 0', borderRadius:8, background:'rgba(255,77,109,0.1)', border:'1px solid rgba(255,77,109,0.3)', color:C.danger, fontSize:14, fontWeight:800, cursor:'pointer' }}
+                          style={{ padding:'4px 10px', borderRadius:7, background:'rgba(255,77,109,0.1)', border:'1px solid rgba(255,77,109,0.3)', color:C.danger, fontSize:13, fontWeight:800, cursor:'pointer' }}
                           onMouseEnter={e => e.currentTarget.style.background='rgba(255,77,109,0.25)'}
                           onMouseLeave={e => e.currentTarget.style.background='rgba(255,77,109,0.1)'}
                         >삭제</button>
