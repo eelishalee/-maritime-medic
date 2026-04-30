@@ -562,7 +562,7 @@ export default function Settings() {
                   }}
                   style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
                 >
-                  {CREW.map(c => <option key={c.id} value={c.id}>{c.name} ({c.role} · {c.dept})</option>)}
+                  {CREW.map(c => <option key={c.id} value={c.id}>{c.name} ⏐ {c.id} ⏐ {c.role} · {c.dept}</option>)}
                 </select>
               </div>
               <div>
