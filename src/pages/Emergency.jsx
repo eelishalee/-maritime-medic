@@ -207,37 +207,11 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     return null
   })
 
-  const [goldenTime, setGoldenTime] = useState(300) // 5분 골든타임
-  const [isGoldenTimeActive, setIsGoldenTimeActive] = useState(false)
-
   // 환자 변경 시 이미지 에러 상태 초기화
   useEffect(() => {
     if (imgError) setImgError(false)
   }, [patient])
 
-  useEffect(() => {
-    let interval;
-    if (activeAction && isGoldenTimeActive && goldenTime > 0) {
-      interval = setInterval(() => setGoldenTime(prev => prev - 1), 1000)
-    }
-    return () => clearInterval(interval)
-  }, [activeAction, isGoldenTimeActive, goldenTime])
-
-  useEffect(() => {
-    if (activeAction && !isGoldenTimeActive) setIsGoldenTimeActive(true)
-  }, [activeAction, isGoldenTimeActive])
-
-  const getGoldenTimeColor = () => {
-    if (goldenTime > 180) return '#22c55e'
-    if (goldenTime > 60) return '#f59e0b'
-    return '#ef4444'
-  }
-
-  const formatGoldenTime = (sec) => {
-    const m = Math.floor(sec / 60)
-    const s = sec % 60
-    return `${m}:${String(s).padStart(2, '0')}`
-  }
 
   const [completedSteps, setCompletedSteps] = useState([])
   const [selectedStepIndex, setSelectedStepIndex] = useState(null)
@@ -517,26 +491,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
             ))}
           </div>
 
-          <div style={{ width: 340, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(20px)', borderRadius: 32, border: '2px solid rgba(56,189,248,0.2)', padding: 24, boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-              <Brain size={24} color="#38bdf8" />
-              <div style={{ fontSize: 18, fontWeight: 950, color: '#fff', letterSpacing: '-0.5px' }}>의식 수준 평가지표 (GCS)</div>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <GCSSelector label="E (개안 반응)" value={gcs.e} max={4} onChange={v => updateGCS('e', v)} color="#38bdf8" />
-              <GCSSelector label="V (언어 반응)" value={gcs.v} max={5} onChange={v => updateGCS('v', v)} color="#2dd4bf" />
-              <GCSSelector label="M (운동 반응)" value={gcs.m} max={6} onChange={v => updateGCS('m', v)} color="#fb923c" />
-            </div>
-
-            <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#94a3b8', marginBottom: 8 }}>GCS TOTAL SCORE</div>
-              <div style={{ fontSize: 56, fontWeight: 950, color: gcs.e+gcs.v+gcs.m <= 8 ? '#f43f5e' : '#fff', lineHeight: 1 }}>{gcs.e+gcs.v+gcs.m}</div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: gcs.e+gcs.v+gcs.m <= 8 ? '#f43f5e' : '#38bdf8', marginTop: 10 }}>
-                {gcs.e+gcs.v+gcs.m <= 8 ? '혼수 (Coma)' : gcs.e+gcs.v+gcs.m <= 12 ? '중등도 저하' : '정상/경미'}
-              </div>
-            </div>
-          </div>
         </div>
         <style>{`
           .triage-btn:hover { background: rgba(255,255,255,0.05) !important; transform: translateY(-8px) scale(1.02); border-color: rgba(255,255,255,0.2) !important; boxShadow: 0 20px 40px rgba(0,0,0,0.4); }
@@ -797,10 +751,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         <section style={{ gridRow: '1', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
           {activeAction ? (
             <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', padding: '24px', position: 'relative' }}>
-              {/* Golden Time Bar (Task 3-2) */}
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: '24px 24px 0 0', overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${(goldenTime / 300) * 100}%`, background: getGoldenTimeColor(), transition: 'all 1s linear', boxShadow: `0 0 10px ${getGoldenTimeColor()}` }} />
-              </div>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
@@ -809,11 +759,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                     <div style={{ color: currentActionData.color, fontSize: 18, fontWeight: 800 }}>AI 진단 : {currentActionData.diagnosis}</div>
                   </div>
                   <h2 style={{ fontSize: 52, fontWeight: 950, letterSpacing: '-2px', margin: 0 }}>{currentActionData.title}</h2>
-                </div>
-                {/* Golden Time Countdown Text */}
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: getGoldenTimeColor(), letterSpacing: '1px', marginBottom: 4 }}>GOLDEN TIME</div>
-                  <div style={{ fontSize: 36, fontWeight: 950, color: '#fff', fontFamily: 'monospace', lineHeight: 1 }}>{formatGoldenTime(goldenTime)}</div>
                 </div>
               </div>
 

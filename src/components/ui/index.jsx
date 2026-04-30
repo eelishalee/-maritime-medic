@@ -46,7 +46,7 @@ export function DashboardVital({ label, value, unit, color, editable, onEdit, li
           : 'rgba(45, 35, 10, 0.95)', 
         backdropFilter: 'blur(40px)', 
         borderRadius: '23px', 
-        padding: '16px 18px', 
+        padding: '16px 18px',
         position: 'relative', 
         zIndex: 2,
         display: 'flex',
@@ -56,18 +56,18 @@ export function DashboardVital({ label, value, unit, color, editable, onEdit, li
         {/* 상단 : 라벨(좌) 및 상태 점/편집 버튼(우) */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <div style={{ 
-              fontSize: 21, fontWeight: 950, 
-              color: isConnected ? 'rgba(255,255,255,0.9)' : '#fbbf24', 
+            <div style={{
+              fontSize: 21, fontWeight: 950,
+              color: isConnected ? 'rgba(255,255,255,0.9)' : '#fbbf24',
               letterSpacing: '0.5px',
               textTransform: 'uppercase',
               textShadow: isConnected ? '0 0 10px rgba(255,255,255,0.2)' : 'none',
-              marginTop: -2 // 텍스트 상단 여백 미세 조정
+              marginTop: -2
             }}>
               {label}
             </div>
-            {/* 정상 범위 정보 추가 */}
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>
+            {/* 정상 범위 정보 */}
+            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.25)', fontWeight: 300, letterSpacing: '0.3px' }}>
               {label === '심박수' ? '60-100' : 
                label === '산소포화도' ? '95-100' : 
                label === '호흡수' ? '12-20' : 

@@ -40,17 +40,34 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
   const [isDoctorOpen, setIsDoctorOpen] = useState(false)
   const [isTimeModalOpen, setIsTimeModalOpen] = useState(false)
   const [dynamicCrewList, setDynamicCrewList] = useState([])
-  const [selectedDoctor, setSelectedDoctor] = useState({ id: 1, name: '한상우', role: '의료관리자' })
-
   const selectRef = useRef(null)
   const doctorSelectRef = useRef(null)
   const timeModalRef = useRef(null)
 
-  const managers = [
-    { id: 1, name: '한상우', role: '의료관리자' },
-    { id: 2, name: '이민호', role: '1등 항해사' },
-    { id: 3, name: '박철수', role: '선장' }
-  ]
+  const [managers, setManagers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('mdts_managers')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (parsed.length > 0) return parsed
+      }
+    } catch {}
+    return [
+      { id: 'S26-001', name: '이선장', role: '안전책임자', dept: '항해부' },
+      { id: 'S26-003', name: '박기관', role: '의료담당자', dept: '기관부' },
+    ]
+  })
+
+  const [selectedDoctor, setSelectedDoctor] = useState(() => {
+    try {
+      const saved = localStorage.getItem('mdts_managers')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (parsed.length > 0) return parsed[0]
+      }
+    } catch {}
+    return { id: 'S26-003', name: '박기관', role: '의료담당자', dept: '기관부' }
+  })
 
   const OTC_MEDS = [
     { id: 'm1', name: '타이레놀', purpose: '해열/진통' },
@@ -64,10 +81,10 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
     { id: 'm9', name: '연고/소독액', purpose: '찰과상' }
   ]
 
-  // 환자 리스트 로드
+  // 환자 리스트 로드 (집중 관리 중인 환자만)
   useEffect(() => {
     const savedCrew = JSON.parse(localStorage.getItem('mdts_crew_list') || '[]')
-    setDynamicCrewList(savedCrew)
+    setDynamicCrewList(savedCrew.filter(c => c.isEmergency === true))
   }, [])
 
   // 환자 변경 시 데이터 동기화
@@ -347,12 +364,53 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
     return { label: '정상', color: '#26de81', bg: 'rgba(38,222,129,0.15)' }
   }
 
-  const displayHistory = patient?.history || '기록 없음'
-  const displayRecentHistory = patient?.recentHistory || { date: '기록 없음', title: '-', detail: '-' }
+  // 과거력: pastHistory(선원관리) → history 순으로 fallback
+  const displayHistory = patient?.pastHistory || patient?.history || patient?.chronic || '기록 없음'
+
+  // 최근 진료 이력: localStorage 기록 우선, 없으면 note 기반 표시
+  const displayRecentHistory = (() => {
+    try {
+      const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
+      const mine = records.filter(r => r.patientId === patient?.id)
+      if (mine.length > 0) {
+        const last = mine[mine.length - 1]
+        return {
+          date: new Date(last.timestamp).toLocaleDateString('ko-KR'),
+          title: last.mainComplaint || '진료 기록',
+          detail: `• 증상: ${(last.selectedSymptoms || []).join(', ') || '없음'}\n• 처치: ${(last.prescribedMeds || []).join(', ') || '없음'}\n• 특이: ${last.otherActions || '없음'}`
+        }
+      }
+    } catch {}
+    if (patient?.note && patient.note !== '특이사항 없음') {
+      return { date: patient?.boardingDate || '-', title: '특이사항', detail: patient.note }
+    }
+    return { date: '기록 없음', title: '-', detail: '-' }
+  })()
+
+  // 알레르기: allergies 필드 직접 매핑
   const displayAllergies = patient?.allergies || '없음'
-  const displayMeds = patient?.meds || []
-  const displayWorkLocation = patient?.workLocation || patient?.location || '미지정'
-  const displayEmergency = patient?.emergencyContact || { name: '미지정', relation: '-', phone: '-' }
+
+  // 복용 약물: lastMed(선원관리) → meds 배열 순으로 fallback
+  const displayMeds = (() => {
+    if (patient?.meds?.length > 0) return patient.meds
+    if (patient?.lastMed && patient.lastMed !== '없음') {
+      return patient.lastMed.split(',').map(m => ({ name: m.trim(), purpose: '처방약' }))
+    }
+    return []
+  })()
+
+  // 작업 위치: location(선원관리) 직접 매핑
+  const displayWorkLocation = patient?.location || patient?.workLocation || '미지정'
+
+  // 비상 연락망: emergencyName + emergency(선원관리) 파싱
+  const displayEmergency = (() => {
+    const name = patient?.emergencyName || '미지정'
+    const raw = patient?.emergency || ''
+    const parts = raw.split(' ')
+    const phone = parts[0] || '-'
+    const relation = parts[1] ? parts[1].replace(/[()]/g, '') : '-'
+    return { name, phone, relation }
+  })()
 
   return (
     <div style={{ padding: '0', height: 'calc(100vh - 72px)', overflow: 'hidden', background: '#020617', color: '#fff', fontFamily: '"Pretendard", sans-serif' }}>
@@ -397,11 +455,13 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
               <ChevronDown size={24} style={{ transform: isSelectOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.3s', color: '#38bdf8' }} />
             </div>
             {isSelectOpen && (
-              <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(20px)', border: '1.5px solid rgba(56,189,248,0.3)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', zIndex: 1000 }}>
-                {dynamicCrewList.map(c => (
+              <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(20px)', border: '1.5px solid rgba(56,189,248,0.3)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', zIndex: 1000, maxHeight: 300, overflowY: 'auto' }}>
+                {dynamicCrewList.length === 0 ? (
+                  <div style={{ padding: '16px 20px', fontSize: '18px', color: '#64748b', fontWeight: 700, textAlign: 'center' }}>집중 관리 중인 환자 없음</div>
+                ) : dynamicCrewList.map(c => (
                   <div key={c.id} onClick={() => { setSelectedId(c.id); setIsSelectOpen(false); }} style={{ padding: '16px 20px', fontSize: '20px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: selectedId === c.id ? 'rgba(56,189,248,0.2)' : 'transparent' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><div style={{ width: 12, height: 12, borderRadius: '50%', background: c.isEmergency ? '#ff4d6d' : '#26de81' }} />{c.name} ({c.role})</div>
-                    {c.isEmergency && <AlertTriangle size={18} color="#ff4d6d" />}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ff4d6d', flexShrink: 0 }} />{c.name} ({c.role})</div>
+                    <AlertTriangle size={18} color="#ff4d6d" />
                   </div>
                 ))}
               </div>
@@ -411,7 +471,6 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div style={{ fontSize: '18px', color: '#64748b', fontWeight: 700 }}>최근 내원일 : <span style={{ color: '#94a3b8' }}>{patient.last_visit || '-'}</span></div>
                 <div ref={doctorSelectRef} style={{ position: 'relative' }}>
                     <div onClick={() => setIsDoctorOpen(!isDoctorOpen)} style={{ background: 'rgba(255,255,255,0.04)', border: `1.5px solid ${isDoctorOpen ? '#38bdf8' : 'rgba(255,255,255,0.15)'}`, borderRadius: '12px', padding: '10px 18px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, transition: '0.2s' }}>
                         <span style={{ fontSize: '22px', color: '#fff', fontWeight: 900 }}>담당 : {selectedDoctor.name}</span>
@@ -450,17 +509,17 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 6 }}>
-                  <div style={{ fontSize: 36, fontWeight: 950, letterSpacing: '-0.5px', color: '#fff' }}>{patient?.name || '김항해'}</div>
-                  <div style={{ fontSize: 20, color: '#38bdf8', fontWeight: 800 }}>{patient?.role || '기관장'}</div>
+                  <div style={{ fontSize: 36, fontWeight: 950, letterSpacing: '-0.5px', color: '#fff' }}>{patient?.name || '-'}</div>
+                  <div style={{ fontSize: 20, color: '#38bdf8', fontWeight: 800 }}>{patient?.role || '-'}</div>
                 </div>
-                <div style={{ fontSize: 16, color: '#475569', fontWeight: 700 }}>ID : {patient?.id || 'S2026-026'}</div>
+                <div style={{ fontSize: 16, color: '#475569', fontWeight: 700 }}>ID : {patient?.id || '-'}</div>
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
-              <InfoItem label="나이/성별" value={`${patient?.age || 55}세 / ${patient?.gender || '남'}`} size="xl_ultra" />
-              <InfoItem label="혈액형" value={patient?.blood || 'A+형'} size="xl_ultra" />
-              <InfoItem label="신장" value={`${patient?.height || 178} cm`} size="xl_ultra" />
-              <InfoItem label="몸무게" value={`${patient?.weight || 82} kg`} size="xl_ultra" />
+              <InfoItem label="나이/성별" value={`${patient?.age ?? '-'}세 / ${patient?.gender || '-'}`} size="xl_ultra" />
+              <InfoItem label="혈액형" value={patient?.blood ? `${patient.blood}형` : '-'} size="xl_ultra" />
+              <InfoItem label="신장" value={patient?.height ? `${patient.height} cm` : '-'} size="xl_ultra" />
+              <InfoItem label="몸무게" value={patient?.weight ? `${patient.weight} kg` : '-'} size="xl_ultra" />
             </div>
           </div>
 
@@ -707,7 +766,7 @@ function VitalField({ label, value, status, editable, onEdit }) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '15px', position: 'relative', background: isNoData ? 'rgba(255,255,255,0.01)' : 'rgba(56,189,248,0.02)', borderRadius: '20px', border: `1.5px solid ${isNoData ? 'rgba(255,255,255,0.05)' : 'rgba(56,189,248,0.1)'}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}><span style={{ fontSize: '20px', color: '#64748b', fontWeight: 800 }}>{label}</span>{!isNoData && <span style={{ padding: '2px 10px', borderRadius: 6, background: status.bg, color: status.color, fontSize: '13px', fontWeight: 900 }}>{status.label}</span>}{editable && (<button onClick={onEdit} style={{ background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.3)', borderRadius: '6px', padding: '4px', cursor: 'pointer', marginLeft: 'auto' }}><Pencil size={14} color="#38bdf8" /></button>)}</div>
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 6, minHeight: '44px' }}>{isNoData ? (<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #38bdf8', borderTopColor: 'transparent', animation: 'spin 1s infinite linear' }} /><span style={{ fontSize: '20px', color: '#475569' }}>대기 중...</span></div>) : (<><span style={{ fontSize: '37px', fontWeight: 950, color: status.color }}>{value.split(' ')[0]}</span>{value.includes(' ') && <span style={{ fontSize: '18px', color: '#64748b', fontWeight: 800 }}>{value.split(' ')[1]}</span>}</>)}</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 6, minHeight: '44px' }}>{isNoData ? (<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #38bdf8', borderTopColor: 'transparent', animation: 'spin 1s infinite linear' }} /><span style={{ fontSize: '20px', color: '#475569' }}>센서를 연결해주세요</span></div>) : (<><span style={{ fontSize: '37px', fontWeight: 950, color: status.color }}>{value.split(' ')[0]}</span>{value.includes(' ') && <span style={{ fontSize: '18px', color: '#64748b', fontWeight: 800 }}>{value.split(' ')[1]}</span>}</>)}</div>
             {isNoData && editable && (<div onClick={onEdit} style={{ marginTop: '8px', fontSize: '17px', color: '#38bdf8', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><Plus size={16}/> 입력</div>)}
         </div>
     )
