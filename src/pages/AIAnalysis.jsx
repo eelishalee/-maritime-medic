@@ -117,78 +117,6 @@ export default function AIAnalysis({ patient, onNavigate }) {
 
   const rescan = () => { setScanning(true); setProgress(0) }
 
-  const CaptureModal = () => {
-    if (!captureModal) return null
-    const isScanning = captureModal === 'scanning'
-    const isSuccess  = captureModal === 'success'
-    return (
-      <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(2,8,18,0.88)', backdropFilter:'blur(8px)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-        <div style={{ width:340, borderRadius:24, overflow:'hidden', boxShadow:'0 30px 80px rgba(0,0,0,0.7)', border:`2px solid ${isScanning?'rgba(13,217,197,0.3)':isSuccess?'rgba(38,222,129,0.4)':'rgba(255,77,109,0.4)'}`, background:'rgba(8,16,32,0.98)' }}>
-          {/* 상단 헤더 컬러 바 */}
-          <div style={{ height:4, background: isScanning?'linear-gradient(90deg,#0dd9c5,#4fc3f7)':isSuccess?'linear-gradient(90deg,#26de81,#0dd9c5)':'linear-gradient(90deg,#ff4d6d,#ff9f43)' }}/>
-          <div style={{ padding:'32px 28px 28px' }}>
-            {/* 아이콘 */}
-            <div style={{ display:'flex', justifyContent:'center', marginBottom:22 }}>
-              {isScanning ? (
-                <div style={{ position:'relative', width:88, height:88 }}>
-                  <div style={{ width:88, height:88, borderRadius:'50%', background:`conic-gradient(#0dd9c5 ${scanProgress*3.6}deg, rgba(13,217,197,0.08) 0deg)`, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <div style={{ width:66, height:66, borderRadius:'50%', background:'#050d1a', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                      <ScanLine size={30} color="#0dd9c5" style={{ animation:'stepPulse 1s infinite' }}/>
-                    </div>
-                  </div>
-                </div>
-              ) : isSuccess ? (
-                <div style={{ width:88, height:88, borderRadius:'50%', background:'rgba(38,222,129,0.12)', border:'2px solid rgba(38,222,129,0.35)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <CheckCircle2 size={44} color="#26de81"/>
-                </div>
-              ) : (
-                <div style={{ width:88, height:88, borderRadius:'50%', background:'rgba(255,77,109,0.12)', border:'2px solid rgba(255,77,109,0.35)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <AlertCircle size={44} color="#ff4d6d"/>
-                </div>
-              )}
-            </div>
-            {/* 텍스트 */}
-            <div style={{ textAlign:'center', marginBottom:24 }}>
-              <div style={{ fontSize:19, fontWeight:900, color:'#fff', marginBottom:8 }}>
-                {isScanning ? '사진 스캔 중...' : isSuccess ? '촬영 완료' : '촬영 오류'}
-              </div>
-              <div style={{ fontSize:13, color:'#8da2c0', lineHeight:1.7 }}>
-                {isScanning
-                  ? <>이미지 품질 및 초점을 분석하고 있습니다.<br/><span style={{ color:'#0dd9c5', fontWeight:700 }}>{Math.round(scanProgress)}%</span> 완료</>
-                  : isSuccess
-                  ? <>이미지가 정상적으로 스캔되었습니다.<br/>AI 외상 분석을 시작할 수 있습니다.</>
-                  : <>이미지를 인식하지 못했습니다.<br/>선명한 사진으로 다시 촬영해 주세요.</>
-                }
-              </div>
-            </div>
-            {/* 스캔바 */}
-            {isScanning && (
-              <div style={{ height:4, borderRadius:2, background:'rgba(255,255,255,0.07)', overflow:'hidden', marginBottom:24 }}>
-                <div style={{ height:'100%', width:`${scanProgress}%`, background:'linear-gradient(90deg,#0dd9c5,#4fc3f7)', borderRadius:2, transition:'width 0.1s' }}/>
-              </div>
-            )}
-            {/* 버튼 */}
-            {!isScanning && (
-              <div style={{ display:'flex', gap:10 }}>
-                {isSuccess ? (
-                  <>
-                    <button onClick={closeCaptureModal} style={{ flex:1, padding:'12px', borderRadius:12, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#8da2c0', fontSize:13, fontWeight:700, cursor:'pointer' }}>닫기</button>
-                    <button onClick={closeCaptureModal} style={{ flex:2, padding:'12px', borderRadius:12, background:'linear-gradient(135deg,#26de81,#0dd9c5)', border:'none', color:'#050d1a', fontSize:13, fontWeight:900, cursor:'pointer' }}>AI 분석 시작 →</button>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={closeCaptureModal} style={{ flex:1, padding:'12px', borderRadius:12, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#8da2c0', fontSize:13, fontWeight:700, cursor:'pointer' }}>취소</button>
-                    <button onClick={retryCapture} style={{ flex:2, padding:'12px', borderRadius:12, background:'linear-gradient(135deg,#ff4d6d,#ff9f43)', border:'none', color:'#fff', fontSize:13, fontWeight:900, cursor:'pointer' }}>다시 촬영</button>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   if (scanning && progress < 100) {
     return (
       <div style={{ height:'calc(100vh - 44px)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#050d1a', gap:28 }}>
@@ -218,9 +146,71 @@ export default function AIAnalysis({ patient, onNavigate }) {
 
   const diag = DIAGNOSES[activeIdx]
 
+  const isCapScanning = captureModal === 'scanning'
+  const isCapSuccess  = captureModal === 'success'
+
   return (
+    <>
+    {captureModal && (
+      <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(2,8,18,0.88)', backdropFilter:'blur(8px)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <div style={{ width:340, borderRadius:24, overflow:'hidden', boxShadow:'0 30px 80px rgba(0,0,0,0.7)', border:`2px solid ${isCapScanning?'rgba(13,217,197,0.3)':isCapSuccess?'rgba(38,222,129,0.4)':'rgba(255,77,109,0.4)'}`, background:'rgba(8,16,32,0.98)' }}>
+          <div style={{ height:4, background: isCapScanning?'linear-gradient(90deg,#0dd9c5,#4fc3f7)':isCapSuccess?'linear-gradient(90deg,#26de81,#0dd9c5)':'linear-gradient(90deg,#ff4d6d,#ff9f43)' }}/>
+          <div style={{ padding:'32px 28px 28px' }}>
+            <div style={{ display:'flex', justifyContent:'center', marginBottom:22 }}>
+              {isCapScanning ? (
+                <div style={{ width:88, height:88, borderRadius:'50%', background:`conic-gradient(#0dd9c5 ${scanProgress*3.6}deg, rgba(13,217,197,0.08) 0deg)`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <div style={{ width:66, height:66, borderRadius:'50%', background:'#050d1a', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <ScanLine size={30} color="#0dd9c5" style={{ animation:'stepPulse 1s infinite' }}/>
+                  </div>
+                </div>
+              ) : isCapSuccess ? (
+                <div style={{ width:88, height:88, borderRadius:'50%', background:'rgba(38,222,129,0.12)', border:'2px solid rgba(38,222,129,0.35)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <CheckCircle2 size={44} color="#26de81"/>
+                </div>
+              ) : (
+                <div style={{ width:88, height:88, borderRadius:'50%', background:'rgba(255,77,109,0.12)', border:'2px solid rgba(255,77,109,0.35)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <AlertCircle size={44} color="#ff4d6d"/>
+                </div>
+              )}
+            </div>
+            <div style={{ textAlign:'center', marginBottom:24 }}>
+              <div style={{ fontSize:19, fontWeight:900, color:'#fff', marginBottom:8 }}>
+                {isCapScanning ? '사진 스캔 중...' : isCapSuccess ? '촬영 완료' : '촬영 오류'}
+              </div>
+              <div style={{ fontSize:13, color:'#8da2c0', lineHeight:1.7 }}>
+                {isCapScanning
+                  ? <>이미지 품질 및 초점을 분석하고 있습니다.<br/><span style={{ color:'#0dd9c5', fontWeight:700 }}>{Math.round(scanProgress)}%</span> 완료</>
+                  : isCapSuccess
+                  ? <>이미지가 정상적으로 스캔되었습니다.<br/>AI 외상 분석을 시작할 수 있습니다.</>
+                  : <>이미지를 인식하지 못했습니다.<br/>선명한 사진으로 다시 촬영해 주세요.</>
+                }
+              </div>
+            </div>
+            {isCapScanning && (
+              <div style={{ height:4, borderRadius:2, background:'rgba(255,255,255,0.07)', overflow:'hidden', marginBottom:24 }}>
+                <div style={{ height:'100%', width:`${scanProgress}%`, background:'linear-gradient(90deg,#0dd9c5,#4fc3f7)', borderRadius:2, transition:'width 0.1s' }}/>
+              </div>
+            )}
+            {!isCapScanning && (
+              <div style={{ display:'flex', gap:10 }}>
+                {isCapSuccess ? (
+                  <>
+                    <button onClick={closeCaptureModal} style={{ flex:1, padding:'12px', borderRadius:12, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#8da2c0', fontSize:13, fontWeight:700, cursor:'pointer' }}>닫기</button>
+                    <button onClick={closeCaptureModal} style={{ flex:2, padding:'12px', borderRadius:12, background:'linear-gradient(135deg,#26de81,#0dd9c5)', border:'none', color:'#050d1a', fontSize:13, fontWeight:900, cursor:'pointer' }}>AI 분석 시작 →</button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={closeCaptureModal} style={{ flex:1, padding:'12px', borderRadius:12, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#8da2c0', fontSize:13, fontWeight:700, cursor:'pointer' }}>취소</button>
+                    <button onClick={retryCapture} style={{ flex:2, padding:'12px', borderRadius:12, background:'linear-gradient(135deg,#ff4d6d,#ff9f43)', border:'none', color:'#fff', fontSize:13, fontWeight:900, cursor:'pointer' }}>다시 촬영</button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
     <div style={{ display:'grid', gridTemplateColumns:'280px 1fr 260px', height:'calc(100vh - 44px)', overflow:'hidden', background:'#050d1a' }}>
-      <CaptureModal/>
 
       {/* ── 좌: 모드 선택 + 진단 목록 ── */}
       <div style={{ borderRight:'1.5px solid rgba(13,217,197,0.13)', background:'rgba(8,18,35,0.98)', padding:'18px 16px', overflowY:'auto', display:'flex', flexDirection:'column', gap:14 }}>
@@ -450,6 +440,7 @@ export default function AIAnalysis({ patient, onNavigate }) {
         </div>
       </div>
     </div>
+    </>
   )
 }
 
