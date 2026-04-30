@@ -370,8 +370,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const [isColdTimerActive, setIsColdTimerActive] = useState(false)
   const [washTimer, setWashTimer] = useState(300)
   const [imgLoaded, setImgLoaded] = useState(false)
-
-  useEffect(() => { setImgLoaded(false) }, [activeAction, activeDisplayIndex])
   const [isWashTimerActive, setIsWashTimerActive] = useState(false)
 
   useEffect(() => {
@@ -403,11 +401,13 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const currentActionData = activeAction ? ACTION_GUIDES[activeAction] : null
   
   // 이미지 표시 우선순위 : 마지막으로 클릭한 인덱스 > 첫 번째 미완료 단계
-  const activeDisplayIndex = selectedStepIndex !== null 
-    ? selectedStepIndex 
+  const activeDisplayIndex = selectedStepIndex !== null
+    ? selectedStepIndex
     : (currentActionData?.steps.findIndex((_, i) => !completedSteps.includes(i)) ?? 0)
-  
+
   const stepNum = activeDisplayIndex + 1
+
+  useEffect(() => { setImgLoaded(false) }, [activeAction, activeDisplayIndex])
 
   if (triageStep === 'CHECK') {
     const triageData = [
