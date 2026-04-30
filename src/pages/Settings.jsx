@@ -9,6 +9,7 @@ import {
   ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell
 } from 'recharts'
 import { SHIP_INFO, DEVICE_INFO } from '../utils/constants'
+import { useAlert } from '../utils/AlertContext'
 
 const C = {
   bg: '#0b0c10', panel: '#111318', panel2: '#161b22',
@@ -158,6 +159,7 @@ function Toggle({ on, color, onChange }) {
 
 /* ═══════════════════════════════════ MAIN ═════════════════════════════════ */
 export default function Settings() {
+  const { showAlert, showConfirm } = useAlert()
   const [CREW, setCREW] = useState(() => {
     try {
       const saved = localStorage.getItem('mdts_crew_list')
@@ -349,7 +351,7 @@ export default function Settings() {
   const [editMed, setEditMed] = useState(null)
 
   const saveEditMed = () => {
-    if (!editMed.n || !editMed.c) return alert('약품명과 효능을 입력하세요.')
+    if (!editMed.n || !editMed.c) return showAlert('약품명과 효능을 입력하세요.', '입력 오류', 'warning')
     setMeds(prev => prev.map(m => m.id === editMed.id ? { ...editMed } : m))
     const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
     setActivities(p => [...p, { t: nowStr, type: 'info', msg: `재고 : [${editMed.n}] 정보 수정 완료` }])
@@ -358,10 +360,11 @@ export default function Settings() {
 
   const deleteMed = (id) => {
     const target = meds.find(m => m.id === id)
-    if (!window.confirm(`[${target?.n}] 약품을 삭제하시겠습니까?`)) return
-    setMeds(prev => prev.filter(m => m.id !== id))
-    const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
-    setActivities(p => [...p, { t: nowStr, type: 'warning', msg: `재고 : [${target?.n}] 삭제됨` }])
+    showConfirm(`[${target?.n}] 약품을 삭제하시겠습니까?`, () => {
+      setMeds(prev => prev.filter(m => m.id !== id))
+      const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
+      setActivities(p => [...p, { t: nowStr, type: 'warning', msg: `재고 : [${target?.n}] 삭제됨` }])
+    }, '약품 삭제', 'danger')
   }
 
   const updateMed = (id, delta) => {
@@ -379,7 +382,7 @@ export default function Settings() {
   }
 
   const addMed = () => {
-    if (!newMed.n || !newMed.c) return alert('약품명과 효능을 입력하세요.')
+    if (!newMed.n || !newMed.c) return showAlert('약품명과 효능을 입력하세요.', '입력 오류', 'warning')
     setMeds(prev => [...prev, { ...newMed, id: Date.now(), e: '-' }])
     setIsMedModalOpen(false)
     setNewMed({ n: '', c: '', q: 10, m: 5, cat: 'pill' })
@@ -398,7 +401,7 @@ export default function Settings() {
   }
 
   const saveEditEdu = () => {
-    if (!editEduTarget.data.date) return alert('날짜를 선택하세요.')
+    if (!editEduTarget.data.date) return showAlert('날짜를 선택하세요.', '입력 오류', 'warning')
     setTrainingList(prev => prev.map((r, i) => i === editEduTarget.index ? { ...editEduTarget.data } : r))
     const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
     setActivities(p => [...p, { t: nowStr, type: 'info', msg: `교육이력 수정 : ${editEduTarget.data.name} - ${editEduTarget.data.type}` }])
@@ -451,8 +454,8 @@ export default function Settings() {
   }
 
   const addManager = () => {
-    if (!newManager.id) return alert('선원을 선택하세요.')
-    if (managers.find(m => m.id === newManager.id)) return alert('이미 등록된 선원입니다.')
+    if (!newManager.id) return showAlert('선원을 선택하세요.', '입력 오류', 'warning')
+    if (managers.find(m => m.id === newManager.id)) return showAlert('이미 등록된 선원입니다.', '등록 오류', 'danger')
     const updated = [...managers, { ...newManager }]
     saveManagers(updated)
     setIsManagerModalOpen(false)
@@ -470,7 +473,7 @@ export default function Settings() {
   }
 
   const addEdu = () => {
-    if (!newEdu.id || !newEdu.date) return alert('선원과 날짜를 선택하세요.')
+    if (!newEdu.id || !newEdu.date) return showAlert('선원과 날짜를 선택하세요.', '입력 오류', 'warning')
     setTrainingList([ { ...newEdu }, ...trainingList ])
     setIsModalOpen(false)
     setNewEdu({ name:'', id:'', dept:'', type:'기본 CPR (심폐소생술)', date:'', expiry:'' })
@@ -492,14 +495,14 @@ export default function Settings() {
                 <select value={editEduTarget.data.id} onChange={e => {
                   const c = CREW.find(x => x.id === e.target.value)
                   if (c) setEditEduTarget(p => ({ ...p, data: { ...p.data, id: c.id, name: c.name, dept: c.dept } }))
-                }} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
+                }} style={{ width:'100%', backgroundColor:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
                   <option value="">선원을 선택하세요</option>
                   {CREW.map(c => <option key={c.id} value={c.id}>{c.name} ⏐ {c.id} ⏐ {c.dept}</option>)}
                 </select>
               </div>
               <div>
                 <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>교육 과정</div>
-                <select value={editEduTarget.data.type} onChange={e => setEditEduTarget(p => ({ ...p, data: { ...p.data, type: e.target.value } }))} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
+                <select value={editEduTarget.data.type} onChange={e => setEditEduTarget(p => ({ ...p, data: { ...p.data, type: e.target.value } }))} style={{ width:'100%', backgroundColor:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
                   <option>기본 CPR (심폐소생술)</option>
                   <option>의료 응급 처치 (STCW)</option>
                   <option>선상 응급 의료 (Advanced)</option>
@@ -567,7 +570,7 @@ export default function Settings() {
                     const crew = CREW.find(c => c.id === e.target.value)
                     setEditManagerTarget(p => ({ ...p, id: e.target.value, name: crew?.name || '', dept: crew?.dept || '' }))
                   }}
-                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                  style={{ width:'100%', backgroundColor:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
                 >
                   {CREW.map(c => <option key={c.id} value={c.id}>{c.name} ⏐ {c.id} ⏐ {c.role} · {c.dept}</option>)}
                 </select>
@@ -577,7 +580,7 @@ export default function Settings() {
                 <select
                   value={editManagerTarget.role}
                   onChange={e => setEditManagerTarget(p => ({ ...p, role: e.target.value }))}
-                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                  style={{ width:'100%', backgroundColor:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
                 >
                   {MANAGER_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
@@ -643,14 +646,14 @@ export default function Settings() {
                 <select value={newEdu.id} onChange={e => {
                     const c = CREW.find(x => x.id === e.target.value);
                     if(c) setNewEdu({...newEdu, id:c.id, name:c.name, dept:c.dept});
-                  }} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
+                  }} style={{ width:'100%', backgroundColor:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
                   <option value="">선원을 선택하세요 (이름 ⏐ ID ⏐ 부서)</option>
                   {CREW.map(c => <option key={c.id} value={c.id}>{c.name} ⏐ {c.id} ⏐ {c.dept}</option>)}
                 </select>
               </div>
               <div>
                 <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>교육 과정</div>
-                <select value={newEdu.type} onChange={e=>setNewEdu({...newEdu, type:e.target.value})} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
+                <select value={newEdu.type} onChange={e=>setNewEdu({...newEdu, type:e.target.value})} style={{ width:'100%', backgroundColor:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 44px 18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}>
                   <option>기본 CPR (심폐소생술)</option>
                   <option>의료 응급 처치 (STCW)</option>
                   <option>선상 응급 의료 (Advanced)</option>
@@ -1050,7 +1053,7 @@ export default function Settings() {
                     const crew = CREW.find(c => c.id === e.target.value)
                     setNewManager(p => ({ ...p, id: e.target.value, name: crew?.name || '', dept: crew?.dept || '' }))
                   }}
-                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                  style={{ width:'100%', backgroundColor:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
                 >
                   <option value="">-- 선원 선택 --</option>
                   {CREW.filter(c => !managers.find(m => m.id === c.id)).map(c => (
@@ -1063,7 +1066,7 @@ export default function Settings() {
                 <select
                   value={newManager.role}
                   onChange={e => setNewManager(p => ({ ...p, role: e.target.value }))}
-                  style={{ width:'100%', background:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
+                  style={{ width:'100%', backgroundColor:C.panel2, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 44px 14px 18px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }}
                 >
                   {MANAGER_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
@@ -1164,7 +1167,7 @@ export default function Settings() {
           appearance: none;
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%2394a3b8' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
           background-repeat: no-repeat;
-          background-position: right 30% center;
+          background-position: right 20px center;
           padding-right: 44px !important;
           box-sizing: border-box;
         }

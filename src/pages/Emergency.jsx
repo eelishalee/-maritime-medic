@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Brain, Heart, Zap, Shield, Cpu, AlertCircle, Wind, Clock, Video, Pill, History, User, Info, Activity, Scissors, Plus, Thermometer, Mic, X, ChevronRight, HeartPulse, ChevronLeft, CheckCircle2, AlertTriangle, ArrowDown, FileText, Ruler, Droplets, MapPin, Phone, Upload, Camera, Edit3, Bone, Flame, RefreshCw, Send, Check, LayoutDashboard, AlertOctagon } from 'lucide-react'
+import { useAlert } from '../utils/AlertContext'
 import { CardiacIllustration, TraumaIllustration, UnconsciousIllustration, RespiratoryIllustration } from '../components/EmergencyIllustrations'
 import CameraModal from '../components/CameraModal'
 
@@ -174,6 +175,7 @@ const FOLLOWUP_GUIDES = {
 }
 
 export default function Emergency({ patient, initialAction, onNavigate }) {
+  const { showAlert } = useAlert()
   const [triageStep, setTriageStep] = useState(() => {
     if (initialAction) {
       const mapping = {
@@ -242,11 +244,11 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     if (editTarget.key === 'bp') {
       const parts = val.split('/')
       if (parts.length !== 2 || isNaN(parseInt(parts[0])) || isNaN(parseInt(parts[1]))) {
-        alert('혈압 형식이 올바르지 않습니다. 예: 120/80')
+        showAlert('혈압 형식이 올바르지 않습니다. 예: 120/80', '입력 오류', 'warning')
         return
       }
     } else if (isNaN(parseFloat(val))) {
-      alert('숫자를 입력하세요.')
+      showAlert('숫자를 입력하세요.', '입력 오류', 'warning')
       return
     }
     const now = new Date().toLocaleTimeString('ko-KR', { hour12: false })

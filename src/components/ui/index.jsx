@@ -303,3 +303,83 @@ export function ModalField({ label, value, onChange, placeholder, readOnly }) {
     </div>
   )
 }
+
+export function AlertModal({ isOpen, title, message, onConfirm, onCancel, type = 'info', isConfirm = false }) {
+  if (!isOpen) return null
+
+  const colors = {
+    info: '#38bdf8',
+    warning: '#fbbf24',
+    danger: '#f43f5e',
+    success: '#10b981'
+  }
+  const color = colors[type] || colors.info
+
+  return (
+    <div style={{ 
+      position: 'fixed', inset: 0, zIndex: 9999, 
+      background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(12px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: 20
+    }}>
+      <div style={{ 
+        width: '100%', maxWidth: 480, background: '#0f172a', 
+        border: `2px solid ${color}44`, borderRadius: 24, padding: 40,
+        boxShadow: `0 20px 50px rgba(0,0,0,0.5), 0 0 20px ${color}11`,
+        animation: 'modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 15, marginBottom: 20 }}>
+          <div style={{ 
+            width: 12, height: 32, background: color, borderRadius: 4,
+            boxShadow: `0 0 15px ${color}66`
+          }} />
+          <h2 style={{ fontSize: 28, fontWeight: 950, color: '#fff', letterSpacing: '-0.5px' }}>
+            {title || (isConfirm ? '확인' : '알림')}
+          </h2>
+        </div>
+        <div style={{ 
+          fontSize: 20, color: '#94a3b8', lineHeight: 1.6, marginBottom: 40, 
+          whiteSpace: 'pre-wrap', fontWeight: 600
+        }}>
+          {message}
+        </div>
+        <div style={{ display: 'flex', gap: 12 }}>
+          {isConfirm && (
+            <button 
+              onClick={onCancel}
+              style={{ 
+                flex: 1, padding: '18px', borderRadius: 16, 
+                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8',
+                fontSize: 20, fontWeight: 950, cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+              onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+            >
+              취소
+            </button>
+          )}
+          <button 
+            onClick={onConfirm}
+            style={{ 
+              flex: 2, padding: '18px', borderRadius: 16, 
+              background: color, border: 'none', color: '#000',
+              fontSize: 20, fontWeight: 950, cursor: 'pointer',
+              transition: 'all 0.2s', boxShadow: `0 8px 20px ${color}33`
+            }}
+            onMouseOver={e => e.currentTarget.style.filter = 'brightness(1.1)'}
+            onMouseOut={e => e.currentTarget.style.filter = 'none'}
+          >
+            {isConfirm ? '확인' : '닫기'}
+          </button>
+        </div>
+      </div>
+      <style>{`
+        @keyframes modalSlideUp {
+          from { opacity: 0; transform: translateY(20px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
+    </div>
+  )
+}

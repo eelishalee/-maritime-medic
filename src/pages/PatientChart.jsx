@@ -1,181 +1,79 @@
 import { useState, useEffect, useRef } from 'react'
 import { 
-  Activity, Heart, Thermometer, Droplets, Clock, AlertTriangle, 
-  Stethoscope, ClipboardList, Pill, Camera, ChevronRight, CheckCircle2,
-  AlertCircle, Info, Search, User, ChevronDown, ShieldAlert, Zap, ThermometerSnowflake,
-  History, RotateCcw, MapPin, Anchor, Weight, Ruler, HeartPulse, Paperclip, ArrowUp, Sparkles, ShieldCheck, Phone, Pencil, Plus
+  HeartPulse, Activity, Stethoscope, Pill, Clock, Plus, 
+  ChevronDown, User, History, RotateCcw, AlertCircle, 
+  MapPin, Anchor, Phone, AlertTriangle, CheckCircle2, 
+  Sparkles, ShieldAlert, ShieldCheck, Info, Pencil, Zap
 } from 'lucide-react'
+import { useAlert } from '../utils/AlertContext'
 
-// 확장된 선원 데이터 (localStorage 없을 때 fallback)
-const ALL_CREW = [
-  { id:'S26-001', name:'이선장',  age:52, gender:'남', dob:'1974-05-12', role:'선장',         dept:'항해부', blood:'O+',  height:175, weight:78, chronic:'고혈압',          pastHistory:'2020년 맹장 수술',    allergies:'없음',   contact:'010-2600-0001', emergencyName:'김도윤', emergency:'010-1234-5678 (배우자)', location:'항해 브릿지 (Nav. Bridge)',   lastMed:'암로디핀 5mg', note:'혈압 관리 주의',   isEmergency:false },
-  { id:'S26-002', name:'김항해',  age:45, gender:'남', dob:'1981-11-20', role:'1등 항해사',   dept:'항해부', blood:'A+',  height:180, weight:82, chronic:'없음',             pastHistory:'없음',                allergies:'페니실린',contact:'010-2600-0002', emergencyName:'이서연', emergency:'010-9876-5432 (부친)',   location:'메인 데크 · 화물 관리구역',   lastMed:'없음',        note:'특이사항 없음', isEmergency:false },
-  { id:'S26-003', name:'박기관',  age:55, gender:'남', dob:'1971-08-05', role:'기관장',       dept:'기관부', blood:'B+',  height:172, weight:70, chronic:'고혈압, 고지혈증',  pastHistory:'2021년 고혈압 진단',  allergies:'아스피린',contact:'010-2600-0003', emergencyName:'양정희', emergency:'010-8765-4321 (배우자)', location:'엔진 제어실 (ECR)',           lastMed:'암로디핀 5mg', note:'기관실 추락 사고', isEmergency:true  },
-  { id:'S26-004', name:'최갑판',  age:41, gender:'남', dob:'1985-03-15', role:'갑판장',       dept:'항해부', blood:'AB+', height:178, weight:75, chronic:'허리디스크',        pastHistory:'2022년 요추 시술',    allergies:'없음',   contact:'010-2600-0004', emergencyName:'박지호', emergency:'010-1122-3344 (배우자)', location:'선수 갑판 (Forecastle Deck)', lastMed:'없음',        note:'중량물 운반 주의', isEmergency:false },
-  { id:'S26-005', name:'정조타',  age:38, gender:'남', dob:'1988-12-22', role:'조타사',       dept:'항해부', blood:'O-',  height:170, weight:68, chronic:'없음',             pastHistory:'없음',                allergies:'조개류', contact:'010-2600-0005', emergencyName:'최민준', emergency:'010-5566-7788 (동생)',   location:'조타실 (Wheel House)',        lastMed:'없음',        note:'식품 알레르기 주의', isEmergency:false },
-  { id:'S26-006', name:'한통신',  age:43, gender:'남', dob:'1983-05-30', role:'통신장',       dept:'항해부', blood:'A+',  height:174, weight:72, chronic:'비염',             pastHistory:'없음',                allergies:'먼지',   contact:'010-2600-0006', emergencyName:'정하윤', emergency:'010-9988-7766 (배우자)', location:'통신 제어실 (Radio Room)',    lastMed:'없음',        note:'건강 양호',     isEmergency:false },
-  { id:'S26-007', name:'강기계',  age:47, gender:'남', dob:'1979-11-18', role:'1등 기관사',   dept:'기관부', blood:'B-',  height:179, weight:80, chronic:'없음',             pastHistory:'없음',                allergies:'벌침',   contact:'010-2600-0007', emergencyName:'강준우', emergency:'010-4455-6677 (누나)',   location:'제2엔진실 구역 B-1',          lastMed:'없음',        note:'숙련 정비사',   isEmergency:false },
-  { id:'S26-008', name:'윤조리',  age:49, gender:'남', dob:'1977-09-22', role:'조리장',       dept:'지원부', blood:'O+',  height:168, weight:76, chronic:'당뇨',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0008', emergencyName:'조예은', emergency:'010-6677-8899 (배우자)', location:'상부 데크 조리실 (Galley)',   lastMed:'메트포르민',  note:'식이 관리 필요', isEmergency:false },
-  { id:'S26-009', name:'임전기',  age:35, gender:'남', dob:'1991-03-12', role:'전기사',       dept:'기관부', blood:'AB-', height:176, weight:73, chronic:'없음',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0009', emergencyName:'윤도현', emergency:'010-2211-0099 (형)',     location:'주 발전기실 (Gen. Room)',     lastMed:'없음',        note:'전기 설비 담당', isEmergency:false },
-  { id:'S26-010', name:'백보급',  age:32, gender:'남', dob:'1994-07-08', role:'사무장',       dept:'지원부', blood:'A-',  height:165, weight:58, chronic:'없음',             pastHistory:'없음',                allergies:'먼지',   contact:'010-2600-0010', emergencyName:'장수빈', emergency:'010-3344-5566 (모친)',   location:'A-데크 사무실',               lastMed:'없음',        note:'물자 관리 담당', isEmergency:false },
-  { id:'S26-011', name:'황갑판',  age:28, gender:'남', dob:'1998-01-25', role:'갑판원',       dept:'항해부', blood:'B+',  height:182, weight:85, chronic:'없음',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0011', emergencyName:'임지훈', emergency:'010-1100-2233 (동생)',   location:'보트 데크 위험물 창고',        lastMed:'없음',        note:'체력 우수',     isEmergency:false },
-  { id:'S26-012', name:'서기관',  age:30, gender:'남', dob:'1996-12-05', role:'3등 기관사',   dept:'기관부', blood:'O+',  height:173, weight:70, chronic:'없음',             pastHistory:'없음',                allergies:'땅콩',   contact:'010-2600-0012', emergencyName:'한지민', emergency:'010-5544-3322 (친구)',   location:'청정기실 (Purifier Room)',    lastMed:'없음',        note:'초임 사관',     isEmergency:false },
-  { id:'S26-013', name:'오항해',  age:26, gender:'남', dob:'2000-04-14', role:'실습 항해사',  dept:'항해부', blood:'A+',  height:177, weight:68, chronic:'없음',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0013', emergencyName:'오세현', emergency:'010-7788-9900 (부친)',   location:'항해 브릿지 · 조타 지원',     lastMed:'없음',        note:'실습 중',       isEmergency:false },
-  { id:'S26-014', name:'나위생',  age:31, gender:'여', dob:'1995-10-30', role:'위생원',       dept:'지원부', blood:'B+',  height:162, weight:52, chronic:'없음',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0014', emergencyName:'신예준', emergency:'010-1122-3344 (언니)',   location:'거주구역 공용실',              lastMed:'없음',        note:'방역 담당',     isEmergency:false },
-  { id:'S26-015', name:'고기수',  age:44, gender:'남', dob:'1982-08-12', role:'기수',         dept:'기관부', blood:'O-',  height:171, weight:75, chronic:'치질',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0015', emergencyName:'송다희', emergency:'010-9900-1122 (배우자)', location:'엔진룸 기계 워크샵',           lastMed:'없음',        note:'용접 숙련',     isEmergency:false },
-  { id:'S26-016', name:'문세탁',  age:33, gender:'남', dob:'1993-02-14', role:'세탁원',       dept:'지원부', blood:'AB+', height:164, weight:60, chronic:'습진',             pastHistory:'없음',                allergies:'세제',   contact:'010-2600-0016', emergencyName:'권태한', emergency:'010-8899-2233 (모친)',   location:'B-데크 세탁실',               lastMed:'연고',        note:'장갑 착용 필수', isEmergency:false },
-]
+// --- 컴포넌트 내부에서 사용되는 UI 조각들 ---
 
-const OTC_MEDS = [
-  { id: 'm1', name: '해열·진통·소염제', type: '통증 관리' },
-  { id: 'm2', name: '항히스타민제', type: '독충/알레르기' },
-  { id: 'm3', name: '스테로이드 연고', type: '피부 손상' },
-  { id: 'm4', name: '화상 연고', type: '화상 처치' },
-  { id: 'm5', name: '연고/소독액', type: '살균/소독' },
-  { id: 'm6', name: '파스/근육통약', type: '근육 손상' },
-  { id: 'm7', name: '인공눈물/세척액', type: '안구 외상' },
-  { id: 'm8', name: '압박붕대/거즈', type: '지혈/고정' },
-  { id: 'm9', name: '부목/삼각건', type: '골절 처치' },
-]
-
-export default function PatientChart({ patient: activePatientProp, onNavigate, onSwitchPatient }) {
-  // 선내 담당자 목록 불러오기 (시스템 설정 연동)
-  const [managers] = useState(() => {
-    try {
-      const saved = localStorage.getItem('mdts_managers')
-      return saved ? JSON.parse(saved) : [
-        { id: 'm1', name: '이선장', role: '안전책임자' },
-        { id: 'm2', name: '박기관', role: '의료담당자' },
-      ]
-    } catch { return [] }
-  })
-
-  // 환자 데이터 우선순위 : Props -> ALL_CREW -> 기본값
-  const [selectedId, setSelectedId] = useState(activePatientProp?.id || 'S26-003')
-  const [dynamicCrewList, setDynamicCrewList] = useState([])
-
-  // 환자 목록 동적 생성 (누적 로직)
-  useEffect(() => {
-    // 1. 전체 선원 목록 로드
-    const savedCrew = JSON.parse(localStorage.getItem('mdts_crew_list') || '[]')
-    const baseList = savedCrew.length > 0 ? savedCrew : ALL_CREW
-    
-    // 2. 저장된 환자 기록 로드 (누적 확인용)
-    const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
-    const recordedIds = new Set(records.map(r => r.patientId))
-
-    // 3. 드롭다운에 표시할 환자 필터링
-    // 조건: 응급 환자이거나, 저장된 기록이 있거나, 현재 선택된 환자인 경우
-    const activePatients = baseList.filter(c => 
-      c.isEmergency || recordedIds.has(c.id) || c.id === selectedId || c.id === activePatientProp?.id
-    )
-
-    setDynamicCrewList(activePatients)
-  }, [selectedId, activePatientProp])
+export default function PatientChart({ patient: initialPatient, onNavigate, onSwitchPatient }) {
+  const { showAlert, showConfirm } = useAlert()
+  const [selectedId, setSelectedId] = useState(initialPatient?.id)
+  const [patient, setPatient] = useState(initialPatient)
   
-  // 외부에서 Prop으로 넘어온 환자 정보가 있으면 그것을 최우선으로 사용, 없으면 ID로 찾기
-  const patient = (activePatientProp && activePatientProp.id === selectedId) 
-    ? activePatientProp 
-    : (dynamicCrewList.find(c => c.id === selectedId) || ALL_CREW.find(c => c.id === selectedId) || ALL_CREW[0])
-
-  // 환자 변경 시 상위 컴포넌트(App)의 상태도 업데이트 + 스크롤 리셋
-  useEffect(() => {
-    if (patient && onSwitchPatient && patient.id !== activePatientProp?.id) {
-      onSwitchPatient(patient)
-    }
-    const container = document.querySelector('.chart-scroll-container')
-    if (container) container.scrollTop = 0
-  }, [patient?.id])
-
-  // 필드명 매핑 (CrewManagement와 PatientChart 간의 차이 해소)
-  const displayHistory = patient.pastHistory || patient.history || '과거 이력 없음';
-  const displayWorkLocation = patient.location || patient.workLocation || '미지정';
-  const displayAllergies = patient.allergies || '알레르기 정보 없음';
-  
-  // 복용 중인 약물 처리
-  const displayMeds = (patient.lastMed || patient.currentMeds) 
-    ? (typeof (patient.lastMed || patient.currentMeds) === 'string' 
-        ? (patient.lastMed || patient.currentMeds).split(',').map(m => ({ name: m.trim(), purpose: '기재됨' }))
-        : (patient.lastMed || patient.currentMeds))
-    : [];
-
-  // 최근 진료 이력 처리
-  const displayRecentHistory = patient.recentHistory || {
-    date: patient.last_visit || '기록 없음',
-    title: '최근 진료 기록 없음',
-    detail: '해당 선원의 과거 진료 데이터가 존재하지 않습니다.'
-  };
-  
-  // 비상연락처 처리 (emergencyName 필드 최우선 적용 및 강제 매핑)
-  let displayEmergency = { name: '미지정', phone: '-', relation: '-' };
-
-  const PROTECTOR_MAP = {
-    'S26-001': '김도윤', 'S26-002': '김도장', 'S26-003': '양정희', 'S26-004': '박지호',
-    'S26-005': '정민준', 'S26-006': '정하윤', 'S26-007': '강준우', 'S26-008': '조예은',
-    'S26-009': '임도현', 'S26-010': '장수빈', 'S26-011': '황지훈', 'S26-012': '한지민',
-    'S26-013': '오세현', 'S26-014': '나혜지', 'S26-015': '송다희', 'S26-016': '김한혜'
-  };
-
-  const forcedName = PROTECTOR_MAP[patient.id];
-  
-  if (patient.emergencyName || forcedName) {
-    displayEmergency.name = forcedName || patient.emergencyName;
-    if (patient.emergency && typeof patient.emergency === 'string') {
-      const parts = patient.emergency.split(' ');
-      displayEmergency.phone = parts[0] || '-';
-      displayEmergency.relation = parts[1] ? parts[1].replace(/[()]/g, '') : '가족';
-    }
-  } else if (patient.emergencyContact && typeof patient.emergencyContact === 'object') {
-    displayEmergency = {
-      name: forcedName || patient.emergencyContact.name || '미지정',
-      phone: patient.emergencyContact.phone || '-',
-      relation: patient.emergencyContact.relation || '-'
-    };
-  } else if (patient.emergency && typeof patient.emergency === 'string') {
-    const parts = patient.emergency.split(' ');
-    displayEmergency.phone = parts[0] || '-';
-    displayEmergency.relation = parts[1] ? parts[1].replace(/[()]/g, '') : '가족';
-    displayEmergency.name = forcedName || '보호자';
-  }
-
-  const [selectedDoctor, setSelectedDoctor] = useState(managers[0] || { name: '미지정', role: '-' })
+  // ─── 상태 선언 (useEffect 보다 위로 이동하여 호이스팅 문제 해결) ───
+  const [vitals, setVitals] = useState({ hr: '-', spo2: '-', temp: '-', bp: '-', rr: '-' })
+  const [mainComplaint, setMainComplaint] = useState('')
+  const [painAreas, setPainAreas] = useState([])
+  const [selectedSymptoms, setSelectedSymptoms] = useState([])
+  const [detailedNote, setDetailedNote] = useState('')
+  const [selectedMeds, setSelectedMeds] = useState([])
+  const [otherActions, setOtherActions] = useState('')
+  const [showPlan, setShowPlan] = useState(false)
+  const [editTarget, setEditTarget] = useState(null)
+  const [editValue, setEditValue] = useState('')
+  const [occurrenceTime, setOccurrenceTime] = useState('오후 02:00')
+  const [ampm, setAmpm] = useState('오후')
+  const [hour, setHour] = useState('2')
+  const [minute, setMinute] = useState('00')
+  const [lastMealTime, setLastMealTime] = useState('기록 없음')
+  const [isSelectOpen, setIsSelectOpen] = useState(false)
   const [isDoctorOpen, setIsDoctorOpen] = useState(false)
   const [isTimeModalOpen, setIsTimeModalOpen] = useState(false)
+  const [dynamicCrewList, setDynamicCrewList] = useState([])
+  const [selectedDoctor, setSelectedDoctor] = useState({ id: 1, name: '한상우', role: '의료관리자' })
 
-  // 바이탈 입력 상태
-  const [vitals, setVitals] = useState({
-    bp: patient.vitals?.bp || '',
-    hr: patient.vitals?.hr || '',
-    rr: patient.vitals?.rr || '',
-    temp: patient.vitals?.temp || '',
-    spo2: patient.vitals?.spo2 || ''
-  })
-  
+  const selectRef = useRef(null)
   const doctorSelectRef = useRef(null)
   const timeModalRef = useRef(null)
-  const selectRef = useRef(null)
-  const [isSelectOpen, setIsSelectOpen] = useState(false)
 
-  // 시간 상태
-  const [ampm, setAmpm] = useState('오후')
-  const [hour, setHour] = useState('12')
-  const [minute, setMinute] = useState('00')
-  const [occurrenceTime, setOccurrenceTime] = useState('오후 12:00')
-  const [lastMealTime, setLastMealTime] = useState('기록 없음')
+  const managers = [
+    { id: 1, name: '한상우', role: '의료관리자' },
+    { id: 2, name: '이민호', role: '1등 항해사' },
+    { id: 3, name: '박철수', role: '선장' }
+  ]
 
-  // 환자 변경 시 바이탈 데이터 동기화
+  const OTC_MEDS = [
+    { id: 'm1', name: '타이레놀', purpose: '해열/진통' },
+    { id: 'm2', name: '애드빌', purpose: '소염진통' },
+    { id: 'm3', name: '항히스타민제', purpose: '알레르기/가려움' },
+    { id: 'm4', name: '소화제', purpose: '소화불량' },
+    { id: 'm5', name: '제산제', purpose: '속쓰림' },
+    { id: 'm6', name: '지사제', purpose: '설사' },
+    { id: 'm7', name: '압박붕대', purpose: '환부 고정' },
+    { id: 'm8', name: '부목', purpose: '골절 의심' },
+    { id: 'm9', name: '연고/소독액', purpose: '찰과상' }
+  ]
+
+  // 환자 리스트 로드
   useEffect(() => {
-    if (patient) {
-      const isS3 = patient.id === 'S26-003';
-      
-      // 박기관 외 환자들을 위한 1인 1센서 할당 로직
-      const getInitialVitals = () => {
-        if (isS3) return {
-          bp: '158/95', hr: '92', rr: '18', temp: '37.8', spo2: '98'
-        };
+    const savedCrew = JSON.parse(localStorage.getItem('mdts_crew_list') || '[]')
+    setDynamicCrewList(savedCrew)
+  }, [])
 
-        const v = { bp: '', hr: '', rr: '', temp: '', spo2: '' };
-        const idNum = parseInt(patient.id.split('-')[1]) || 0;
+  // 환자 변경 시 데이터 동기화
+  useEffect(() => {
+    const p = dynamicCrewList.find(c => c.id === selectedId)
+    if (p) {
+      setPatient(p)
+      onSwitchPatient?.(p)
+      
+      const getInitialVitals = () => {
+        const v = { hr: '-', spo2: '-', temp: '-', bp: '-', rr: '-' };
+        const idNum = parseInt(p.id.split('-')[1]) || 0;
         const sensorType = idNum % 5; // 0:HR, 1:SpO2, 2:Temp, 3:BP, 4:RR
 
         if (sensorType === 0) v.hr = '72';
@@ -199,9 +97,9 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
       setLastMealTime('기록 없음')
       setShowPlan(false)
     }
-  }, [selectedId])
+  }, [selectedId, dynamicCrewList])
 
-  // 실시간 센서 데이터 시뮬레이션 (박기관 및 기타 환자 통합)
+  // 실시간 센서 데이터 시뮬레이션
   useEffect(() => {
     let interval;
     if (patient) {
@@ -212,14 +110,12 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
           const sensorType = idNum % 5;
 
           if (patient.id === 'S26-003') {
-            // 박기관은 전체 데이터 시뮬레이션
             next.hr = (92 + Math.floor(Math.random() * 5) - 2).toString();
             next.spo2 = (98 + Math.floor(Math.random() * 2) - 1).toString();
             next.rr = (18 + Math.floor(Math.random() * 3) - 1).toString();
             next.temp = (37.8 + (Math.random() * 0.2 - 0.1)).toFixed(1);
             next.bp = `158/${95 + Math.floor(Math.random() * 4) - 2}`;
           } else {
-            // 그 외 환자들은 할당된 1개 센서만 시뮬레이션
             if (sensorType === 0) next.hr = (72 + Math.floor(Math.random() * 4) - 2).toString();
             else if (sensorType === 1) next.spo2 = (97 + Math.floor(Math.random() * 3)).toString();
             else if (sensorType === 2) next.temp = (36.5 + (Math.random() * 0.2 - 0.1)).toFixed(1);
@@ -233,20 +129,9 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
     return () => clearInterval(interval);
   }, [patient?.id]);
 
-  // 증상 및 조치 상태
-  const [mainComplaint, setMainComplaint] = useState('')
-  const [painAreas, setPainAreas] = useState([])
-  const [selectedSymptoms, setSelectedSymptoms] = useState([])
-  const [detailedNote, setDetailedNote] = useState('')
-  const [selectedMeds, setSelectedMeds] = useState([])
-  const [otherActions, setOtherActions] = useState('')
-  const [showPlan, setShowPlan] = useState(false)
-  const [editTarget, setEditTarget] = useState(null)
-  const [editValue, setEditValue] = useState('')
-
   const openEdit = (target, currentVal) => {
     setEditTarget(target)
-    setEditValue(currentVal.toString().split(' ')[0]) // 단위 제외하고 값만
+    setEditValue(currentVal.toString().split(' ')[0])
   }
 
   const saveEdit = () => {
@@ -255,12 +140,12 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
     if (editTarget === 'bp') {
       const parts = val.split('/')
       if (parts.length !== 2 || isNaN(parseInt(parts[0])) || isNaN(parseInt(parts[1]))) {
-        alert('혈압 형식이 올바르지 않습니다. 예: 120/80')
+        showAlert('혈압 형식이 올바르지 않습니다. 예: 120/80', '입력 오류', 'warning')
         return
       }
       setVitals(prev => ({ ...prev, bp: val }))
     } else if (editTarget === 'temp') {
-      if (isNaN(parseFloat(val))) { alert('숫자를 입력하세요.'); return }
+      if (isNaN(parseFloat(val))) { showAlert('숫자를 입력하세요.', '입력 오류', 'warning'); return }
       setVitals(prev => ({ ...prev, temp: val }))
     }
     setEditTarget(null)
@@ -301,18 +186,16 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
 
   const toggleMed = (medName) => {
     if (medName === '항히스타민제') {
-      alert("⚠️ 주의 : 항히스타민제는 졸음을 유발할 수 있으니 작업 전 주의하세요.");
+      showAlert("항히스타민제는 졸음을 유발할 수 있으니 작업 전 주의하세요.", "복약 주의", "warning");
     } else if (medName === '연고/소독액') {
-      alert("ℹ️ 가이드 : 개방된 큰 상처에는 직접 붓지 마세요.");
+      showAlert("개방된 큰 상처에는 직접 붓지 마세요.", "사용 가이드", "info");
     }
 
     if (selectedMeds.includes(medName)) {
       setSelectedMeds(selectedMeds.filter(m => m !== medName));
-      // 텍스트 영역에서도 제거
       setOtherActions(prev => prev.replace(new RegExp(`, ${medName}|${medName}, |${medName}`, 'g'), '').trim().replace(/^,|,$/g, ''));
     } else {
       setSelectedMeds([...selectedMeds, medName]);
-      // 텍스트 영역에 누적 기록
       const prefix = medName.includes('붕대') || medName.includes('부목') ? '조치' : '투약';
       const actionText = `${medName}(${prefix})`;
       setOtherActions(prev => prev ? `${prev}, ${actionText}` : actionText);
@@ -320,17 +203,14 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
   }
 
   const handleSave = () => {
-    // 오프라인 상태 확인
     if (!navigator.onLine) {
-      alert(`[오프라인 : 네트워크 연결 끊김]\n\n현재 시스템이 오프라인 상태입니다.\n기록은 브라우저 임시 저장소에 안전하게 보관되며,\n네트워크 재연결 시 자동으로 서버와 동기화됩니다.`);
+      showAlert(`현재 시스템이 오프라인 상태입니다.\n기록은 브라우저 임시 저장소에 안전하게 보관되며,\n네트워크 재연결 시 자동으로 서버와 동기화됩니다.`, "[오프라인 : 네트워크 연결 끊김]", "warning");
     }
 
-    // 저장 전 페이지 최상단으로 스크롤 이동
     window.scrollTo({ top: 0, behavior: 'smooth' });
     const container = document.querySelector('.chart-scroll-container');
     if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // 저장할 데이터 객체 생성
     const chartRecord = {
       patientId: patient.id,
       patientName: patient.name,
@@ -348,14 +228,10 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
     }
 
     try {
-      // 기존 기록들 불러오기
       const existingRecords = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
-      // 새로운 기록 추가
       const updatedRecords = [chartRecord, ...existingRecords]
-      // 다시 저장
       localStorage.setItem('mdts_patient_records', JSON.stringify(updatedRecords))
       
-      // 환자의 최신 상태 업데이트 (ALL_CREW 시뮬레이션용 로컬 스토리지)
       const crewStatus = JSON.parse(localStorage.getItem('mdts_crew_status') || '{}')
       crewStatus[patient.id] = {
         lastVisit: new Date().toLocaleDateString(),
@@ -364,10 +240,8 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
       }
       localStorage.setItem('mdts_crew_status', JSON.stringify(crewStatus))
 
-      // 저장 완료 알림창 띄우기
-      alert(`[최종 기록 저장 완료]\n환자 : ${patient.name}\n조치 내용이 성공적으로 시스템에 기록되었습니다.`);
+      showAlert(`환자 : ${patient.name}\n조치 내용이 성공적으로 시스템에 기록되었습니다.`, "[최종 기록 저장 완료]", "success");
 
-      // 알림창 확인 후 바이탈 섹션으로 정밀 스크롤 이동
       const vitalSection = document.getElementById('vital-section');
       if (vitalSection) {
         vitalSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -375,11 +249,10 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
       
     } catch (e) {
       console.error('저장 실패:', e)
-      alert('기록 저장 중 오류가 발생했습니다.')
+      showAlert('기록 저장 중 오류가 발생했습니다.', '저장 실패', 'danger')
     }
   }
 
-  // AI 동적 진단 로직 (비의료진 처치 가이드 강화)
   const getAIDiagnosis = () => {
     const allKey = [...selectedSymptoms, ...painAreas]
     if (allKey.length === 0) return { 
@@ -392,60 +265,29 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
     let guide = ["환자를 편안한 자세로 안정", "추가 증상 발생 시 즉시 보고", "원격 의료진 연결 대기"]
     let meds = ["해열·진통·소염제"]
 
-    // 특정 증상별 맞춤형 로직
     if (allKey.some(s => s.includes('머리') || s.includes('두통') || s.includes('얼굴'))) {
       briefing = "두부 통증 및 관련 증상은 뇌압 변화 또는 신경계 피로일 수 있습니다. 의식 상태 변화를 주의 깊게 살피십시오."
-      guide = [
-        "조명을 어둡게 하고 조용한 환경에서 절대 안정",
-        "머리를 30도 정도 높게 유지하여 뇌압 상승 방지",
-        "말이 어눌해지거나 팔다리 힘 빠짐이 있는지 10분 간격 확인",
-        "자극적인 음식이나 카페인 섭취 금지"
-      ]
+      guide = ["조명을 어둡게 하고 조용한 환경에서 절대 안정", "머리를 30도 정도 높게 유지하여 뇌압 상승 방지", "말이 어눌해지거나 팔다리 힘 빠짐이 있는지 10분 간격 확인", "자극적인 음식이나 카페인 섭취 금지"]
       meds = ["타이레놀(아세트아미노펜)", "진통제"]
     } else if (allKey.some(s => s.includes('복부') || s.includes('구토') || s.includes('설사'))) {
       briefing = "급성 위장염 또는 식중독 의심 증상입니다. 탈수 방지와 복부 압박 완화가 우선입니다."
-      guide = [
-        "증상 호전 시까지 음식 섭취를 제한(금식 권장)",
-        "미지근한 물 또는 이온음료를 소량씩 자주 섭취",
-        "복부를 따뜻하게 유지하고 왼쪽으로 눕혀 가스 배출 유도",
-        "심한 통증 시 복부를 누르지 말고 구부린 자세 유지"
-      ]
+      guide = ["증상 호전 시까지 음식 섭취를 제한(금식 권장)", "미지근한 물 또는 이온음료를 소량씩 자주 섭취", "복부를 따뜻하게 유지하고 왼쪽으로 눕혀 가스 배출 유도", "심한 통증 시 복부를 누르지 말고 구부린 자세 유지"]
       meds = ["소화제", "제산제", "지사제(설사 시)"]
     } else if (allKey.some(s => s.includes('발열') || s.includes('감기') || s.includes('목'))) {
       briefing = "감염성 질환으로 인한 고열 및 전신 증상입니다. 체온 조절과 교차 감염 예방이 필요합니다."
-      guide = [
-        "실내 온도를 20-22도로 유지하고 가습기 사용",
-        "미온수를 적신 수건으로 겨드랑이, 사타구니를 닦아 체온 하강 유도",
-        "충분한 수분 보충과 함께 고단백 위주의 가벼운 식사",
-        "다른 선원들과의 접촉을 피하고 마스크 착용"
-      ]
+      guide = ["실내 온도를 20-22도로 유지하고 가습기 사용", "미온수를 적신 수건으로 겨드랑이, 사타구니를 닦아 체온 하강 유도", "충분한 수분 보충과 함께 고단백 위주의 가벼운 식사", "다른 선원들과의 접촉을 피하고 마스크 착용"]
       meds = ["해열진통제", "종합감기약", "기침/콧물약"]
     } else if (allKey.some(s => s.includes('어깨') || s.includes('다리') || s.includes('무릎') || s.includes('허리') || s.includes('손목') || s.includes('팔'))) {
       briefing = "근골격계 손상 또는 염좌가 의심됩니다. 추가 손상 방지를 위한 RICE 원칙을 적용하십시오."
-      guide = [
-        "Rest(안정) : 환부를 움직이지 않게 고정 및 휴식",
-        "Ice(냉찜질) : 15분 간격으로 냉찜질 시행 (부종/통증 완화)",
-        "Compression(압박) : 압박 붕대로 환부를 적당한 강도로 고정",
-        "Elevation(거상) : 환부를 심장보다 높게 유지하여 부종 감소"
-      ]
+      guide = ["Rest(안정) : 환부를 움직이지 않게 고정 및 휴식", "Ice(냉찜질) : 15분 간격으로 냉찜질 시행 (부종/통증 완화)", "Compression(압박) : 압박 붕대로 환부를 적당한 강도로 고정", "Elevation(거상) : 환부를 심장보다 높게 유지하여 부종 감소"]
       meds = ["파스/근육통약", "소염진통제", "연고/소독액"]
     } else if (allKey.some(s => s.includes('발진') || s.includes('가려움') || s.includes('피부'))) {
       briefing = "알레르기 반응 또는 접촉성 피부염입니다. 원인 물질 차단과 환부 자극 최소화가 중요합니다."
-      guide = [
-        "환부를 긁지 않도록 주의 (2차 감염 방지)",
-        "비누 없이 미온수로 가볍게 씻어내고 물기만 제거",
-        "증상 부위에 차가운 수건을 대어 가려움증 완화",
-        "호흡 곤란이나 입술 부어오름 발생 시 즉시 응급 보고"
-      ]
+      guide = ["환부를 긁지 않도록 주의 (2차 감염 방지)", "비누 없이 미온수로 가볍게 씻어내고 물기만 제거", "증상 부위에 차가운 수건을 대어 가려움증 완화", "호흡 곤란이나 입술 부어오름 발생 시 즉시 응급 보고"]
       meds = ["항히스타민제", "스테로이드 연고"]
     } else if (allKey.some(s => s.includes('흉통') || s.includes('가슴') || s.includes('호흡'))) {
       briefing = "흉부 통증 및 호흡 곤란은 심폐기관의 이상 징후일 수 있습니다. 즉각적인 의료진 연결이 필수입니다."
-      guide = [
-        "상의 단추나 벨트를 풀고 호흡이 편한 자세(반좌위) 유지",
-        "지속적으로 의식을 확인하고 말을 시키지 않음",
-        "주변에 AED(자동심장충격기) 위치 확인 및 비치",
-        "산소 공급이 가능할 경우 저농도 산소 투여 검토"
-      ]
+      guide = ["상의 단추나 벨트를 풀고 호흡이 편한 자세(반좌위) 유지", "지속적으로 의식을 확인하고 말을 시키지 않음", "주변에 AED(자동심장충격기) 위치 확인 및 비치", "산소 공급이 가능할 경우 저농도 산소 투여 검토"]
       meds = ["의사 지시 전 약물 투여 금지"]
     }
 
@@ -454,13 +296,11 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
 
   const aiResult = getAIDiagnosis()
 
-  // 외부 클릭 닫기 로직
   useEffect(() => {
     function handleClickOutside(e) {
       if (selectRef.current && !selectRef.current.contains(e.target)) setIsSelectOpen(false)
       if (doctorSelectRef.current && !doctorSelectRef.current.contains(e.target)) setIsDoctorOpen(false)
       if (isTimeModalOpen && timeModalRef.current && !timeModalRef.current.contains(e.target)) {
-          // 버튼 클릭 시에는 닫히지 않도록 (이벤트 전파 방지 처리 예정)
           setIsTimeModalOpen(false)
       }
     }
@@ -468,9 +308,8 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [isTimeModalOpen])
 
-  // 바이탈 상태 판별 로직
   const getVitalStatus = (type, value) => {
-    if (!value) return { label: '정보없음', color: '#64748b', bg: 'rgba(100,116,139,0.1)' }
+    if (!value || value === '-') return { label: '정보없음', color: '#64748b', bg: 'rgba(100,116,139,0.1)' }
     if (type === 'bp') {
         const sys = parseInt(value.split('/')[0])
         if (sys >= 160) return { label: '위험', color: '#ff4d6d', bg: 'rgba(255,77,109,0.15)' }
@@ -502,15 +341,20 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
     return { label: '정상', color: '#26de81', bg: 'rgba(38,222,129,0.15)' }
   }
 
+  const displayHistory = patient?.history || '기록 없음'
+  const displayRecentHistory = patient?.recentHistory || { date: '기록 없음', title: '-', detail: '-' }
+  const displayAllergies = patient?.allergies || '없음'
+  const displayMeds = patient?.meds || []
+  const displayWorkLocation = patient?.workLocation || patient?.location || '미지정'
+  const displayEmergency = patient?.emergencyContact || { name: '미지정', relation: '-', phone: '-' }
+
   return (
     <div style={{ padding: '0', height: 'calc(100vh - 72px)', overflow: 'hidden', background: '#020617', color: '#fff', fontFamily: '"Pretendard", sans-serif' }}>
       
-      {/* 시간 선택 모달 */}
       {isTimeModalOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
           <div ref={timeModalRef} style={{ background: '#0f172a', border: '1.5px solid rgba(56,189,248,0.3)', borderRadius: '32px', padding: '40px', width: '560px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
             <div style={{ fontSize: '24px', fontWeight: 900, marginBottom: '30px', textAlign: 'center', color: '#38bdf8' }}>증상이 나타난 시각 선택</div>
-            
             <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
               <div style={{ display: 'flex', gap: 12 }}>
                 {['오전', '오후'].map(a => (
@@ -539,7 +383,6 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
         </div>
       )}
 
-      {/* 상단 헤더 */}
       <div style={{ position: 'relative', zIndex: 100, background: 'rgba(7, 15, 30, 0.98)', backdropFilter: 'blur(15px)', borderBottom: '1.5px solid rgba(255,255,255,0.1)', padding: '16px 60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
           <div ref={selectRef} style={{ position: 'relative', width: '360px' }}>
@@ -584,8 +427,6 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', gap: 0, height: 'calc(100% - 82px)' }}>
-        
-        {/* [Left] Patient Info Panel */}
         <aside style={{ borderRight: '1px solid rgba(255,255,255,0.05)', background: '#05070a', display: 'flex', flexDirection: 'column', position: 'relative', minHeight: 0 }}>
           <div style={{ flexShrink: 0, padding: '24px 28px 20px 28px', borderBottom: '1px solid rgba(56,189,248,0.1)', background: 'rgba(56,189,248,0.03)' }}>
             <div style={{ display: 'flex', gap: 24, marginBottom: 24 }}>
@@ -617,7 +458,6 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
           </div>
 
           <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, padding: '28px 28px 120px 28px', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 32 }}>
-            {/* 과거력 섹션 */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
                 <History size={20}/> 과거력
@@ -628,8 +468,6 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
                 ))}
               </div>
             </div>
-
-            {/* 최근 진료 이력 섹션 */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#00d2ff', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
                 <RotateCcw size={20}/> 최근 진료 이력
@@ -644,8 +482,6 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
                 </div>
               </div>
             </div>
-
-            {/* 알레르기 및 주의사항 */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#f43f5e', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
                 <AlertCircle size={20}/> 알레르기 / 주의사항
@@ -659,8 +495,6 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
                 ))}
               </div>
             </div>
-
-            {/* 복용 약물 */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#fb923c', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
                 <Pill size={20}/> 복용 중인 약물
@@ -678,8 +512,6 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
                 )}
               </div>
             </div>
-
-            {/* 작업 위치 섹션 */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
                 <MapPin size={20}/> 환자 작업 위치
@@ -694,8 +526,6 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
                 </div>
               </div>
             </div>
-
-            {/* 비상 연락망 섹션 */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#26de81', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
                 <Phone size={20}/> 비상 연락망
@@ -713,72 +543,34 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
           </div>
           
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '20px 28px 24px 28px', borderTop: '1px solid rgba(255,77,109,0.2)', background: 'linear-gradient(to top, #05070a 85%, transparent)', zIndex: 10 }}>
-            <button onClick={(e) => { e.stopPropagation(); if(confirm('응급 상황을 선포하고 처치 가이드 화면으로 이동하시겠습니까?')) onNavigate?.('emergency') }} style={{ width: '100%', height: 72, borderRadius: 20, background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, fontSize: 22, boxShadow: '0 8px 25px rgba(244, 63, 94, 0.3)' }}>
+            <button onClick={(e) => { e.stopPropagation(); showConfirm('응급 상황을 선포하고 처치 가이드 화면으로 이동하시겠습니까?', () => onNavigate?.('emergency'), '응급 상황 선포', 'danger') }} style={{ width: '100%', height: 72, borderRadius: 20, background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, fontSize: 22, boxShadow: '0 8px 25px rgba(244, 63, 94, 0.3)' }}>
               <AlertTriangle size={28} /> 응급 처치 액션 시작
             </button>
           </div>
         </aside>
 
-        {/* [Right] Main Panel */}
         <div className="chart-scroll-container" style={{ display: 'flex', flexDirection: 'column', gap: 35, padding: '40px 60px', overflowY: 'auto' }}>
-          {/* 활력 징후 입력 확인 섹션 */}
           <SectionCard id="vital-section" title="현재 활력 징후 확인 (실시간 센서 데이터)" icon={<HeartPulse size={36} color="#ff4d6d"/>} right={
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              {[
-                { label: '정상', color: '#26de81' },
-                { label: '관찰', color: '#38bdf8' },
-                { label: '주의', color: '#fb923c' },
-                { label: '위험', color: '#ff4d6d' },
-              ].map(({ label, color }) => (
-                <div key={label} style={{ padding: '6px 16px', borderRadius: 10, background: `${color}12`, border: `1.5px solid ${color}50`, fontSize: 15, fontWeight: 900, color }}>
-                  {label}
-                </div>
+              {[{ label: '정상', color: '#26de81' }, { label: '관찰', color: '#38bdf8' }, { label: '주의', color: '#fb923c' }, { label: '위험', color: '#ff4d6d' }].map(({ label, color }) => (
+                <div key={label} style={{ padding: '6px 16px', borderRadius: 10, background: `${color}12`, border: `1.5px solid ${color}50`, fontSize: 15, fontWeight: 900, color }}>{label}</div>
               ))}
             </div>
           }>
             <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 25, background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: 24, border: '1.5px solid rgba(255,255,255,0.05)' }}>
-                <VitalField label="심박수" value={vitals.hr || patient.vitals?.hr ? `${vitals.hr || patient.vitals?.hr} 회/분` : ''} status={getVitalStatus('hr', vitals.hr || patient.vitals?.hr)} />
-                <VitalField label="산소포화도" value={vitals.spo2 || patient.vitals?.spo2 ? `${vitals.spo2 || patient.vitals?.spo2} %` : ''} status={getVitalStatus('spo2', vitals.spo2 || patient.vitals?.spo2)} />
-                <VitalField label="호흡수" value={vitals.rr ? `${vitals.rr} 회/분` : ''} status={{ label: '정상', color: '#26de81', bg: 'rgba(38,222,129,0.15)' }} />
-                <VitalField label="혈압" value={vitals.bp || ''} status={getVitalStatus('bp', vitals.bp)} editable onEdit={() => openEdit('bp', vitals.bp)} />
-                <VitalField label="체온" value={vitals.temp ? `${vitals.temp} °C` : ''} status={getVitalStatus('temp', vitals.temp)} editable onEdit={() => openEdit('temp', vitals.temp)} />
+                <VitalField label="심박수" value={vitals.hr !== '-' ? `${vitals.hr} 회/분` : ''} status={getVitalStatus('hr', vitals.hr)} />
+                <VitalField label="산소포화도" value={vitals.spo2 !== '-' ? `${vitals.spo2} %` : ''} status={getVitalStatus('spo2', vitals.spo2)} />
+                <VitalField label="호흡수" value={vitals.rr !== '-' ? `${vitals.rr} 회/분` : ''} status={getVitalStatus('rr', vitals.rr)} />
+                <VitalField label="혈압" value={vitals.bp !== '-' ? vitals.bp : ''} status={getVitalStatus('bp', vitals.bp)} editable onEdit={() => openEdit('bp', vitals.bp)} />
+                <VitalField label="체온" value={vitals.temp !== '-' ? `${vitals.temp} °C` : ''} status={getVitalStatus('temp', vitals.temp)} editable onEdit={() => openEdit('temp', vitals.temp)} />
 
-                {/* 인라인 플로팅 입력 모달 (메인 페이지 스타일) */}
                 {editTarget && editTarget !== 'role' && (
-                  <div style={{
-                    position: 'absolute', 
-                    top: '110%', 
-                    left: editTarget === 'bp' ? 'auto' : 'auto',
-                    right: editTarget === 'bp' ? '20%' : (editTarget === 'temp' ? '25px' : 'auto'),
-                    transform: 'none',
-                    zIndex: 1000,
-                    width: 360, background: '#1e293b', border: '2px solid #38bdf8', borderRadius: 24,
-                    padding: 28, boxShadow: '0 20px 50px rgba(0,0,0,0.6)', animation: 'slideDown 0.2s ease'
-                  }}>
-                    <div style={{ fontSize: 21, fontWeight: 900, color: '#38bdf8', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
-                      {editTarget === 'bp' ? <Activity size={24} /> : <Droplets size={24} />}
-                      {editTarget === 'bp' ? '혈압 직접 입력' : '체온 직접 입력'}
-                    </div>
-                    <input 
-                      autoFocus
-                      value={editValue} 
-                      placeholder={editTarget === 'bp' ? '예: 120/80' : '예: 36.5'}
-                      onChange={e => setEditValue(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          saveEdit();
-                        }
-                      }}
-                      style={{
-                        width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)',
-                        borderRadius: 14, padding: '16px 20px', color: '#fff', fontSize: 29, fontWeight: 800,
-                        outline: 'none', marginBottom: 20, textAlign: 'center', letterSpacing: '1px'
-                      }}
-                    />
+                  <div style={{ position: 'absolute', top: '110%', right: editTarget === 'bp' ? '20%' : (editTarget === 'temp' ? '25px' : 'auto'), zIndex: 1000, width: 360, background: '#1e293b', border: '2px solid #38bdf8', borderRadius: 24, padding: 28, boxShadow: '0 20px 50px rgba(0,0,0,0.6)', animation: 'slideDown 0.2s ease' }}>
+                    <div style={{ fontSize: 21, fontWeight: 900, color: '#38bdf8', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10 }}>{editTarget === 'bp' ? <Activity size={24} /> : <Droplets size={24} />}{editTarget === 'bp' ? '혈압 직접 입력' : '체온 직접 입력'}</div>
+                    <input autoFocus value={editValue} placeholder={editTarget === 'bp' ? '예: 120/80' : '예: 36.5'} onChange={e => setEditValue(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') saveEdit(); }} style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 14, padding: '16px 20px', color: '#fff', fontSize: 29, fontWeight: 800, outline: 'none', marginBottom: 20, textAlign: 'center', letterSpacing: '1px' }} />
                     <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-                      <button onClick={() => setEditTarget(null)} style={{ flex: 1, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: 'none', fontWeight: 800, fontSize: 19, cursor: 'pointer', transition: '0.2s' }}>취소</button>
-                      <button onClick={saveEdit} style={{ flex: 2, padding: '14px', borderRadius: 12, background: '#38bdf8', color: '#000', border: 'none', fontWeight: 950, fontSize: 19, cursor: 'pointer', transition: '0.2s' }}>데이터 저장</button>
+                      <button onClick={() => setEditTarget(null)} style={{ flex: 1, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: 'none', fontWeight: 800, fontSize: 19, cursor: 'pointer' }}>취소</button>
+                      <button onClick={saveEdit} style={{ flex: 2, padding: '14px', borderRadius: 12, background: '#38bdf8', color: '#000', border: 'none', fontWeight: 950, fontSize: 19, cursor: 'pointer' }}>데이터 저장</button>
                     </div>
                   </div>
                 )}
@@ -787,12 +579,9 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
           
           <SectionCard title="1. 환자 상태 관찰 일지" icon={<Stethoscope size={36} color="#38bdf8"/>}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 35 }}>
-              <div style={{ padding: '18px 24px', background: 'rgba(56,189,248,0.05)', borderRadius: 16, border: '1px solid rgba(56,189,248,0.1)', fontSize: '23px', color: '#38bdf8', fontWeight: 700, lineHeight: 1.5 }}>
-                💡 환자가 통증을 느끼는 부위를 선택하고, 관찰된 증상을 기록해 주세요.
-              </div>
-              
+              <div style={{ padding: '18px 24px', background: 'rgba(56,189,248,0.05)', borderRadius: 16, border: '1px solid rgba(56,189,248,0.1)', fontSize: '23px', color: '#38bdf8', fontWeight: 700, lineHeight: 1.5 }}>💡 환자가 통증을 느끼는 부위를 선택하고, 관찰된 증상을 기록해 주세요.</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <label style={{ fontSize: '28px', color: '#94a3b8', fontWeight: 800 }}>통증 부위 선택 (환자가 아프다고 하는 곳)</label>
+                <label style={{ fontSize: '28px', color: '#94a3b8', fontWeight: 800 }}>통증 부위 선택</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 20 }}>
                   <PainAreaGroup label="머리 / 목" icon={<User size={26} color="#38bdf8" />} areas={['머리(두통)', '얼굴', '목', '치아/잇몸']} selectedAreas={painAreas} onClick={handlePainAreaClick} />
                   <PainAreaGroup label="몸통 (앞/뒤)" icon={<Activity size={26} color="#38bdf8" />} areas={['가슴(흉통)', '어깨', '상복부', '하복부', '옆구리', '등/허리']} selectedAreas={painAreas} onClick={handlePainAreaClick} />
@@ -800,17 +589,16 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
                   <PainAreaGroup label="팔 / 기타" icon={<Sparkles size={26} color="#38bdf8" />} areas={['팔꿈치', '팔(전체)', '손목/손', '항문/회음부', '전신 통증']} selectedAreas={painAreas} onClick={handlePainAreaClick} />
                 </div>
               </div>
-
               <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
                 <div>
-                  <div style={{ fontSize: '28px', color: '#94a3b8', fontWeight: 800, marginBottom: 15 }}>눈에 보이는 증상 (관찰된 것)</div>
+                  <div style={{ fontSize: '28px', color: '#94a3b8', fontWeight: 800, marginBottom: 15 }}>눈에 보이는 증상</div>
                   <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, padding: '25px 30px', border: '1.5px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', gap: 22 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                       <span style={{ fontSize: '21px', color: '#64748b', fontWeight: 800, whiteSpace: 'nowrap', width: '180px' }}>전신/의식 상태</span>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                         {['의식 변화', '호흡 곤란', '구토', '발열', '식은땀', '청색증'].map(s => {
                           const active = selectedSymptoms.includes(s)
-                          return (<button key={s} onClick={() => toggleSymptom(s)} style={{ padding: '12px 20px', borderRadius: 14, background: active ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.03)', border: `1.5px solid ${active ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, color: active ? '#38bdf8' : '#fff', fontSize: '21px', fontWeight: 700, cursor: 'pointer', transition: '0.2s' }}>{s}</button>)
+                          return (<button key={s} onClick={() => toggleSymptom(s)} style={{ padding: '12px 20px', borderRadius: 14, background: active ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.03)', border: `1.5px solid ${active ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, color: active ? '#38bdf8' : '#fff', fontSize: '21px', fontWeight: 700, cursor: 'pointer' }}>{s}</button>)
                         })}
                       </div>
                     </div>
@@ -820,75 +608,24 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                         {['출혈', '대량 출혈(위험)', '부종(부기)', '피부 발진', '마비/저림', '찰과상/열상', '총상/자상(초응급)', '변형(골절의심)'].map(s => {
                           const active = selectedSymptoms.includes(s)
-                          return (<button key={s} onClick={() => toggleSymptom(s)} style={{ padding: '12px 20px', borderRadius: 14, background: active ? (s.includes('위험') || s.includes('응급') ? 'rgba(244,63,94,0.3)' : 'rgba(56,189,248,0.25)') : 'rgba(255,255,255,0.03)', border: `1.5px solid ${active ? (s.includes('위험') || s.includes('응급') ? '#f43f5e' : '#38bdf8') : 'rgba(255,255,255,0.1)'}`, color: active ? (s.includes('위험') || s.includes('응급') ? '#ff4d6d' : '#38bdf8') : '#fff', fontSize: '21px', fontWeight: 700, cursor: 'pointer', transition: '0.2s' }}>{s}</button>)
+                          return (<button key={s} onClick={() => toggleSymptom(s)} style={{ padding: '12px 20px', borderRadius: 14, background: active ? (s.includes('위험') || s.includes('응급') ? 'rgba(244,63,94,0.3)' : 'rgba(56,189,248,0.25)') : 'rgba(255,255,255,0.03)', border: `1.5px solid ${active ? (s.includes('위험') || s.includes('응급') ? '#f43f5e' : '#38bdf8') : 'rgba(255,255,255,0.1)'}`, color: active ? (s.includes('위험') || s.includes('응급') ? '#ff4d6d' : '#38bdf8') : '#fff', fontSize: '21px', fontWeight: 700, cursor: 'pointer' }}>{s}</button>)
                         })}
                       </div>
                     </div>
                   </div>
                 </div>
-                <InputBox label="상세한 증상 이야기 (언제부터, 어떻게 아픈가요?)" placeholder="증상이 시작된 계기나 통증의 느낌(콕콕 쑤심, 묵직함 등)을 자유롭게 적어주세요." isTextArea value={detailedNote} onChange={(v) => { setDetailedNote(v); setShowPlan(false); }} />
+                <InputBox label="상세한 증상 이야기" placeholder="상세 내용을 적어주세요." isTextArea value={detailedNote} onChange={(v) => { setDetailedNote(v); setShowPlan(false); }} />
               </div>
-
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 25, marginTop: 10 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12, background: 'rgba(56,189,248,0.03)', padding: '20px', borderRadius: 20, border: '1.5px solid rgba(56,189,248,0.1)' }}>
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                    <label style={{ fontSize: '24px', color: '#38bdf8', fontWeight: 900 }}>증상이 나타난 시각</label>
-                    <button onClick={(e) => { e.stopPropagation(); setNowTime(); }} style={{ padding: '8px 16px', borderRadius: 10, background: 'rgba(56,189,248,0.2)', border: '1.5px solid #38bdf8', color: '#38bdf8', fontSize: '18px', fontWeight: 900, cursor: 'pointer' }}>지금으로 설정</button>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 15, background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: 15 }}>
-                    <Clock size={24} color="#38bdf8" />
-                    <span style={{ fontSize: '34px', fontWeight: 950, color: '#fff', letterSpacing: '1px' }}>{occurrenceTime}</span>
-                    <button onClick={(e) => { e.stopPropagation(); setIsTimeModalOpen(true); }} style={{ padding: '8px 16px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', color: '#94a3b8', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}>변경</button>
-                  </div>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}><label style={{ fontSize: '24px', color: '#38bdf8', fontWeight: 900 }}>증상 발현 시각</label><button onClick={setNowTime} style={{ padding: '8px 16px', borderRadius: 10, background: 'rgba(56,189,248,0.2)', border: '1.5px solid #38bdf8', color: '#38bdf8', fontSize: '18px', fontWeight: 900, cursor: 'pointer' }}>지금</button></div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 15, background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: 15 }}><Clock size={24} color="#38bdf8" /><span style={{ fontSize: '34px', fontWeight: 950, color: '#fff' }}>{occurrenceTime}</span><button onClick={() => setIsTimeModalOpen(true)} style={{ padding: '8px 16px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', color: '#94a3b8', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}>변경</button></div>
                 </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: 20, border: '1.5px solid rgba(255,255,255,0.05)' }}>
-                  <label style={{ fontSize: '24px', color: '#94a3b8', fontWeight: 900 }}>최종 취식/음용 시각</label>
-                  <div style={{ display: 'flex', gap: 12, marginTop: 5 }}>
-                    <input 
-                      type="text" 
-                      placeholder='예: "1시간 전", "오전 8시"' 
-                      value={lastMealTime === '기록 없음' ? '' : lastMealTime} 
-                      onChange={(e) => setLastMealTime(e.target.value)}
-                      style={{ flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 15, padding: '15px 22px', color: '#fff', fontSize: '24px', outline: 'none', fontFamily: '"Pretendard", sans-serif' }} 
-                    />
-                    <button onClick={() => setLastMealTime('금식 중')} style={{ padding: '0 25px', borderRadius: 15, background: 'rgba(244,63,94,0.1)', border: '1.5px solid rgba(244,63,94,0.3)', color: '#f43f5e', fontSize: '20px', fontWeight: 800, cursor: 'pointer' }}>금식</button>
-                  </div>
-                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: 20, border: '1.5px solid rgba(255,255,255,0.05)' }}><label style={{ fontSize: '24px', color: '#94a3b8', fontWeight: 900 }}>최종 취식 시각</label><div style={{ display: 'flex', gap: 12, marginTop: 5 }}><input type="text" placeholder='예: "1시간 전"' value={lastMealTime === '기록 없음' ? '' : lastMealTime} onChange={(e) => setLastMealTime(e.target.value)} style={{ flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 15, padding: '15px 22px', color: '#fff', fontSize: '24px', outline: 'none' }} /><button onClick={() => setLastMealTime('금식 중')} style={{ padding: '0 25px', borderRadius: 15, background: 'rgba(244,63,94,0.1)', border: '1.5px solid rgba(244,63,94,0.3)', color: '#f43f5e', fontSize: '20px', fontWeight: 800, cursor: 'pointer' }}>금식</button></div></div>
               </div>
-
-              <div style={{ padding: '15px 25px', background: 'rgba(56,189,248,0.03)', borderRadius: 18, border: '1.2px dashed rgba(56,189,248,0.2)', display: 'flex', alignItems: 'center', gap: 15 }}>
-                <Info size={26} color="#38bdf8" style={{ flexShrink: 0 }} />
-                <span style={{ fontSize: '21.5px', color: '#94a3b8', fontWeight: 600, lineHeight: 1.4 }}>수술 및 마취가 필요할 수 있는 응급 상황에 대비해 마지막 음식 섭취 시각을 반드시 확인하십시오.</span>
-              </div>
-
               {!showPlan && (
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
-                  <button 
-                    onClick={() => setShowPlan(true)} 
-                    style={{ 
-                      padding: '22px 60px', 
-                      borderRadius: 24, 
-                      background: selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) 
-                        ? 'linear-gradient(135deg, #f43f5e 0%, #991b1b 100%)' 
-                        : 'linear-gradient(135deg, #38bdf8 0%, #26de81 100%)', 
-                      color: '#fff', 
-                      border: 'none', 
-                      fontWeight: 950, 
-                      fontSize: '24px', 
-                      cursor: 'pointer', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 15, 
-                      boxShadow: selectedSymptoms.some(s => s.includes('위험') || s.includes('응급'))
-                        ? '0 10px 40px rgba(244,63,94,0.4)'
-                        : '0 10px 40px rgba(56,189,248,0.3)',
-                      transition: 'all 0.3s'
-                    }}
-                  >
-                    {selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? <ShieldAlert size={28} /> : <Sparkles size={28} />}
-                    {selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? '초응급 모드 진단 실행' : 'AI 진단 및 처치 가이드 생성'}
-                  </button>
+                  <button onClick={() => setShowPlan(true)} style={{ padding: '22px 60px', borderRadius: 24, background: selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? 'linear-gradient(135deg, #f43f5e 0%, #991b1b 100%)' : 'linear-gradient(135deg, #38bdf8 0%, #26de81 100%)', color: '#fff', border: 'none', fontWeight: 950, fontSize: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 15, boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>{selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? <ShieldAlert size={28} /> : <Sparkles size={28} />} {selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? '초응급 모드 진단 실행' : 'AI 진단 가이드 생성'}</button>
                 </div>
               )}
             </div>
@@ -896,193 +633,37 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
           
           {showPlan && (
             <div style={{ animation: 'slideDown 0.6s ease-out forwards', display: 'flex', flexDirection: 'column', gap: 35 }}>
-              <SectionCard title={selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? "🚨 초응급 조치 명령" : "2. 조치 및 계획"} icon={<Pill size={36} color={selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? "#f43f5e" : "#26de81"}/>}>
+              <SectionCard title="2. 조치 및 계획" icon={<Pill size={36} color="#26de81"/>}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 25 }}>
-                  
-                  {/* 비의료진 외상 처치 안전 수칙 안내 박스 (트라우마 특화) */}
-                  <div style={{ background: 'rgba(15, 23, 42, 0.3)', border: '2px solid #fb923c', borderRadius: '32px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
-                    <div style={{ background: 'linear-gradient(90deg, #fb923c 0%, #f59e0b 100%)', padding: '24px 40px', display: 'flex', alignItems: 'center', gap: 20 }}>
-                      <ShieldAlert size={40} color="#0f172a" />
-                      <span style={{ fontSize: '32px', fontWeight: 950, color: '#0f172a', letterSpacing: '-0.5px' }}>비의료진 외상 처치 안전 수칙 (필독)</span>
-                    </div>
-                    
-                    <div style={{ padding: '40px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
-                        <div style={{ display: 'flex', gap: 20 }}>
-                          <div style={{ fontSize: '40px', fontWeight: 950, color: '#fb923c', opacity: 0.5, lineHeight: 1 }}>01</div>
-                          <div>
-                            <div style={{ fontSize: '24px', fontWeight: 900, color: '#fb923c', marginBottom: 8 }}>지혈 및 상처 보호</div>
-                            <div style={{ fontSize: '21px', color: '#fff', lineHeight: 1.6, fontWeight: 700 }}>
-                              출혈 부위는 멸균 거즈로 <span style={{ color: '#fb923c' }}>직접 압박</span>하여 지혈하며, 오염된 손으로 상처를 직접 만지지 마십시오.
-                            </div>
-                          </div>
-                        </div>
-                        <div style={{ display: 'flex', gap: 20 }}>
-                          <div style={{ fontSize: '40px', fontWeight: 950, color: '#fb923c', opacity: 0.5, lineHeight: 1 }}>02</div>
-                          <div>
-                            <div style={{ fontSize: '24px', fontWeight: 900, color: '#fb923c', marginBottom: 8 }}>환부 고정 및 이동 제한</div>
-                            <div style={{ fontSize: '21px', color: '#fff', lineHeight: 1.6, fontWeight: 700 }}>
-                              골절이 의심될 경우 <span style={{ color: '#fb923c' }}>부목이나 삼각건</span>을 이용해 움직임을 최소화하고, 무리하게 환자를 옮기지 마십시오.
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
-                        <div style={{ display: 'flex', gap: 20 }}>
-                          <div style={{ fontSize: '40px', fontWeight: 950, color: '#fb923c', opacity: 0.5, lineHeight: 1 }}>03</div>
-                          <div>
-                            <div style={{ fontSize: '24px', fontWeight: 900, color: '#fb923c', marginBottom: 8 }}>바이탈 체크 및 쇼크 방지</div>
-                            <div style={{ fontSize: '21px', color: '#fff', lineHeight: 1.6, fontWeight: 700 }}>
-                              환자의 <span style={{ color: '#fb923c' }}>의식과 호흡</span>을 지속적으로 확인하며, 담요 등을 이용해 체온이 떨어지지 않도록 유지하십시오.
-                            </div>
-                          </div>
-                        </div>
-                        <div style={{ display: 'flex', gap: 20, background: 'rgba(244, 63, 94, 0.1)', padding: '20px', borderRadius: '20px', border: '1.5px solid rgba(244, 63, 94, 0.3)' }}>
-                          <div style={{ fontSize: '40px', fontWeight: 950, color: '#f43f5e', lineHeight: 1 }}>!</div>
-                          <div>
-                            <div style={{ fontSize: '24px', fontWeight: 900, color: '#f43f5e', marginBottom: 8 }}>경추 및 척추 손상 주의</div>
-                            <div style={{ fontSize: '21px', color: '#fff', lineHeight: 1.6, fontWeight: 800 }}>
-                              추락 사고 등 <span style={{ color: '#f43f5e', textDecoration: 'underline' }}>척추 손상</span>이 의심되는 경우 환자의 머리와 목을 절대 움직이지 않도록 고정해야 합니다.
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                  <div style={{ background: 'rgba(15, 23, 42, 0.3)', border: '2px solid #fb923c', borderRadius: '32px', overflow: 'hidden' }}>
+                    <div style={{ background: '#fb923c', padding: '16px 40px', display: 'flex', alignItems: 'center', gap: 20 }}><ShieldAlert size={30} color="#0f172a" /><span style={{ fontSize: '24px', fontWeight: 950, color: '#0f172a' }}>비의료진 외상 처치 안전 수칙</span></div>
+                    <div style={{ padding: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 30 }}>
+                      <div style={{ fontSize: '19px', color: '#fff', lineHeight: 1.6 }}>• 출혈 부위 직접 압박 지혈<br/>• 환부 고정 및 이동 제한</div>
+                      <div style={{ fontSize: '19px', color: '#fff', lineHeight: 1.6 }}>• 의식/호흡 지속 확인<br/>• 경추 손상 시 절대 고정</div>
                     </div>
                   </div>
-
-                  {/* AI 분석 및 제안 섹션 */}
-                  {selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? (
-                    /* 초응급 RED ALERT 모드 UI */
-                    <div style={{ background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.2) 0%, rgba(153, 27, 27, 0.3) 100%)', border: '2px solid #f43f5e', borderRadius: '24px', padding: '30px', position: 'relative', overflow: 'hidden', boxShadow: '0 0 30px rgba(244, 63, 94, 0.2)' }}>
-                      <div style={{ position: 'absolute', top: '10px', right: '10px', animation: 'pulse 2s infinite' }}><ShieldAlert size={80} color="#f43f5e" opacity={0.3} /></div>
-                      
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 15, marginBottom: 25 }}>
-                        <div style={{ width: 50, height: 50, borderRadius: 14, background: '#f43f5e', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(244, 63, 94, 0.6)', animation: 'pulse 1s infinite' }}>
-                          <AlertTriangle size={30} color="#fff" />
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <div style={{ fontSize: '24px', fontWeight: 950, color: '#fff', display: 'flex', alignItems: 'center', gap: 10 }}>위급 상황 : 생명 위협 상황</div>
-                          <div style={{ fontSize: '15px', color: '#fda4af', fontWeight: 700 }}>AI가 감지한 즉시 조치 프로토콜이 활성화되었습니다.</div>
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 20 }}>
-                        <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '20px', borderRadius: 18, border: '1px solid rgba(244, 63, 94, 0.3)' }}>
-                          <div style={{ fontSize: '15px', color: '#ff4d6d', fontWeight: 900, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><ShieldAlert size={18}/> 1단계 : 지혈</div>
-                          <div style={{ fontSize: '17px', color: '#fff', fontWeight: 700, lineHeight: 1.6 }}>
-                            상처 부위를 깨끗한 거즈로 <span style={{ color: '#ff4d6d', textDecoration: 'underline' }}>체중을 실어 직접 압박</span>하십시오. 지혈이 되지 않을 경우 상처 상단 5-10cm 지점에 지혈대(Tourniquet)를 사용하십시오.
-                          </div>
-                        </div>
-
-                        <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '20px', borderRadius: 18, border: '1px solid rgba(244, 63, 94, 0.3)' }}>
-                          <div style={{ fontSize: '15px', color: '#ff4d6d', fontWeight: 900, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Activity size={18}/> 2단계 : 쇼크 방지</div>
-                          <ul style={{ margin: 0, padding: '0 0 0 18px', fontSize: '16px', color: '#fda4af', fontWeight: 700, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            <li>환자를 눕히고 다리를 30cm 거상</li>
-                            <li>체온 유지를 위해 담요 사용</li>
-                            <li>의식 확인 및 지속적 말 걸기</li>
-                          </ul>
-                        </div>
-
-                        <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '20px', borderRadius: 18, border: '1px solid rgba(244, 63, 94, 0.3)' }}>
-                          <div style={{ fontSize: '15px', color: '#ff4d6d', fontWeight: 900, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><Phone size={18}/> 3단계 : 응급 후송 요청</div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                            <button style={{ width: '100%', padding: '12px', borderRadius: 12, background: '#f43f5e', color: '#fff', border: 'none', fontWeight: 900, fontSize: '15px', cursor: 'pointer' }}>해안의료 긴급 구조 발신</button>
-                            <button style={{ width: '100%', padding: '12px', borderRadius: 12, background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid #f43f5e', fontWeight: 800, fontSize: '14px', cursor: 'pointer' }}>원격 의사 화상 연결</button>
-                          </div>
-                        </div>
-                      </div>
+                  <div style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1.5px solid rgba(56, 189, 248, 0.2)', borderRadius: '24px', padding: '25px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}><Sparkles size={28} color="#38bdf8" /><div style={{ fontSize: '24px', fontWeight: 900 }}>AI 실시간 증상 분석</div></div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 20 }}>
+                      <div style={{ background: 'rgba(0,0,0,0.2)', padding: '20px', borderRadius: 18 }}><div style={{ fontSize: '20px', color: '#38bdf8', fontWeight: 800, marginBottom: 10 }}>분석 브리핑</div><div style={{ fontSize: '22px', lineHeight: 1.5 }}>{aiResult.briefing}</div></div>
+                      <div style={{ background: 'rgba(0,0,0,0.2)', padding: '20px', borderRadius: 18 }}><div style={{ fontSize: '20px', color: '#26de81', fontWeight: 800, marginBottom: 10 }}>처치 가이드</div><ul style={{ margin: 0, paddingLeft: 20, fontSize: '20px' }}>{aiResult.guide.map((g, i) => <li key={i}>{g}</li>)}</ul></div>
+                      <div style={{ background: 'rgba(0,0,0,0.2)', padding: '20px', borderRadius: 18 }}><div style={{ fontSize: '20px', color: '#fb923c', fontWeight: 800, marginBottom: 10 }}>추천 약물</div><div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>{aiResult.meds.map((m, i) => <span key={i} style={{ padding: '5px 12px', background: 'rgba(251,146,60,0.1)', border: '1px solid #fb923c', borderRadius: 8, color: '#fb923c', fontSize: '18px' }}>{m}</span>)}</div></div>
                     </div>
-                  ) : (
-                    /* 일반 모드 AI 리포트 UI (기존 유지) */
-                    <div style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(38, 222, 129, 0.1) 100%)', border: '1.5px solid rgba(56, 189, 248, 0.3)', borderRadius: '24px', padding: '25px', position: 'relative', overflow: 'hidden' }}>
-                      <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.1 }}><Sparkles size={120} color="#38bdf8" /></div>
-                      
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-                        <div style={{ width: 50, height: 50, borderRadius: 12, background: '#38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 15px rgba(56, 189, 248, 0.5)' }}>
-                          <Sparkles size={28} color="#0f172a" />
-                        </div>
-                        <div style={{ fontSize: '28px', fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
-                          AI 실시간 증상 분석 리포트
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 20 }}>
-                        {/* 분석 브리핑 */}
-                        <div style={{ background: 'rgba(15, 23, 42, 0.4)', padding: '20px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <div style={{ fontSize: '24px', color: '#38bdf8', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><ShieldCheck size={24}/> 분석 브리핑</div>
-                          <div style={{ fontSize: '28px', color: '#e2e8f0', fontWeight: 700, lineHeight: 1.5 }}>
-                            {aiResult.briefing}
-                          </div>
-                        </div>
-
-                        {/* 권장 처치 가이드 */}
-                        <div style={{ background: 'rgba(15, 23, 42, 0.4)', padding: '20px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <div style={{ fontSize: '24px', color: '#26de81', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Activity size={24}/> 비의료진 권장 처치</div>
-                          <ul style={{ margin: 0, padding: '0 0 0 28px', fontSize: '26px', color: '#cbd5e1', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            {aiResult.guide.map((item, idx) => (
-                              <li key={idx}>{item}</li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {/* 제안 상비약 */}
-                        <div style={{ background: 'rgba(15, 23, 42, 0.4)', padding: '20px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <div style={{ fontSize: '24px', color: '#fb923c', fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Pill size={24}/> AI 추천 상비약</div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-                            {aiResult.meds.map((m, idx) => (
-                              <span key={idx} style={{ fontSize: '21px', padding: '8px 18px', borderRadius: 10, background: 'rgba(251, 146, 60, 0.15)', color: '#fb923c', border: '1px solid rgba(251, 146, 60, 0.3)', fontWeight: 800 }}>{m}</span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
+                  </div>
                   <div>
-                    <div style={{ marginBottom: 18, display: 'flex', alignItems: 'center', gap: 20 }}>
-                      <label style={{ fontSize: '34px', color: '#94a3b8', fontWeight: 800 }}>실제 수행한 조치 내용</label>
-                      <span style={{ fontSize: '16px', color: '#ff4d6d', fontWeight: 900, background: 'rgba(255, 77, 109, 0.1)', padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(255, 77, 109, 0.3)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <AlertTriangle size={14} /> 처방약 투여 시 반드시 기록
-                      </span>
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 16, marginBottom: 25 }}>
+                    <div style={{ fontSize: '28px', color: '#94a3b8', fontWeight: 800, marginBottom: 18 }}>수행한 조치 기록</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12, marginBottom: 20 }}>
                       {OTC_MEDS.map(m => (
-                        <button 
-                          key={m.id} 
-                          onClick={() => toggleMed(m.name)} 
-                          style={{ 
-                            padding: '20px 10px', 
-                            borderRadius: 20, 
-                            textAlign: 'center', 
-                            cursor: 'pointer', 
-                            background: selectedMeds.includes(m.name) ? 'rgba(38,222,129,0.15)' : 'rgba(255,255,255,0.02)', 
-                            border: `1.5px solid ${selectedMeds.includes(m.name) ? '#26de81' : 'rgba(255,255,255,0.1)'}`, 
-                            transition: '0.2s' 
-                          }}
-                        >
-                          <div style={{ fontSize: '24px', fontWeight: 900, color: selectedMeds.includes(m.name) ? '#26de81' : '#fff' }}>{m.name}</div>
-                        </button>
+                        <button key={m.id} onClick={() => toggleMed(m.name)} style={{ padding: '15px 10px', borderRadius: 15, background: selectedMeds.includes(m.name) ? 'rgba(38,222,129,0.1)' : 'rgba(255,255,255,0.02)', border: `1.5px solid ${selectedMeds.includes(m.name) ? '#26de81' : 'rgba(255,255,255,0.1)'}`, color: selectedMeds.includes(m.name) ? '#26de81' : '#fff', fontSize: '20px', fontWeight: 800, cursor: 'pointer' }}>{m.name}</button>
                       ))}
                     </div>
-                    <InputBox label="" placeholder={selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? "초응급 처치 수행 내역과 원격 지시 사항을 상세히 기록하십시오." : "AI 제안 사항 중 수행한 내용이나, 원격 의사의 추가 지시 사항을 기록하세요."} isTextArea value={otherActions} onChange={(v) => { setOtherActions(v); }} />
+                    <InputBox label="" placeholder="추가 조치 사항을 적어주세요." isTextArea value={otherActions} onChange={setOtherActions} />
                   </div>
                 </div>
               </SectionCard>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 22, paddingBottom: 40 }}>
-                <button 
-                  onClick={() => setShowPlan(false)} 
-                  style={{ padding: '24px 40px', borderRadius: 20, background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', fontWeight: 800, fontSize: '20px', cursor: 'pointer' }}
-                >
-                  기록 수정하기
-                </button>
-                <button 
-                  onClick={handleSave} 
-                  style={{ padding: '24px 50px', borderRadius: 20, background: selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? '#f43f5e' : '#38bdf8', color: '#fff', border: 'none', fontWeight: 950, fontSize: '26px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 15, boxShadow: selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? '0 10px 30px rgba(244,63,94,0.3)' : '0 10px 30px rgba(56,189,248,0.2)' }}
-                >
-                  <CheckCircle2 size={32}/> {selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? "긴급 상황 보고 및 저장" : "최종 기록 저장"}
-                </button>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 20, paddingBottom: 40 }}>
+                <button onClick={() => setShowPlan(false)} style={{ padding: '20px 40px', borderRadius: 18, background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', fontSize: '20px', fontWeight: 800, cursor: 'pointer' }}>수정</button>
+                <button onClick={handleSave} style={{ padding: '20px 50px', borderRadius: 18, background: selectedSymptoms.some(s => s.includes('위험') || s.includes('응급')) ? '#f43f5e' : '#38bdf8', color: '#fff', border: 'none', fontSize: '24px', fontWeight: 950, cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}><CheckCircle2 size={28}/> 저장 완료</button>
               </div>
             </div>
           )}
@@ -1090,20 +671,11 @@ export default function PatientChart({ patient: activePatientProp, onNavigate, o
       </div>
       <style>{`
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.6; transform: scale(1); } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
       `}</style>
     </div>
   )
-}
-
-function InfoItem({ label, value, size }) {
-    const valueSize = size === 'xl_ultra' ? 32 : (size === 'xl_max' ? 28 : (size === 'xl_plus' ? 25 : (size === 'xl' ? 22 : (size === 'large' ? 18 : 13))))
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <span style={{ fontSize: '18px', color: '#64748b', fontWeight: 700 }}>{label}</span>
-            <span style={{ fontSize: valueSize, fontWeight: 800, color: '#fff' }}>{value}</span>
-        </div>
-    )
 }
 
 function SectionCard({ title, icon, children, right, id }) {
@@ -1113,91 +685,30 @@ function SectionCard({ title, icon, children, right, id }) {
 function PainAreaGroup({ label, areas, selectedAreas, onClick, icon }) {
   return (
     <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, padding: '24px', border: '1.5px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', gap: 18 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 15 }}>
-        {icon}
-        <div style={{ fontSize: '25px', color: '#e2e8f0', fontWeight: 850 }}>{label}</div>
-      </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15 }}>
-        {areas.map(area => {
-          const isActive = selectedAreas.includes(area)
-          return (
-            <button 
-              key={area} 
-              onClick={() => onClick(area)} 
-              style={{ 
-                padding: '13px 24px', 
-                borderRadius: 16, 
-                background: isActive ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.03)', 
-                border: `1.5px solid ${isActive ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, 
-                color: isActive ? '#38bdf8' : '#cbd5e1', 
-                fontSize: '23px', 
-                fontWeight: 700, 
-                cursor: 'pointer', 
-                transition: 'all 0.2s' 
-              }}
-            >
-              {area}
-            </button>
-          )
-        })}
-      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 15 }}>{icon}<div style={{ fontSize: '25px', color: '#e2e8f0', fontWeight: 850 }}>{label}</div></div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15 }}>{areas.map(area => { const isActive = selectedAreas.includes(area); return (<button key={area} onClick={() => onClick(area)} style={{ padding: '13px 24px', borderRadius: 16, background: isActive ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.03)', border: `1.5px solid ${isActive ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, color: isActive ? '#38bdf8' : '#cbd5e1', fontSize: '23px', fontWeight: 700, cursor: 'pointer' }}>{area}</button>) })}</div>
     </div>
   )
 }
 
 function InputBox({ label, placeholder, isTextArea, value, onChange }) {
-  return (<div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}><label style={{ fontSize: '24px', color: '#94a3b8', fontWeight: 800 }}>{label}</label>{isTextArea ? (<textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', minHeight: 120, background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '22px', color: '#fff', fontSize: '23px', outline: 'none', resize: 'none', lineHeight: 1.5, fontFamily: '"Pretendard", sans-serif' }} />) : (<input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '20px 28px', color: '#fff', fontSize: '23px', outline: 'none', fontFamily: '"Pretendard", sans-serif' }} />)}</div>)
+  return (<div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}><label style={{ fontSize: '24px', color: '#94a3b8', fontWeight: 800 }}>{label}</label>{isTextArea ? (<textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', minHeight: 120, background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '22px', color: '#fff', fontSize: '23px', outline: 'none', resize: 'none', lineHeight: 1.5 }} />) : (<input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '20px 28px', color: '#fff', fontSize: '23px', outline: 'none' }} />)}</div>)
 }
 
 function VitalField({ label, value, status, editable, onEdit }) {
-    const valStr = String(value || '').trim();
-    // 숫자가 하나라도 포함되어 있으면 데이터가 있는 것으로 간주
-    const isNoData = !/[0-9]/.test(valStr) || valStr.startsWith('-');
-    
+    const isNoData = !value || value === '' || value.startsWith('-');
     return (
-        <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: 12, 
-            padding: '15px', 
-            position: 'relative',
-            background: isNoData ? 'rgba(255,255,255,0.01)' : 'rgba(56,189,248,0.02)',
-            borderRadius: '20px',
-            border: `1.5px solid ${isNoData ? 'rgba(255,255,255,0.05)' : 'rgba(56,189,248,0.1)'}`,
-            transition: 'all 0.3s'
-        }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
-                <span style={{ fontSize: '20px', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</span>
-                {!isNoData && <span style={{ padding: '2px 10px', borderRadius: 6, background: status.bg, color: status.color, fontSize: '13px', fontWeight: 900, border: `1px solid ${status.color}40` }}>{status.label}</span>}
-                {editable && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                    style={{ background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.3)', borderRadius: '6px', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 'auto' }}
-                  >
-                    <Pencil size={14} color="#38bdf8" />
-                  </button>
-                )}
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 6, minHeight: '44px' }}>
-                {isNoData ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, animation: 'pulse 2s infinite' }}>
-                        <div style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #38bdf8', borderTopColor: 'transparent', animation: 'spin 1s infinite linear' }} />
-                        <span style={{ fontSize: '22px', fontWeight: 800, color: '#475569', letterSpacing: '-0.5px' }}>센서 연결 대기 중...</span>
-                    </div>
-                ) : (
-                    <>
-                        <span style={{ fontSize: '37px', fontWeight: 950, color: status.color, letterSpacing: '-1px', lineHeight: 1 }}>{value.split(' ')[0]}</span>
-                        {value.includes(' ') && <span style={{ fontSize: '18.5px', color: '#64748b', fontWeight: 800 }}>{value.split(' ')[1]}</span>}
-                    </>
-                )}
-            </div>
-            
-            {isNoData && editable && (
-                <div onClick={onEdit} style={{ marginTop: '8px', fontSize: '17px', color: '#38bdf8', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(56,189,248,0.1)', padding: '6px 12px', borderRadius: '10px', width: 'fit-content', border: '1px solid rgba(56,189,248,0.2)' }}>
-                    <Plus size={16}/> 직접 입력하기
-                </div>
-            )}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '15px', position: 'relative', background: isNoData ? 'rgba(255,255,255,0.01)' : 'rgba(56,189,248,0.02)', borderRadius: '20px', border: `1.5px solid ${isNoData ? 'rgba(255,255,255,0.05)' : 'rgba(56,189,248,0.1)'}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}><span style={{ fontSize: '20px', color: '#64748b', fontWeight: 800 }}>{label}</span>{!isNoData && <span style={{ padding: '2px 10px', borderRadius: 6, background: status.bg, color: status.color, fontSize: '13px', fontWeight: 900 }}>{status.label}</span>}{editable && (<button onClick={onEdit} style={{ background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.3)', borderRadius: '6px', padding: '4px', cursor: 'pointer', marginLeft: 'auto' }}><Pencil size={14} color="#38bdf8" /></button>)}</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 6, minHeight: '44px' }}>{isNoData ? (<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #38bdf8', borderTopColor: 'transparent', animation: 'spin 1s infinite linear' }} /><span style={{ fontSize: '20px', color: '#475569' }}>대기 중...</span></div>) : (<><span style={{ fontSize: '37px', fontWeight: 950, color: status.color }}>{value.split(' ')[0]}</span>{value.includes(' ') && <span style={{ fontSize: '18px', color: '#64748b', fontWeight: 800 }}>{value.split(' ')[1]}</span>}</>)}</div>
+            {isNoData && editable && (<div onClick={onEdit} style={{ marginTop: '8px', fontSize: '17px', color: '#38bdf8', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><Plus size={16}/> 입력</div>)}
         </div>
+    )
+}
+
+function InfoItem({ label, value, size }) {
+    const valueSize = size === 'xl_ultra' ? 32 : 22
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}><span style={{ fontSize: '18px', color: '#64748b', fontWeight: 700 }}>{label}</span><span style={{ fontSize: valueSize, fontWeight: 800, color: '#fff' }}>{value}</span></div>
     )
 }

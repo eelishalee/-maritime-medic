@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react'
-import { Search, Plus, UserPlus, Users, Anchor, Cog, Coffee, ShieldAlert, CheckCircle2, ChevronRight, Phone, Heart, Activity, X, Ruler, Scale, MapPin, Calendar, FileText, Pill, User as UserIcon, ChevronDown, Camera, Upload, PenLine } from 'lucide-react'
+import { Search, Plus, UserPlus, Users, Anchor, Cog, Coffee, ShieldAlert, CheckCircle2, ChevronRight, Phone, Heart, Activity, X, Ruler, Scale, MapPin, Calendar, FileText, Pill, User as UserIcon, ChevronDown, Trash2 } from 'lucide-react'
+import { useAlert } from '../utils/AlertContext'
+
 
 // ─── 이미지 자산 매핑 (Vite) ───
 const getPhoto = (name) => new URL(`../assets/photo/${name}`, import.meta.url).href
@@ -32,6 +34,7 @@ const TABS = [
 ]
 
 export default function CrewManagement({ onSelectPatient }) {
+  const { showAlert, showConfirm } = useAlert()
   const [crew, setCrew] = useState(() => {
     try {
       const saved = localStorage.getItem('mdts_crew_list')
@@ -84,9 +87,9 @@ export default function CrewManagement({ onSelectPatient }) {
 
   const handleAddCrew = (e) => {
     e.preventDefault()
-    if (!newCrew.name.trim()) { alert('이름을 입력하세요.'); return }
-    if (!newCrew.role.trim()) { alert('직책을 입력하세요.'); return }
-    if (!newCrew.dept.trim()) { alert('부서를 선택하세요.'); return }
+    if (!newCrew.name.trim()) { showAlert('이름을 입력하세요.', '입력 오류', 'warning'); return }
+    if (!newCrew.role.trim()) { showAlert('직책을 입력하세요.', '입력 오류', 'warning'); return }
+    if (!newCrew.dept.trim()) { showAlert('부서를 선택하세요.', '입력 오류', 'warning'); return }
     const id = `S26-${String(crew.length + 1).padStart(3, '0')}`
     const finalAvatar = newCrew.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(newCrew.name)}&background=random&color=fff&size=200`
     const entry = { ...newCrew, id, avatar: finalAvatar, age: Number(newCrew.age), isEmergency: false }
@@ -106,8 +109,8 @@ export default function CrewManagement({ onSelectPatient }) {
 
   const handleEditCrew = (e) => {
     e.preventDefault()
-    if (!manageTarget.name.trim()) { alert('이름을 입력하세요.'); return }
-    if (!manageTarget.role.trim()) { alert('직책을 입력하세요.'); return }
+    if (!manageTarget.name.trim()) { showAlert('이름을 입력하세요.', '입력 오류', 'warning'); return }
+    if (!manageTarget.role.trim()) { showAlert('직책을 입력하세요.', '입력 오류', 'warning'); return }
     saveCrew(crew.map(c => c.id === manageTarget.id ? { ...manageTarget } : c))
     setShowManage(false)
     setManageTarget(null)
@@ -126,13 +129,13 @@ export default function CrewManagement({ onSelectPatient }) {
       onSelectPatient(c)
       return
     }
-    if (window.confirm(`[${c.id}] ${c.name} 선원을 응급 환자로 등록하시겠습니까?`)) {
+    showConfirm(`[${c.id}] ${c.name} 선원을 응급 환자로 등록하시겠습니까?`, () => {
       const updatedCrew = crew.map(member => 
         member.id === c.id ? { ...member, isEmergency: true } : member
       )
       saveCrew(updatedCrew)
       onSelectPatient({ ...c, isEmergency: true })
-    }
+    }, '응급 환자 등록', 'danger')
   }
 
   const filtered = crew.filter(c => {
