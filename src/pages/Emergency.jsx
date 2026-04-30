@@ -553,6 +553,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                       (activeAction === '기도 확보' && activeDisplayIndex === 1) ? 'scale(1.3)' :
                       (activeAction === '기도 확보' && activeDisplayIndex === 3) ? 'scale(1.25)' :
                       'none',
+                    animation: 'imgFadeIn 0.18s ease-out forwards',
                     transition: 'transform 0.3s ease-out'
                   }}
                   alt={currentActionData.steps[activeDisplayIndex].title}
@@ -855,6 +856,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
         @keyframes pulse-alert-border { 0% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); } 50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.6); } 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); } }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes imgFadeIn { from { opacity: 0; } to { opacity: 1; } }
       `}</style>
     </div>
   )
