@@ -390,6 +390,16 @@ export default function Settings() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newEdu, setNewEdu] = useState({ name:'', id:'', dept:'', type:'기본 CPR (심폐소생술)', date:'', expiry:'' })
   const [dateEditor, setDateEditor] = useState(null)
+  const [deleteEduTarget, setDeleteEduTarget] = useState(null)
+
+  const confirmDeleteEdu = () => {
+    if (deleteEduTarget === null) return
+    const target = trainingList[deleteEduTarget]
+    setTrainingList(prev => prev.filter((_, i) => i !== deleteEduTarget))
+    const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
+    setActivities(p => [...p, { t: nowStr, type: 'warning', msg: `교육이력 삭제 : ${target.name} - ${target.type}` }])
+    setDeleteEduTarget(null)
+  }
 
   // 관리자 등록 현황
   const MANAGER_ROLES = ['안전책임자', '의료담당자', '응급처치 담당자', '위생관리 책임자']
@@ -404,6 +414,7 @@ export default function Settings() {
   })
   const [isManagerModalOpen, setIsManagerModalOpen] = useState(false)
   const [newManager, setNewManager] = useState({ id: '', name: '', dept: '', role: '안전책임자' })
+  const [deleteManagerTarget, setDeleteManagerTarget] = useState(null)
 
   const saveManagers = (list) => {
     setManagers(list)
@@ -438,6 +449,62 @@ export default function Settings() {
 
   return (
     <div style={{ display:'flex', height:'calc(100vh - 72px)', background:C.bg, color:C.text, fontFamily:'"Pretendard",sans-serif', overflow:'hidden', position:'relative' }}>
+
+      {/* ── 교육 이력 삭제 재확인 모달 ── */}
+      {deleteEduTarget !== null && (() => {
+        const r = trainingList[deleteEduTarget]
+        const status = getStatusInfo(r?.expiry)
+        return (
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.88)', backdropFilter:'blur(12px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000 }}>
+            <div style={{ background:C.panel, border:`2px solid ${C.danger}`, borderRadius:24, padding:48, width:520, boxShadow:'0 30px 60px rgba(0,0,0,0.6)' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:10 }}>
+                <div style={{ width:48, height:48, borderRadius:14, background:`rgba(255,77,109,0.15)`, border:`1.5px solid ${C.danger}55`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <X size={26} color={C.danger} />
+                </div>
+                <div style={{ fontSize:26, fontWeight:950, color:'#fff' }}>교육 이력 삭제</div>
+              </div>
+              <div style={{ fontSize:17, color:C.sub, fontWeight:700, marginBottom:28 }}>이 교육 이력을 영구적으로 삭제합니다.</div>
+              <div style={{ background:C.panel2, border:`1px solid ${C.border}`, borderRadius:16, padding:'22px 26px', marginBottom:32 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:10 }}>
+                  <span style={{ fontSize:24, fontWeight:900, color:'#fff' }}>{r?.name}</span>
+                  <Tag color={C.dim} small style={{ fontSize:14, padding:'3px 10px', color:C.text }}>{r?.dept}</Tag>
+                  <Tag color={status.color} small>{status.label}</Tag>
+                </div>
+                <div style={{ fontSize:20, fontWeight:800, color:C.info, marginBottom:8 }}>{r?.type}</div>
+                {r?.expiry && <div style={{ fontSize:16, color:C.sub, fontWeight:700, display:'flex', alignItems:'center', gap:6 }}><Clock size={13} color={C.sub}/> 만료일 : <span style={{ color:status.color, fontWeight:900 }}>{r.expiry}</span></div>}
+              </div>
+              <div style={{ display:'flex', gap:14 }}>
+                <button onClick={()=>setDeleteEduTarget(null)} style={{ flex:1, padding:'18px', borderRadius:14, background:'rgba(255,255,255,0.04)', border:`1px solid ${C.border}`, color:C.sub, fontSize:20, fontWeight:800, cursor:'pointer' }}>취소</button>
+                <button onClick={confirmDeleteEdu} style={{ flex:2, padding:'18px', borderRadius:14, background:C.danger, border:'none', color:'#fff', fontSize:20, fontWeight:950, cursor:'pointer' }}>삭제 확인</button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* ── 관리자 삭제 재확인 모달 ── */}
+      {deleteManagerTarget && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.88)', backdropFilter:'blur(12px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:3000 }}>
+          <div style={{ background:C.panel, border:`2px solid ${C.danger}`, borderRadius:24, padding:48, width:500, boxShadow:'0 30px 60px rgba(0,0,0,0.6)' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:10 }}>
+              <div style={{ width:48, height:48, borderRadius:14, background:`rgba(255,77,109,0.15)`, border:`1.5px solid ${C.danger}55`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <X size={26} color={C.danger} />
+              </div>
+              <div style={{ fontSize:26, fontWeight:950, color:'#fff' }}>관리자 해제</div>
+            </div>
+            <div style={{ fontSize:17, color:C.sub, fontWeight:700, marginBottom:28 }}>해당 선원의 관리자 권한을 해제합니다.</div>
+            <div style={{ background:C.panel2, border:`1px solid ${C.border}`, borderRadius:16, padding:'22px 26px', marginBottom:32 }}>
+              <div style={{ fontSize:13, fontWeight:800, color:C.purple, background:`${C.purple}18`, padding:'3px 10px', borderRadius:6, border:`1px solid ${C.purple}40`, width:'fit-content', marginBottom:12 }}>{deleteManagerTarget.role}</div>
+              <div style={{ fontSize:26, fontWeight:950, color:'#fff', marginBottom:6 }}>{deleteManagerTarget.name}</div>
+              <div style={{ fontSize:18, color:C.sub, fontWeight:700 }}>{deleteManagerTarget.dept} · {deleteManagerTarget.id}</div>
+            </div>
+            <div style={{ display:'flex', gap:14 }}>
+              <button onClick={()=>setDeleteManagerTarget(null)} style={{ flex:1, padding:'18px', borderRadius:14, background:'rgba(255,255,255,0.04)', border:`1px solid ${C.border}`, color:C.sub, fontSize:20, fontWeight:800, cursor:'pointer' }}>취소</button>
+              <button onClick={() => { removeManager(deleteManagerTarget.id); setDeleteManagerTarget(null) }} style={{ flex:2, padding:'18px', borderRadius:14, background:C.danger, border:'none', color:'#fff', fontSize:20, fontWeight:950, cursor:'pointer' }}>해제 확인</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── 캘린더 모달 ── */}
       {dateEditor && (
@@ -557,22 +624,35 @@ export default function Settings() {
             </GPanel>
             <GPanel title="선원 의료 교육 이력" icon={<Users size={22} color={C.cyan}/>} right={<Btn color={C.info} small onClick={()=>setIsModalOpen(true)}>+</Btn>}>
               <div style={{ display:'flex', flexDirection:'column', gap:15 }}>
-                {trainingList.map((r,i)=>(
-                  <div key={i} style={{ padding:'20px 25px', borderRadius:18, background:C.panel2, border:`1px solid ${C.border}` }}>
-                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
-                      <div>
-                        <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:6 }}><span style={{ fontSize:26, fontWeight:900, color:'#fff' }}>{r.name}</span><Tag color={C.dim} small style={{ fontSize:15, padding:'4px 10px', color:C.text }}>{r.dept}</Tag></div>
-                        <div style={{ fontSize:22, fontWeight:850, color:C.info }}>{r.type}</div>
+                {trainingList.map((r,i)=>{
+                  const status = getStatusInfo(r.expiry)
+                  return (
+                    <div key={i} style={{ padding:'20px 25px', borderRadius:18, background:C.panel2, border:`1px solid ${C.border}` }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
+                        <div>
+                          <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:6 }}><span style={{ fontSize:26, fontWeight:900, color:'#fff' }}>{r.name}</span><Tag color={C.dim} small style={{ fontSize:15, padding:'4px 10px', color:C.text }}>{r.dept}</Tag></div>
+                          <div style={{ fontSize:22, fontWeight:850, color:C.info }}>{r.type}</div>
+                        </div>
+                        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                          <Tag color={status.color}>{status.label}</Tag>
+                          <button
+                            onClick={() => setDeleteEduTarget(i)}
+                            style={{ padding:'5px 12px', borderRadius:8, background:`rgba(255,77,109,0.12)`, border:`1px solid rgba(255,77,109,0.35)`, color:C.danger, fontSize:15, fontWeight:800, cursor:'pointer', flexShrink:0, transition:'all 0.15s' }}
+                            onMouseEnter={e => e.currentTarget.style.background='rgba(255,77,109,0.28)'}
+                            onMouseLeave={e => e.currentTarget.style.background='rgba(255,77,109,0.12)'}
+                          >
+                            삭제
+                          </button>
+                        </div>
                       </div>
-                      <Tag color={getStatusInfo(r.expiry).color}>{getStatusInfo(r.expiry).label}</Tag>
+                      {r.expiry && (
+                        <div style={{ fontSize:17, color:C.sub, fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
+                          <Clock size={14} color={C.sub}/> 만료일 : <span style={{ color: status.color, fontWeight:900 }}>{r.expiry}</span>
+                        </div>
+                      )}
                     </div>
-                    {r.expiry && (
-                      <div style={{ fontSize:17, color:C.sub, fontWeight:700, display:'flex', alignItems:'center', gap:6 }}>
-                        <Clock size={14} color={C.sub}/> 만료일 : <span style={{ color: getStatusInfo(r.expiry).color, fontWeight:900 }}>{r.expiry}</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </GPanel>
           </div>
@@ -589,10 +669,12 @@ export default function Settings() {
                   {managers.map((m, i) => (
                     <div key={m.id} style={{ background:C.panel2, border:`1.5px solid ${C.border}`, borderRadius:16, padding:'22px 20px', position:'relative', display:'flex', flexDirection:'column', gap:10 }}>
                       <button
-                        onClick={() => removeManager(m.id)}
-                        style={{ position:'absolute', top:12, right:12, background:'rgba(255,77,109,0.1)', border:'1px solid rgba(255,77,109,0.3)', borderRadius:8, width:28, height:28, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}
+                        onClick={() => setDeleteManagerTarget(m)}
+                        style={{ position:'absolute', top:12, right:12, background:'rgba(255,77,109,0.1)', border:'1px solid rgba(255,77,109,0.3)', borderRadius:8, padding:'4px 10px', color:C.danger, fontSize:14, fontWeight:800, cursor:'pointer' }}
+                        onMouseEnter={e => e.currentTarget.style.background='rgba(255,77,109,0.28)'}
+                        onMouseLeave={e => e.currentTarget.style.background='rgba(255,77,109,0.1)'}
                       >
-                        <X size={14} color={C.danger} />
+                        삭제
                       </button>
                       <div style={{ fontSize:13, fontWeight:800, color:C.purple, background:`${C.purple}18`, padding:'3px 10px', borderRadius:6, border:`1px solid ${C.purple}40`, width:'fit-content' }}>{m.role}</div>
                       <div style={{ fontSize:26, fontWeight:950, color:'#fff' }}>{m.name}</div>
