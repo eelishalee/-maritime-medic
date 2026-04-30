@@ -879,23 +879,23 @@ export default function Settings() {
               </div>
             </GPanel>
             <GPanel title="건강 위험 분포" icon={<Activity size={22} color={C.danger}/>}>
-              <div style={{ display: 'flex', alignItems: 'center', height: 250 }}>
+              <div style={{ display: 'flex', alignItems: 'center', height: 360 }}>
                 <div style={{ width: '60%', height: '100%', position: 'relative' }}>
-                  <ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={[{v:70,c:C.success},{v:20,c:C.warning},{v:10,c:C.danger}]} innerRadius={60} outerRadius={90} dataKey="v" stroke="none">{[{v:70,c:C.success},{v:20,c:C.warning},{v:10,c:C.danger}].map((e,idx)=><Cell key={idx} fill={e.c}/>)}</Pie></PieChart></ResponsiveContainer>
-                  <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', textAlign:'center' }}><div style={{ fontSize:18, color:C.sub }}>안전도</div><div style={{ fontSize:32, fontWeight:900 }}>82%</div></div>
+                  <ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={[{v:70,c:C.success},{v:20,c:C.warning},{v:10,c:C.danger}]} innerRadius={90} outerRadius={130} dataKey="v" stroke="none">{[{v:70,c:C.success},{v:20,c:C.warning},{v:10,c:C.danger}].map((e,idx)=><Cell key={idx} fill={e.c}/>)}</Pie></PieChart></ResponsiveContainer>
+                  <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', textAlign:'center' }}><div style={{ fontSize:22, color:C.sub }}>안전도</div><div style={{ fontSize:44, fontWeight:900 }}>82%</div></div>
                 </div>
-                <div style={{ width: '40%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ width: '40%', display: 'flex', flexDirection: 'column', gap: 20 }}>
                   {[
                     { label: '양호', val: 70, color: C.success },
                     { label: '주의', val: 20, color: C.warning },
                     { label: '위험', val: 10, color: C.danger }
                   ].map(d => (
-                    <div key={d.label} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <div key={d.label} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: 16, fontWeight: 800, color: d.color }}>{d.label}</span>
-                        <span style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>{d.val}%</span>
+                        <span style={{ fontSize: 20, fontWeight: 800, color: d.color }}>{d.label}</span>
+                        <span style={{ fontSize: 24, fontWeight: 900, color: '#fff' }}>{d.val}%</span>
                       </div>
-                      <div style={{ height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: 2 }}><div style={{ width: `${d.val}%`, height: '100%', background: d.color, borderRadius: 2 }} /></div>
+                      <div style={{ height: 6, background: 'rgba(255,255,255,0.05)', borderRadius: 3 }}><div style={{ width: `${d.val}%`, height: '100%', background: d.color, borderRadius: 3 }} /></div>
                     </div>
                   ))}
                 </div>
