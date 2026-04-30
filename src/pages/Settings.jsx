@@ -417,13 +417,20 @@ export default function Settings() {
   // 관리자 등록 현황
   const MANAGER_ROLES = ['안전책임자', '의료담당자', '응급처치 담당자', '위생관리 책임자']
   const [managers, setManagers] = useState(() => {
+    const defaults = [
+      { id: 'S26-001', name: '이선장', role: '안전책임자', dept: '항해부' },
+      { id: 'S26-003', name: '박기관', role: '의료담당자', dept: '기관부' },
+    ]
     try {
       const saved = localStorage.getItem('mdts_managers')
-      return saved ? JSON.parse(saved) : [
-        { id: 'S26-001', name: '이선장', role: '안전책임자', dept: '항해부' },
-        { id: 'S26-003', name: '박기관', role: '의료담당자', dept: '기관부' },
-      ]
-    } catch { return [] }
+      if (!saved) return defaults
+      const parsed = JSON.parse(saved)
+      // CREW_FALLBACK 기준으로 id/dept 보정 (stale 캐시 방지)
+      return parsed.map(m => {
+        const crew = CREW_FALLBACK.find(c => c.name === m.name)
+        return crew ? { ...m, id: crew.id, dept: crew.dept } : m
+      })
+    } catch { return defaults }
   })
   const [isManagerModalOpen, setIsManagerModalOpen] = useState(false)
   const [newManager, setNewManager] = useState({ id: '', name: '', dept: '', role: '안전책임자' })
