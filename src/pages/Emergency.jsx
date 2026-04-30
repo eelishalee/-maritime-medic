@@ -369,7 +369,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const [coldTimer, setColdTimer] = useState(900)
   const [isColdTimerActive, setIsColdTimerActive] = useState(false)
   const [washTimer, setWashTimer] = useState(300)
-  const [imgLoaded, setImgLoaded] = useState(false)
   const [isWashTimerActive, setIsWashTimerActive] = useState(false)
 
   useEffect(() => {
@@ -407,7 +406,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
 
   const stepNum = activeDisplayIndex + 1
 
-  useEffect(() => { setImgLoaded(false) }, [activeAction, activeDisplayIndex])
 
   if (triageStep === 'CHECK') {
     const triageData = [
@@ -539,7 +537,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                 <img
                   key={`${activeAction}-${activeDisplayIndex}`}
                   src={currentActionData.steps[activeDisplayIndex].stepImage}
-                  onLoad={() => setImgLoaded(true)}
                   style={{
                     position: 'absolute', inset: 0,
                     width: '100%', height: '100%',
