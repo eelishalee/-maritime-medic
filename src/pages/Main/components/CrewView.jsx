@@ -1,9 +1,19 @@
+import { useState } from 'react'
 import { Search, Plus, Edit3, Trash2 } from 'lucide-react'
 
 export default function CrewView({ 
   crewList, crewSearch, setCrewSearch, crewRoleTab, setCrewRoleTab, roles, 
   filteredCrew, activePatient, switchPatient, setShowModal 
 }) {
+  const [imgErrors, setImgErrors] = useState(new Set())
+  const handleImageError = (id) => {
+    setImgErrors(prev => {
+      const next = new Set(prev)
+      next.add(id)
+      return next
+    })
+  }
+
   return (
     <div style={{ flex: 1, padding: 45, overflowY: 'auto', background: '#05070a' }}>
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
@@ -40,10 +50,10 @@ export default function CrewView({
                   <td style={{ padding: '28px 32px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                       <div style={{ width: 56, height: 56, borderRadius: 16, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {c.avatar ? (
-                          <img src={c.avatar} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        {c.avatar && !imgErrors.has(c.id) ? (
+                          <img src={c.avatar} onError={() => handleImageError(c.id)} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
-                          <div style={{ color: '#38bdf8', fontWeight: 900 }}>{c.name[0]}</div>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: '#475569', textAlign: 'center' }}>이미지 로드 중</div>
                         )}
                       </div>
                       <div>

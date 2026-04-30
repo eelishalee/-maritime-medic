@@ -85,13 +85,22 @@ export default function CrewManagement({ onSelectPatient }) {
     setDateEditor(null)
   }
 
+  const [imgErrors, setImgErrors] = useState(new Set())
+  const handleImageError = (id) => {
+    setImgErrors(prev => {
+      const next = new Set(prev)
+      next.add(id)
+      return next
+    })
+  }
+
   const handleAddCrew = (e) => {
     e.preventDefault()
     if (!newCrew.name.trim()) { showAlert('이름을 입력하세요.', '입력 오류', 'warning'); return }
     if (!newCrew.role.trim()) { showAlert('직책을 입력하세요.', '입력 오류', 'warning'); return }
     if (!newCrew.dept.trim()) { showAlert('부서를 선택하세요.', '입력 오류', 'warning'); return }
     const id = `S26-${String(crew.length + 1).padStart(3, '0')}`
-    const finalAvatar = newCrew.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(newCrew.name)}&background=random&color=fff&size=200`
+    const finalAvatar = newCrew.avatar || null
     const entry = { ...newCrew, id, avatar: finalAvatar, age: Number(newCrew.age), isEmergency: false }
     saveCrew([...crew, entry])
     setIsAdding(false)
@@ -212,8 +221,12 @@ export default function CrewManagement({ onSelectPatient }) {
               <tr key={c.id} style={{ transition: '0.2s' }} className="crew-card-row">
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px 0 0 20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-                    <div style={{ width: 64, height: 80, borderRadius: '12px', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', background: '#0a1628' }}>
-                      <img src={c.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={c.name} />
+                    <div style={{ width: 64, height: 80, borderRadius: '12px', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', background: '#0a1628', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {!imgErrors.has(c.id) ? (
+                        <img src={c.avatar} onError={() => handleImageError(c.id)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={c.name} />
+                      ) : (
+                        <div style={{ fontSize: 10, fontWeight: 800, color: '#475569', textAlign: 'center' }}>이미지 로드 중</div>
+                      )}
                     </div>
                     <div style={{ textAlign: 'left', minWidth: '120px' }}>
                       <div style={{ fontSize: '25px', fontWeight: 950, color: '#fff' }}>{c.name}</div>
@@ -337,8 +350,12 @@ export default function CrewManagement({ onSelectPatient }) {
                   <div style={{ fontSize: 28, fontWeight: 950, color: '#fff' }}>선원 삭제 확인</div>
                   <div style={{ fontSize: 17, color: '#64748b', fontWeight: 700, textAlign: 'center', lineHeight: 1.7 }}>아래 선원을 명부에서 영구 삭제합니다.<br/>이 작업은 되돌릴 수 없습니다.</div>
                   <div style={{ background: 'rgba(255,77,109,0.06)', border: '1.5px solid rgba(255,77,109,0.2)', borderRadius: 20, padding: '24px 40px', display: 'flex', alignItems: 'center', gap: 24 }}>
-                    <div style={{ width: 72, height: 90, borderRadius: 12, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
-                      <img src={manageTarget.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={manageTarget.name}/>
+                    <div style={{ width: 72, height: 90, borderRadius: 12, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a1628' }}>
+                      {!imgErrors.has(manageTarget.id) ? (
+                        <img src={manageTarget.avatar} onError={() => handleImageError(manageTarget.id)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={manageTarget.name}/>
+                      ) : (
+                        <div style={{ fontSize: 10, fontWeight: 800, color: '#475569', textAlign: 'center' }}>이미지 로드 중</div>
+                      )}
                     </div>
                     <div>
                       <div style={{ fontSize: 26, fontWeight: 950, color: '#fff', marginBottom: 4 }}>{manageTarget.name}</div>
@@ -356,8 +373,12 @@ export default function CrewManagement({ onSelectPatient }) {
                 <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px 0' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 32 }}>
                     <div style={{ position: 'relative', flexShrink: 0, width: 80, height: 100 }}>
-                      <div style={{ width: 80, height: 100, borderRadius: 14, overflow: 'hidden', border: '2px solid rgba(56,189,248,0.3)' }}>
-                        <img src={manageTarget.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={manageTarget.name}/>
+                      <div style={{ width: 80, height: 100, borderRadius: 14, overflow: 'hidden', border: '2px solid rgba(56,189,248,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a1224' }}>
+                        {!imgErrors.has(manageTarget.id) ? (
+                          <img src={manageTarget.avatar} onError={() => handleImageError(manageTarget.id)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={manageTarget.name}/>
+                        ) : (
+                          <div style={{ fontSize: 10, fontWeight: 800, color: '#475569', textAlign: 'center' }}>이미지 로드 중</div>
+                        )}
                       </div>
                       <button
                         type="button"
@@ -482,7 +503,7 @@ export default function CrewManagement({ onSelectPatient }) {
                     style={{ width: 120, height: 150, borderRadius: 16, background: 'rgba(255,255,255,0.02)', border: '2px dashed rgba(13,217,197,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', position: 'relative', transition: '0.2s' }}
                   >
                     {newCrew.avatar ? (
-                      <img src={newCrew.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={newCrew.avatar} onError={() => setNewCrew(p => ({ ...p, avatar: null }))} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <>
                         <Camera size={32} color="#0dd9c5" style={{ marginBottom: 8 }} />

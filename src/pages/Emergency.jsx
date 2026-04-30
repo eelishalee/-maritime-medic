@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Brain, Heart, Zap, Shield, Cpu, AlertCircle, Wind, Clock, Video, Pill, History, User, Info, Activity, Scissors, Plus, Thermometer, Mic, X, ChevronRight, HeartPulse, ChevronLeft, CheckCircle2, AlertTriangle, ArrowDown, FileText, Ruler, Droplets, MapPin, Phone, Upload, Camera, Edit3, Bone, Flame, RefreshCw, Send, Check, LayoutDashboard, AlertOctagon } from 'lucide-react'
+import { Brain, Heart, Zap, Shield, ShieldAlert, Cpu, AlertCircle, Wind, Clock, Video, Pill, History, User, Info, Activity, Scissors, Plus, Thermometer, Mic, X, ChevronRight, HeartPulse, ChevronLeft, CheckCircle2, AlertTriangle, ArrowDown, FileText, Ruler, Droplets, MapPin, Phone, Upload, Camera, Edit3, Bone, Flame, RefreshCw, Send, Check, LayoutDashboard, AlertOctagon } from 'lucide-react'
 import { useAlert } from '../utils/AlertContext'
 import { CardiacIllustration, TraumaIllustration, UnconsciousIllustration, RespiratoryIllustration } from '../components/EmergencyIllustrations'
 import CameraModal from '../components/CameraModal'
@@ -176,6 +176,9 @@ const FOLLOWUP_GUIDES = {
 
 export default function Emergency({ patient, initialAction, onNavigate }) {
   const { showAlert } = useAlert()
+  const [imgError, setImgError] = useState(false)
+  const [selectedTriage, setSelectedTriage] = useState(null)
+  
   const [triageStep, setTriageStep] = useState(() => {
     if (initialAction) {
       const mapping = {
@@ -204,7 +207,38 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     return null
   })
 
-  const [selectedTriage, setSelectedTriage] = useState(null)
+  const [goldenTime, setGoldenTime] = useState(300) // 5분 골든타임
+  const [isGoldenTimeActive, setIsGoldenTimeActive] = useState(false)
+
+  // 환자 변경 시 이미지 에러 상태 초기화
+  useEffect(() => {
+    if (imgError) setImgError(false)
+  }, [patient])
+
+  useEffect(() => {
+    let interval;
+    if (activeAction && isGoldenTimeActive && goldenTime > 0) {
+      interval = setInterval(() => setGoldenTime(prev => prev - 1), 1000)
+    }
+    return () => clearInterval(interval)
+  }, [activeAction, isGoldenTimeActive, goldenTime])
+
+  useEffect(() => {
+    if (activeAction && !isGoldenTimeActive) setIsGoldenTimeActive(true)
+  }, [activeAction, isGoldenTimeActive])
+
+  const getGoldenTimeColor = () => {
+    if (goldenTime > 180) return '#22c55e'
+    if (goldenTime > 60) return '#f59e0b'
+    return '#ef4444'
+  }
+
+  const formatGoldenTime = (sec) => {
+    const m = Math.floor(sec / 60)
+    const s = sec % 60
+    return `${m}:${String(s).padStart(2, '0')}`
+  }
+
   const [completedSteps, setCompletedSteps] = useState([])
   const [selectedStepIndex, setSelectedStepIndex] = useState(null)
   const SESSION_KEY = `emergency_logs_${patient?.id || 'unknown'}`
@@ -221,13 +255,13 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const [bpm] = useState(120)
   const [beat, setBeat] = useState(false)
   
-  const [vitals, setVitals] = useState({ 
-    hr: 96, 
-    spo2: '94.2', 
-    bp: '158/95', 
-    temp: '37.6', 
-    rr: 24 
-  })
+  const [vitals, setVitals] = useState(() => ({ 
+    hr: patient?.hr || patient?.vitals?.hr || 96, 
+    spo2: patient?.spo2 || patient?.vitals?.spo2 || '94.2', 
+    bp: patient?.bp || patient?.vitals?.bp || '158/95', 
+    temp: patient?.temp || patient?.vitals?.temp || '37.6', 
+    rr: patient?.rr || patient?.vitals?.rr || 24 
+  }))
 
   const [editTarget, setEditTarget] = useState(null)
   const [inputValue, setInputValue] = useState('')
@@ -328,23 +362,37 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     // 마지막 클릭한 번호 고정
     setSelectedStepIndex(index)
 
-    if (activeAction === '화상' && index === 0) {
-      setIsBurnTimerActive(true)
-    }
-    if (activeAction === '골절 / 탈구' && index === 2) {
-      setColdTimer(900)
-      setIsColdTimerActive(true)
-    }
-    if (activeAction === '상처 세척' && index === 0) {
-      setWashTimer(300)
-      setIsWashTimerActive(true)
-    }
+    if (!isDone) {
+      if (activeAction === '화상' && index === 0) {
+        setIsBurnTimerActive(true)
+      }
+      if (activeAction === '골절 / 탈구' && index === 2) {
+        setColdTimer(1200) // 15분(900)에서 20분(1200)으로 변경
+        setIsColdTimerActive(true)
+      }
+      if (activeAction === '상처 세척' && index === 0) {
+        setWashTimer(300)
+        setIsWashTimerActive(true)
+      }
 
-    if (activeAction && ACTION_GUIDES[activeAction] && !isDone) {
-      const stepTitle = ACTION_GUIDES[activeAction].steps[index].title
-      setSessionLogs([{ time: now, text: `${stepTitle} 완료`, type: 'SUCCESS' }, ...sessionLogs])
-      setCompletedSteps([...completedSteps, index])
-      setShowCompletionPanel(true)
+      if (activeAction && ACTION_GUIDES[activeAction]) {
+        const stepTitle = ACTION_GUIDES[activeAction].steps[index].title
+        setSessionLogs([{ time: now, text: `${stepTitle} 완료`, type: 'SUCCESS' }, ...sessionLogs])
+        setCompletedSteps([...completedSteps, index])
+        setShowCompletionPanel(true)
+      }
+    } else {
+      // 이미 완료된 단계인 경우 취소 처리 (Task 3-4)
+      if (activeAction && ACTION_GUIDES[activeAction]) {
+        const stepTitle = ACTION_GUIDES[activeAction].steps[index].title
+        setSessionLogs([{ time: now, text: `${stepTitle} 완료 취소`, type: 'INFO' }, ...sessionLogs])
+        setCompletedSteps(completedSteps.filter(i => i !== index))
+        
+        // 타이머 중지 로직 (선택 사항)
+        if (activeAction === '화상' && index === 0) setIsBurnTimerActive(false)
+        if (activeAction === '골절 / 탈구' && index === 2) setIsColdTimerActive(false)
+        if (activeAction === '상처 세척' && index === 0) setIsWashTimerActive(false)
+      }
     }
   }
 
@@ -400,6 +448,11 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   }
 
   const [hoveredAction, setHoveredAction] = useState(null)
+  const [gcs, setGcs] = useState({ e: 4, v: 5, m: 6 })
+
+  const updateGCS = (key, val) => {
+    setGcs(prev => ({ ...prev, [key]: val }))
+  }
 
   const currentActionData = activeAction ? ACTION_GUIDES[activeAction] : null
 
@@ -416,11 +469,10 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const displayImageIndex = hoveredAction && hoveredAction !== activeAction ? 0 : activeDisplayIndex
   const displayStepImage = displayActionData?.steps[displayImageIndex]?.stepImage
 
-
   if (triageStep === 'CHECK') {
     const triageData = [
       { label: '눈을 뜨고 말을 하나요?', desc: '정상 의식', sub: '일반적인 대화 가능', action: '상처 세척', color: '#2dd4bf', icon: <CheckCircle2 size={32}/> },
-      { label: '부르면 대답을 하나요?', desc: '언어 반응', sub: '부르는 소리에 반응', action: '기도 확보', color: '#fb923c', icon: <Mic size={32}/> },
+      { label: '부르면 대답을 하나요?', desc: '언어 반응', sub: '부르는 소리에 반응', action: '지혈/압박', color: '#fb923c', icon: <Mic size={32}/> },
       { label: '꼬집을 때만 반응하나요?', desc: '통증 반응', sub: '강한 자극에만 반응', action: '기도 확보', color: '#fb923c', icon: <Zap size={32}/> },
       { label: '전혀 반응이 없나요?', desc: '무반응 (긴급)', sub: '의식 및 반응 없음', action: '심폐소생술', color: '#f43f5e', icon: <AlertOctagon size={32}/> },
     ]
@@ -438,30 +490,53 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 1140, width: '100%', position: 'relative', zIndex: 10 }}>
-          {triageData.map((t, i) => (
-            <button
-              key={i}
-              onClick={() => handleTriageSelect(t)}
-              onMouseEnter={() => {
-                const guide = ACTION_GUIDES[t.action]
-                if (guide) guide.steps.forEach(s => { if (s.stepImage) { const img = new window.Image(); img.src = s.stepImage } })
-              }}
-              style={{ 
-                background: 'rgba(30, 41, 59, 0.4)', backdropFilter: 'blur(12px)', border: '2px solid rgba(255,255,255,0.08)', borderRadius: 32, padding: '32px 32px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: 24, boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-              }} 
-              className="triage-btn"
-            >
-              <div style={{ width: 72, height: 72, borderRadius: 22, background: `${t.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.color, border: `2.5px solid ${t.color}40`, flexShrink: 0, boxShadow: `0 0 20px ${t.color}15` }}>{t.icon}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 21, fontWeight: 900, color: t.color, letterSpacing: '1.5px', marginBottom: 6, opacity: 0.9, whiteSpace: 'nowrap' }}>{t.sub}</div>
-                <div style={{ fontSize: 26, fontWeight: 950, color: '#fff', marginBottom: 4, letterSpacing: '-0.5px', whiteSpace: 'nowrap' }}>{t.label}</div>
-                <div style={{ fontSize: 20, color: '#94a3b8', fontWeight: 700, whiteSpace: 'nowrap' }}>{t.desc}</div>
+        <div style={{ display: 'flex', gap: 24, maxWidth: 1280, width: '100%', position: 'relative', zIndex: 10, alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, flex: 1 }}>
+            {triageData.map((t, i) => (
+              <button
+                key={i}
+                onClick={() => handleTriageSelect(t)}
+                onMouseEnter={() => {
+                  const guide = ACTION_GUIDES[t.action]
+                  if (guide) guide.steps.forEach(s => { if (s.stepImage) { const img = new window.Image(); img.src = s.stepImage } })
+                }}
+                style={{ 
+                  background: 'rgba(30, 41, 59, 0.4)', backdropFilter: 'blur(12px)', border: '2px solid rgba(255,255,255,0.08)', borderRadius: 32, padding: '32px 32px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: 24, boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+                }} 
+                className="triage-btn"
+              >
+                <div style={{ width: 72, height: 72, borderRadius: 22, background: `${t.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.color, border: `2.5px solid ${t.color}40`, flexShrink: 0, boxShadow: `0 0 20px ${t.color}15` }}>{t.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 21, fontWeight: 900, color: t.color, letterSpacing: '1.5px', marginBottom: 6, opacity: 0.9, whiteSpace: 'nowrap' }}>{t.sub}</div>
+                  <div style={{ fontSize: 26, fontWeight: 950, color: '#fff', marginBottom: 4, letterSpacing: '-0.5px', whiteSpace: 'nowrap' }}>{t.label}</div>
+                  <div style={{ fontSize: 20, color: '#94a3b8', fontWeight: 700, whiteSpace: 'nowrap' }}>{t.desc}</div>
+                </div>
+                <ChevronRight size={32} color="#1e293b" style={{ opacity: 0.5, flexShrink: 0 }} />
+                <div className="btn-glow" style={{ position: 'absolute', inset: 0, background: `linear-gradient(135deg, ${t.color}15, transparent)`, opacity: 0, transition: '0.3s' }} />
+              </button>
+            ))}
+          </div>
+
+          <div style={{ width: 340, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(20px)', borderRadius: 32, border: '2px solid rgba(56,189,248,0.2)', padding: 24, boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+              <Brain size={24} color="#38bdf8" />
+              <div style={{ fontSize: 18, fontWeight: 950, color: '#fff', letterSpacing: '-0.5px' }}>의식 수준 평가지표 (GCS)</div>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <GCSSelector label="E (개안 반응)" value={gcs.e} max={4} onChange={v => updateGCS('e', v)} color="#38bdf8" />
+              <GCSSelector label="V (언어 반응)" value={gcs.v} max={5} onChange={v => updateGCS('v', v)} color="#2dd4bf" />
+              <GCSSelector label="M (운동 반응)" value={gcs.m} max={6} onChange={v => updateGCS('m', v)} color="#fb923c" />
+            </div>
+
+            <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#94a3b8', marginBottom: 8 }}>GCS TOTAL SCORE</div>
+              <div style={{ fontSize: 56, fontWeight: 950, color: gcs.e+gcs.v+gcs.m <= 8 ? '#f43f5e' : '#fff', lineHeight: 1 }}>{gcs.e+gcs.v+gcs.m}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: gcs.e+gcs.v+gcs.m <= 8 ? '#f43f5e' : '#38bdf8', marginTop: 10 }}>
+                {gcs.e+gcs.v+gcs.m <= 8 ? '혼수 (Coma)' : gcs.e+gcs.v+gcs.m <= 12 ? '중등도 저하' : '정상/경미'}
               </div>
-              <ChevronRight size={32} color="#1e293b" style={{ opacity: 0.5, flexShrink: 0 }} />
-              <div className="btn-glow" style={{ position: 'absolute', inset: 0, background: `linear-gradient(135deg, ${t.color}15, transparent)`, opacity: 0, transition: '0.3s' }} />
-            </button>
-          ))}
+            </div>
+          </div>
         </div>
         <style>{`
           .triage-btn:hover { background: rgba(255,255,255,0.05) !important; transform: translateY(-8px) scale(1.02); border-color: rgba(255,255,255,0.2) !important; boxShadow: 0 20px 40px rgba(0,0,0,0.4); }
@@ -721,7 +796,12 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         </section>
         <section style={{ gridRow: '1', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
           {activeAction ? (
-            <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', padding: '24px' }}>
+            <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', padding: '24px', position: 'relative' }}>
+              {/* Golden Time Bar (Task 3-2) */}
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: '24px 24px 0 0', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${(goldenTime / 300) * 100}%`, background: getGoldenTimeColor(), transition: 'all 1s linear', boxShadow: `0 0 10px ${getGoldenTimeColor()}` }} />
+              </div>
+              
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8 }}>
@@ -730,7 +810,36 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                   </div>
                   <h2 style={{ fontSize: 52, fontWeight: 950, letterSpacing: '-2px', margin: 0 }}>{currentActionData.title}</h2>
                 </div>
+                {/* Golden Time Countdown Text */}
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 13, fontWeight: 900, color: getGoldenTimeColor(), letterSpacing: '1px', marginBottom: 4 }}>GOLDEN TIME</div>
+                  <div style={{ fontSize: 36, fontWeight: 950, color: '#fff', fontFamily: 'monospace', lineHeight: 1 }}>{formatGoldenTime(goldenTime)}</div>
+                </div>
               </div>
+
+              {/* 알레르기 경고 배너 (Task 3-1) */}
+              {patient?.allergies && patient.allergies !== '없음' && (activeAction === '심폐소생술' || activeAction === '심근경색') && (
+                <div style={{ 
+                  background: 'rgba(239,68,68,0.15)', 
+                  border: '2px solid #ef4444', 
+                  borderRadius: 20, 
+                  padding: '16px 20px', 
+                  marginBottom: 20,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  animation: 'pulse-alert-border 1.5s infinite'
+                }}>
+                  <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <ShieldAlert size={28} color="#fff" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 18, fontWeight: 950, color: '#ef4444', marginBottom: 2 }}>투약 알레르기 경고</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>환자에게 <span style={{ color: '#ef4444', textDecoration: 'underline' }}>{patient.allergies}</span> 알레르기가 있습니다. 관련 약물(아스피린 등) 투여 시 각별히 주의하십시오.</div>
+                  </div>
+                </div>
+              )}
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 24 }}>
                 <div style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 20, padding: 18 }}><div style={{ color: '#22c55e', fontSize: 20, fontWeight: 900, marginBottom: 10 }}>권고 사항</div>{currentActionData.dos.map((d, i) => <div key={i} style={{ fontSize: 20, fontWeight: 700, marginBottom: 6, color: '#e2e8f0', display: 'flex', gap: '8px' }}><span style={{ flexShrink: 0 }}>•</span><span>{d}</span></div>)}</div>
                 <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444', borderRadius: 20, padding: 18 }}><div style={{ color: '#ef4444', fontSize: 20, fontWeight: 900, marginBottom: 10 }}>절대 금기</div>{currentActionData.donts.map((d, i) => <div key={i} style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginBottom: 6, display: 'flex', gap: '8px' }}><span style={{ flexShrink: 0 }}>•</span><span>{d}</span></div>)}</div>
@@ -765,7 +874,18 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         <aside style={{ gridRow: '1', display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0, overflow: 'hidden' }}>
           {/* Patient Profile - Top Priority Anchor */}
           <div style={{ padding: '16px 20px', background: 'rgba(255,255,255,0.03)', border: '1.5px solid rgba(255,255,255,0.08)', borderRadius: 24, display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ width: 60, height: 60, borderRadius: 16, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.1)', flexShrink: 0 }}><img src={patient?.avatar || 'CE.jpeg'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
+            <div style={{ width: 60, height: 60, borderRadius: 16, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.1)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1e293b' }}>
+              {!imgError ? (
+                <img 
+                  src={patient?.avatar || 'CE.jpeg'} 
+                  onError={() => setImgError(true)} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  alt="Avatar"
+                />
+              ) : (
+                <div style={{ fontSize: 10, fontWeight: 800, color: '#475569', textAlign: 'center' }}>이미지<br/>로드 중</div>
+              )}
+            </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}><div style={{ fontSize: 24, fontWeight: 950, color: '#fff' }}>{patient?.name}</div><div style={{ fontSize: 15, color: '#38bdf8', fontWeight: 800 }}>{patient?.role}</div></div>
               <div style={{ fontSize: 13, color: '#64748b', fontWeight: 700 }}>ID : {patient?.id}</div>
@@ -938,6 +1058,33 @@ function ActionButtonIcon({ label, size = 24 }) {
   if (label === '상처 세척') return <Scissors size={size} />
   if (label === '화상') return <Flame size={size} />
   return <Info size={size} />
+}
+
+function GCSSelector({ label, value, max, onChange, color }) {
+  return (
+    <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: '12px 16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+      <div style={{ fontSize: 13, fontWeight: 800, color: '#94a3b8', marginBottom: 10, display: 'flex', justifyContent: 'space-between' }}>
+        <span>{label}</span>
+        <span style={{ color, fontWeight: 950 }}>SCORE : {value}</span>
+      </div>
+      <div style={{ display: 'flex', gap: 6 }}>
+        {[...Array(max)].map((_, i) => (
+          <button
+            key={i}
+            onClick={() => onChange(i + 1)}
+            style={{
+              flex: 1, height: 32, borderRadius: 8, border: 'none',
+              background: value === (i + 1) ? color : 'rgba(255,255,255,0.08)',
+              color: value === (i + 1) ? '#000' : '#64748b',
+              fontSize: 14, fontWeight: 900, cursor: 'pointer', transition: '0.2s'
+            }}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 function IllustrationSelector({ action, step }) {

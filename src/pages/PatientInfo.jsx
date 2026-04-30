@@ -59,6 +59,13 @@ function NoteModal({ onSave, onClose }) {
 
 export default function PatientInfo({ patient }) {
   const {hr,hist} = useVitals(patient.hr||84)
+  const [imgError, setImgError] = useState(false)
+  
+  // 환자 변경 시 이미지 에러 상태 초기화
+  useEffect(() => {
+    setImgError(false)
+  }, [patient])
+
   const [bp,  setBp]  = useState(patient.bp   || '158/95')
   const [bt,  setBt]  = useState(String(patient.temp || '37.6'))
   const [spo2]        = useState(patient.spo2 || 94)
@@ -107,8 +114,12 @@ export default function PatientInfo({ patient }) {
         {/* 프로필 카드 */}
         <div style={{ background:'linear-gradient(135deg,rgba(13,217,197,0.11),rgba(13,217,197,0.02))', border:'1.5px solid rgba(13,217,197,0.26)', borderRadius:16, padding:'16px' }}>
           <div style={{ display:'flex', gap:12, alignItems:'center', marginBottom:13 }}>
-            <div style={{ width:56, height:56, borderRadius:13, border:'2px solid #0dd9c5', overflow:'hidden', boxShadow:'0 0 14px rgba(13,217,197,0.2)', flexShrink:0 }}>
-              <img src={patient.avatar} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+            <div style={{ width:56, height:56, borderRadius:13, border:'2px solid #0dd9c5', overflow:'hidden', boxShadow:'0 0 14px rgba(13,217,197,0.2)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', background:'#0a1628' }}>
+              {!imgError ? (
+                <img src={patient.avatar} onError={() => setImgError(true)} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+              ) : (
+                <div style={{ fontSize:8, fontWeight:800, color:'#475569', textAlign:'center' }}>이미지<br/>로드 중</div>
+              )}
             </div>
             <div>
               <div style={{ fontSize:17, fontWeight:900, color:'#fff' }}>{patient.name}</div>

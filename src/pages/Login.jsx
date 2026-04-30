@@ -142,7 +142,7 @@ function StatItem({ val, label }) {
   return (
     <div>
       <div style={{ fontSize: '28px', fontWeight: '950', color: '#fff', lineHeight: '1', letterSpacing: '-0.5px' }}>{val}</div>
-      <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.4)', marginTop: '4px', fontWeight: '700' }}>{label}</div>
+      <div style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.4)', marginTop: '4px', fontWeight: '400' }}>{label}</div>
     </div>
   )
 }

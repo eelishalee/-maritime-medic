@@ -392,6 +392,20 @@ function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals, dynamicDiagnoses
   const diag = diagList[safeIdx]
   const riskColor = riskScore >= 70 ? '#ff4d6d' : riskScore >= 40 ? '#ff9f43' : '#26de81'
 
+  // 실데이터 기반 가상 트렌드 생성 (Task 3-5)
+  const currentHr = VITALS.find(v => v.label === '심박수')?.value || 96
+  const currentBp = VITALS.find(v => v.label === '수축기 혈압')?.value || 158
+  
+  const dynamicTrend = [
+    { t: '08:00', hr: currentHr - 18, bp: currentBp - 16 },
+    { t: '08:15', hr: currentHr - 16, bp: currentBp - 13 },
+    { t: '08:30', hr: currentHr - 14, bp: currentBp - 10 },
+    { t: '08:45', hr: currentHr - 11, bp: currentBp - 8 },
+    { t: '09:00', hr: currentHr - 7, bp: currentBp - 5 },
+    { t: '09:15', hr: currentHr - 3, bp: currentBp - 2 },
+    { t: '09:30', hr: currentHr, bp: currentBp },
+  ]
+
   return (
     <div style={{
       display: 'grid',
@@ -580,7 +594,7 @@ function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals, dynamicDiagnoses
       <Card color="#4fc3f7" scanLines style={{ gridColumn: '1/4', padding: '14px' }}>
         <HudLabel color="#4fc3f7">바이탈 추이 — 최근 90분</HudLabel>
         <ResponsiveContainer width="100%" height={130}>
-          <AreaChart data={TREND} margin={{ top: 4, right: 10, bottom: 0, left: -14 }}>
+          <AreaChart data={dynamicTrend} margin={{ top: 4, right: 10, bottom: 0, left: -14 }}>
             <defs>
               <linearGradient id="hrGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%"  stopColor="#ff4d6d" stopOpacity={0.3} />
@@ -592,8 +606,8 @@ function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals, dynamicDiagnoses
               </linearGradient>
             </defs>
             <XAxis dataKey="t" tick={{ fill: '#4a6080', fontSize: 10 }} axisLine={false} tickLine={false} />
-            <YAxis yAxisId="hr" domain={[60, 120]}  tick={{ fill: '#4a6080', fontSize: 10 }} axisLine={false} tickLine={false} width={26} />
-            <YAxis yAxisId="bp" orientation="right" domain={[120, 180]} tick={{ fill: '#4a6080', fontSize: 10 }} axisLine={false} tickLine={false} width={28} />
+            <YAxis yAxisId="hr" domain={[Math.max(0, currentHr - 40), currentHr + 20]}  tick={{ fill: '#4a6080', fontSize: 10 }} axisLine={false} tickLine={false} width={26} />
+            <YAxis yAxisId="bp" orientation="right" domain={[Math.max(0, currentBp - 40), currentBp + 20]} tick={{ fill: '#4a6080', fontSize: 10 }} axisLine={false} tickLine={false} width={28} />
             <Tooltip contentStyle={{ background: '#06090f', border: '1px solid rgba(13,217,197,0.25)', borderRadius: 8, fontSize: 11 }} labelStyle={{ color: '#8da2c0' }} />
             <Area yAxisId="hr" type="monotone" dataKey="hr" stroke="#ff4d6d" strokeWidth={2} fill="url(#hrGrad)" name="심박수" dot={{ r: 3, fill: '#ff4d6d', strokeWidth: 0 }} />
             <Area yAxisId="bp" type="monotone" dataKey="bp" stroke="#ff9f43" strokeWidth={2} fill="url(#bpGrad)" name="수축기혈압" dot={{ r: 3, fill: '#ff9f43', strokeWidth: 0 }} />
@@ -605,9 +619,12 @@ function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals, dynamicDiagnoses
         </div>
       </Card>
 
-      {/* ── Row 5: AI Verdict (full width) ── */}
-      <Card color="#0dd9c5" glow style={{ gridColumn: '1/4', padding: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+      {/* AI 최종 종합 판정 (full width) */}
+      <Card color="#0dd9c5" glow style={{ gridColumn: '1/4', padding: '14px', position: 'relative', overflow: 'hidden' }}>
+        {/* Scanning line animation */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, transparent, #0dd9c5, transparent)', animation: 'hudScan 3s linear infinite', zIndex: 10 }} />
+        
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, position: 'relative', zIndex: 5 }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10, flexShrink: 0,
             background: 'rgba(13,217,197,0.12)', border: '1px solid rgba(13,217,197,0.3)',
@@ -618,19 +635,28 @@ function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals, dynamicDiagnoses
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <span style={{ fontSize: 11, fontWeight: 900, color: '#0dd9c5', letterSpacing: '2px', textTransform: 'uppercase' }}>
-                AI 최종 종합 판정
+                AI 최종 종합 판정 및 리스크 분석
               </span>
               <StatusDot color="#0dd9c5" />
             </div>
             <p style={{ fontSize: 13, color: '#dde9ff', lineHeight: 1.75, fontWeight: 500, margin: 0 }}>
-              현재 위험도 <span style={{ color: '#ff4d6d', fontWeight: 900 }}>극심 (72/100)</span> 단계.
-              다수의 바이탈 지표가 급성 관상동맥 증후군 가능성을 강하게 가리킵니다.
-              즉각적인 응급 처치 개시를 강력 권고합니다.
+              현재 위험 지수 <span style={{ color: riskColor, fontWeight: 900 }}>{riskScore >= 70 ? 'CRITICAL' : riskScore >= 40 ? 'WARNING' : 'STABLE'} ({riskScore}/100)</span>.
+              {riskScore >= 70 
+                ? ' 실시간 바이탈 분석 결과, 다수의 급성 위기 지표가 감지되었습니다. 즉각적인 SOP 가동과 육상 의료진 지원 요청을 강력히 권고합니다.' 
+                : ' 지표가 변동성을 보이고 있으나 즉각적인 생명 위협 단계는 아닙니다. 5분 단위 바이탈 재측정과 추이 관찰이 필요합니다.'}
             </p>
           </div>
         </div>
       </Card>
 
+      <style>{`
+        @keyframes hudScan {
+          0% { top: -2px; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+      `}</style>
     </div>
   )
 }

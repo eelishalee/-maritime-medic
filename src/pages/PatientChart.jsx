@@ -13,6 +13,12 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
   const { showAlert, showConfirm } = useAlert()
   const [selectedId, setSelectedId] = useState(initialPatient?.id)
   const [patient, setPatient] = useState(initialPatient)
+  const [imgError, setImgError] = useState(false)
+  
+  // 환자 변경 시 이미지 에러 상태 초기화
+  useEffect(() => {
+    setImgError(false)
+  }, [patient])
   
   // ─── 상태 선언 (useEffect 보다 위로 이동하여 호이스팅 문제 해결) ───
   const [vitals, setVitals] = useState({ hr: '-', spo2: '-', temp: '-', bp: '-', rr: '-' })
@@ -431,15 +437,16 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
           <div style={{ flexShrink: 0, padding: '24px 28px 20px 28px', borderBottom: '1px solid rgba(56,189,248,0.1)', background: 'rgba(56,189,248,0.03)' }}>
             <div style={{ display: 'flex', gap: 24, marginBottom: 24 }}>
               <div style={{ width: 110, height: 110, borderRadius: 24, background: '#1e293b', border: '3px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
-                <img 
-                  src={patient?.avatar || '/CE.jpeg'} 
-                  onError={(e) => {
-                    e.target.onerror = null; 
-                    e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(patient?.name || 'User') + '&background=0ea5e9&color=fff&size=128';
-                  }}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                  alt="Patient Profile"
-                />
+                {!imgError ? (
+                  <img 
+                    src={patient?.avatar || '/CE.jpeg'} 
+                    onError={() => setImgError(true)}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    alt="Patient Profile"
+                  />
+                ) : (
+                  <div style={{ fontSize: 14, fontWeight: 800, color: '#475569', textAlign: 'center' }}>이미지 로드 중</div>
+                )}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 6 }}>

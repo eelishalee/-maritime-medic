@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Activity, History, RotateCcw, Droplets, Upload, AlertTriangle, Camera, Mic, User, Pill, AlertCircle, MapPin, Phone, Anchor, Weight, Ruler, HeartPulse, Paperclip, ArrowUp, Sparkles, CheckCircle2, Clock, Database, ChevronRight, ChevronDown, Info, ShieldCheck, Zap, Crosshair, Eye, Maximize, Thermometer, Wind } from 'lucide-react'
-import { DashboardVital, InfoItem, TimelineItem, IdPhoto } from '../../../components/ui'
+import { DashboardVital, InfoItem, TimelineItem } from '../../../components/ui'
 import EmergencyGuide from './EmergencyGuide.jsx'
 
 export default function DashboardView({
@@ -353,7 +353,7 @@ function ProfileImage({ avatar, name }) {
           alt="Profile" 
         />
       ) : (
-        <IdPhoto name={name || 'User'} size={110} />
+        <div style={{ fontSize: 14, fontWeight: 800, color: '#475569', textAlign: 'center' }}>이미지 로드 중</div>
       )}
     </div>
   )
