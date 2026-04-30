@@ -334,7 +334,7 @@ export default function DashboardView({
                   {isCapSuccess ? (
                     <>
                       <button onClick={() => { setScanStatus(null); setIsScanning(false); }} style={{ flex: 1, padding: '24px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#94a3b8', fontWeight: 900, fontSize: 22, cursor: 'pointer' }}>닫기</button>
-                      <button onClick={confirmTraumaAnalysis} style={{ flex: 2, padding: '24px', borderRadius: '18px', border: 'none', background: 'linear-gradient(135deg, #26de81, #0dd9c5)', color: '#000', fontWeight: 950, fontSize: 22, cursor: 'pointer', boxShadow: '0 10px 25px rgba(38, 222, 129, 0.3)' }}>AI 분석 시작 →</button>
+                      <button onClick={confirmTraumaAnalysis} style={{ flex: 2, padding: '24px', borderRadius: '18px', border: 'none', background: 'linear-gradient(135deg, #26de81, #0dd9c5)', color: '#000', fontWeight: 950, fontSize: 22, cursor: 'pointer', boxShadow: '0 10px 25px rgba(38, 222, 129, 0.3)' }}>AI 분석 시작</button>
                     </>
                   ) : (
                     <>

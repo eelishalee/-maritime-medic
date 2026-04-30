@@ -196,7 +196,7 @@ export default function AIAnalysis({ patient, onNavigate }) {
                 {isCapSuccess ? (
                   <>
                     <button onClick={closeCaptureModal} style={{ flex:1, padding:'12px', borderRadius:12, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#8da2c0', fontSize:13, fontWeight:700, cursor:'pointer' }}>닫기</button>
-                    <button onClick={closeCaptureModal} style={{ flex:2, padding:'12px', borderRadius:12, background:'linear-gradient(135deg,#26de81,#0dd9c5)', border:'none', color:'#050d1a', fontSize:13, fontWeight:900, cursor:'pointer' }}>AI 분석 시작 →</button>
+                    <button onClick={closeCaptureModal} style={{ flex:2, padding:'12px', borderRadius:12, background:'linear-gradient(135deg,#26de81,#0dd9c5)', border:'none', color:'#050d1a', fontSize:13, fontWeight:900, cursor:'pointer' }}>AI 분석 시작</button>
                   </>
                 ) : (
                   <>
