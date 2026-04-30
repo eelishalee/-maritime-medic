@@ -1159,7 +1159,15 @@ export default function Settings() {
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
         @keyframes progress-flow { 0% { width: 0%; } 100% { width: 100%; } }
-        select { padding-right: 44px !important; box-sizing: border-box; }
+        select {
+          -webkit-appearance: none;
+          appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%2394a3b8' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 30% center;
+          padding-right: 44px !important;
+          box-sizing: border-box;
+        }
         .kpi-card:hover { transform: translateY(-8px); background: rgba(17, 19, 24, 0.8) !important; }
         .sys-kpi-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.05) !important; }
         .premium-btn:hover { filter: brightness(1.2); }
