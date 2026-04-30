@@ -879,12 +879,12 @@ export default function Settings() {
               </div>
             </GPanel>
             <GPanel title="건강 위험 분포" icon={<Activity size={22} color={C.danger}/>}>
-              <div style={{ display: 'flex', alignItems: 'center', height: 360, gap: 16 }}>
-                <div style={{ flex: 1, height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={[{v:70,c:C.success},{v:20,c:C.warning},{v:10,c:C.danger}]} innerRadius={90} outerRadius={130} dataKey="v" stroke="none">{[{v:70,c:C.success},{v:20,c:C.warning},{v:10,c:C.danger}].map((e,idx)=><Cell key={idx} fill={e.c}/>)}</Pie></PieChart></ResponsiveContainer>
-                  <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', textAlign:'center' }}><div style={{ fontSize:22, color:C.sub }}>안전도</div><div style={{ fontSize:44, fontWeight:900 }}>82%</div></div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, padding: '8px 0' }}>
+                <div style={{ width: 240, height: 240, position: 'relative', flexShrink: 0 }}>
+                  <ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={[{v:70,c:C.success},{v:20,c:C.warning},{v:10,c:C.danger}]} innerRadius={75} outerRadius={110} dataKey="v" stroke="none">{[{v:70,c:C.success},{v:20,c:C.warning},{v:10,c:C.danger}].map((e,idx)=><Cell key={idx} fill={e.c}/>)}</Pie></PieChart></ResponsiveContainer>
+                  <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', textAlign:'center' }}><div style={{ fontSize:18, color:C.sub }}>안전도</div><div style={{ fontSize:38, fontWeight:900 }}>82%</div></div>
                 </div>
-                <div style={{ width: 160, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 140 }}>
                   {[
                     { label: '양호', val: 70, color: C.success },
                     { label: '주의', val: 20, color: C.warning },
