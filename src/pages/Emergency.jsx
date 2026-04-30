@@ -293,12 +293,24 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   }
 
   useEffect(() => {
-    try { 
-      localStorage.setItem(SESSION_KEY, JSON.stringify(sessionLogs)) 
+    try {
+      localStorage.setItem(SESSION_KEY, JSON.stringify(sessionLogs))
     } catch {
       // Ignore storage errors
     }
   }, [sessionLogs, SESSION_KEY])
+
+  // 모든 스텝 이미지 사전 로드 (첫 클릭 시 지연 방지)
+  useEffect(() => {
+    Object.values(ACTION_GUIDES).forEach(guide => {
+      guide.steps.forEach(step => {
+        if (step.stepImage) {
+          const img = new window.Image()
+          img.src = step.stepImage
+        }
+      })
+    })
+  }, [])
 
   useEffect(() => {
     if (activeAction === '심폐소생술') {
