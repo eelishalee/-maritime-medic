@@ -19,7 +19,7 @@ const C = {
 }
 
 /* ─── 데이터 ─── */
-const CREW = [
+const CREW_FALLBACK = [
   { id: 'S26-001', name: '이선장', age: 52, role: '선장', dept: '항해부', chronic: '고혈압', allergies: '없음', isEmergency: false },
   { id: 'S26-002', name: '김항해', age: 45, role: '1등 항해사', dept: '항해부', chronic: '없음', allergies: '페니실린', isEmergency: false },
   { id: 'S26-003', name: '박기관', age: 55, role: '기관장', dept: '기관부', chronic: '고혈압, 고지혈증', allergies: '아스피린', isEmergency: true },
@@ -158,6 +158,13 @@ function Toggle({ on, color, onChange }) {
 
 /* ═══════════════════════════════════ MAIN ═════════════════════════════════ */
 export default function Settings() {
+  const [CREW, setCREW] = useState(() => {
+    try {
+      const saved = localStorage.getItem('mdts_crew_list')
+      return saved ? JSON.parse(saved) : CREW_FALLBACK
+    } catch { return CREW_FALLBACK }
+  })
+
   const [now, setNow] = useState(new Date())
   const [checks, setChecks] = useState({ 0: true, 1: true, 6: true })
   const [collapsed, setCollapsed] = useState({})

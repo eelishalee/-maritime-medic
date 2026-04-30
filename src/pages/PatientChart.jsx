@@ -6,44 +6,24 @@ import {
   History, RotateCcw, MapPin, Anchor, Weight, Ruler, HeartPulse, Paperclip, ArrowUp, Sparkles, ShieldCheck, Phone, Pencil, Plus
 } from 'lucide-react'
 
-// 확장된 선원 데이터 (메인 데이터와 동기화용)
+// 확장된 선원 데이터 (localStorage 없을 때 fallback)
 const ALL_CREW = [
-  { 
-    id: 'S26-003', name: '박기관', age: 55, gender: '남', dob: '1971-08-05', role: '기관장', dept: '기관부', 
-    blood: 'B+', height: 172, weight: 70, 
-    chronic: '고혈압, 고지혈증',
-    pastHistory: '2021년 고혈압 진단',
-    allergies: '아스피린', 
-    vitals: { bp: '158/95', hr: 92, rr: 18, temp: 37.8, spo2: 98 }, 
-    last_visit: '2026-04-10', doctor: '김원격 (화상협진)',
-    location: '엔진 제어실 (ECR)',
-    emergencyName: '양정희',
-    emergency: '010-8765-4321 (배우자)',
-    emergencyContact: { name: '양정희', phone: '010-8765-4321', relation: '배우자' },
-    recentHistory: {
-        date: '2026-04-10',
-        title: '혈압 상승 및 두통',
-        detail: '처방 : 혈압조절제 증량\n특이사항 : 원격 진료 통한 상태 확인'
-    },
-    isEmergency: true, avatar: '/CE.jpeg' 
-  },
-  { 
-    id: 'S26-001', name: '이선장', age: 52, gender: '남', dob: '1974-05-12', role: '선장', dept: '항해부', 
-    blood: 'O+', height: 175, weight: 78, 
-    chronic: '고혈압', pastHistory: '고혈압', allergies: '없음',
-    vitals: { bp: '138/85', hr: 78, rr: 16, temp: 36.5, spo2: 98 }, 
-    last_visit: '2026-03-22', doctor: '이원격 (화상협진)',
-    location: '항해 브릿지 (Nav. Bridge)',
-    emergencyName: '김정숙',
-    emergency: '010-1234-5678 (배우자)',
-    emergencyContact: { name: '김정숙', phone: '010-1234-5678', relation: '배우자' },
-    recentHistory: {
-        date: '2026-03-22',
-        title: '정기 검진',
-        detail: '특이사항 없음'
-    },
-    isEmergency: false, avatar: '/CE.jpeg' 
-  },
+  { id:'S26-001', name:'이선장',  age:52, gender:'남', dob:'1974-05-12', role:'선장',         dept:'항해부', blood:'O+',  height:175, weight:78, chronic:'고혈압',          pastHistory:'2020년 맹장 수술',    allergies:'없음',   contact:'010-2600-0001', emergencyName:'김도윤', emergency:'010-1234-5678 (배우자)', location:'항해 브릿지 (Nav. Bridge)',   lastMed:'암로디핀 5mg', note:'혈압 관리 주의',   isEmergency:false },
+  { id:'S26-002', name:'김항해',  age:45, gender:'남', dob:'1981-11-20', role:'1등 항해사',   dept:'항해부', blood:'A+',  height:180, weight:82, chronic:'없음',             pastHistory:'없음',                allergies:'페니실린',contact:'010-2600-0002', emergencyName:'이서연', emergency:'010-9876-5432 (부친)',   location:'메인 데크 · 화물 관리구역',   lastMed:'없음',        note:'특이사항 없음', isEmergency:false },
+  { id:'S26-003', name:'박기관',  age:55, gender:'남', dob:'1971-08-05', role:'기관장',       dept:'기관부', blood:'B+',  height:172, weight:70, chronic:'고혈압, 고지혈증',  pastHistory:'2021년 고혈압 진단',  allergies:'아스피린',contact:'010-2600-0003', emergencyName:'양정희', emergency:'010-8765-4321 (배우자)', location:'엔진 제어실 (ECR)',           lastMed:'암로디핀 5mg', note:'기관실 추락 사고', isEmergency:true  },
+  { id:'S26-004', name:'최갑판',  age:41, gender:'남', dob:'1985-03-15', role:'갑판장',       dept:'항해부', blood:'AB+', height:178, weight:75, chronic:'허리디스크',        pastHistory:'2022년 요추 시술',    allergies:'없음',   contact:'010-2600-0004', emergencyName:'박지호', emergency:'010-1122-3344 (배우자)', location:'선수 갑판 (Forecastle Deck)', lastMed:'없음',        note:'중량물 운반 주의', isEmergency:false },
+  { id:'S26-005', name:'정조타',  age:38, gender:'남', dob:'1988-12-22', role:'조타사',       dept:'항해부', blood:'O-',  height:170, weight:68, chronic:'없음',             pastHistory:'없음',                allergies:'조개류', contact:'010-2600-0005', emergencyName:'최민준', emergency:'010-5566-7788 (동생)',   location:'조타실 (Wheel House)',        lastMed:'없음',        note:'식품 알레르기 주의', isEmergency:false },
+  { id:'S26-006', name:'한통신',  age:43, gender:'남', dob:'1983-05-30', role:'통신장',       dept:'항해부', blood:'A+',  height:174, weight:72, chronic:'비염',             pastHistory:'없음',                allergies:'먼지',   contact:'010-2600-0006', emergencyName:'정하윤', emergency:'010-9988-7766 (배우자)', location:'통신 제어실 (Radio Room)',    lastMed:'없음',        note:'건강 양호',     isEmergency:false },
+  { id:'S26-007', name:'강기계',  age:47, gender:'남', dob:'1979-11-18', role:'1등 기관사',   dept:'기관부', blood:'B-',  height:179, weight:80, chronic:'없음',             pastHistory:'없음',                allergies:'벌침',   contact:'010-2600-0007', emergencyName:'강준우', emergency:'010-4455-6677 (누나)',   location:'제2엔진실 구역 B-1',          lastMed:'없음',        note:'숙련 정비사',   isEmergency:false },
+  { id:'S26-008', name:'윤조리',  age:49, gender:'남', dob:'1977-09-22', role:'조리장',       dept:'지원부', blood:'O+',  height:168, weight:76, chronic:'당뇨',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0008', emergencyName:'조예은', emergency:'010-6677-8899 (배우자)', location:'상부 데크 조리실 (Galley)',   lastMed:'메트포르민',  note:'식이 관리 필요', isEmergency:false },
+  { id:'S26-009', name:'임전기',  age:35, gender:'남', dob:'1991-03-12', role:'전기사',       dept:'기관부', blood:'AB-', height:176, weight:73, chronic:'없음',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0009', emergencyName:'윤도현', emergency:'010-2211-0099 (형)',     location:'주 발전기실 (Gen. Room)',     lastMed:'없음',        note:'전기 설비 담당', isEmergency:false },
+  { id:'S26-010', name:'백보급',  age:32, gender:'남', dob:'1994-07-08', role:'사무장',       dept:'지원부', blood:'A-',  height:165, weight:58, chronic:'없음',             pastHistory:'없음',                allergies:'먼지',   contact:'010-2600-0010', emergencyName:'장수빈', emergency:'010-3344-5566 (모친)',   location:'A-데크 사무실',               lastMed:'없음',        note:'물자 관리 담당', isEmergency:false },
+  { id:'S26-011', name:'황갑판',  age:28, gender:'남', dob:'1998-01-25', role:'갑판원',       dept:'항해부', blood:'B+',  height:182, weight:85, chronic:'없음',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0011', emergencyName:'임지훈', emergency:'010-1100-2233 (동생)',   location:'보트 데크 위험물 창고',        lastMed:'없음',        note:'체력 우수',     isEmergency:false },
+  { id:'S26-012', name:'서기관',  age:30, gender:'남', dob:'1996-12-05', role:'3등 기관사',   dept:'기관부', blood:'O+',  height:173, weight:70, chronic:'없음',             pastHistory:'없음',                allergies:'땅콩',   contact:'010-2600-0012', emergencyName:'한지민', emergency:'010-5544-3322 (친구)',   location:'청정기실 (Purifier Room)',    lastMed:'없음',        note:'초임 사관',     isEmergency:false },
+  { id:'S26-013', name:'오항해',  age:26, gender:'남', dob:'2000-04-14', role:'실습 항해사',  dept:'항해부', blood:'A+',  height:177, weight:68, chronic:'없음',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0013', emergencyName:'오세현', emergency:'010-7788-9900 (부친)',   location:'항해 브릿지 · 조타 지원',     lastMed:'없음',        note:'실습 중',       isEmergency:false },
+  { id:'S26-014', name:'나위생',  age:31, gender:'여', dob:'1995-10-30', role:'위생원',       dept:'지원부', blood:'B+',  height:162, weight:52, chronic:'없음',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0014', emergencyName:'신예준', emergency:'010-1122-3344 (언니)',   location:'거주구역 공용실',              lastMed:'없음',        note:'방역 담당',     isEmergency:false },
+  { id:'S26-015', name:'고기수',  age:44, gender:'남', dob:'1982-08-12', role:'기수',         dept:'기관부', blood:'O-',  height:171, weight:75, chronic:'치질',             pastHistory:'없음',                allergies:'없음',   contact:'010-2600-0015', emergencyName:'송다희', emergency:'010-9900-1122 (배우자)', location:'엔진룸 기계 워크샵',           lastMed:'없음',        note:'용접 숙련',     isEmergency:false },
+  { id:'S26-016', name:'문세탁',  age:33, gender:'남', dob:'1993-02-14', role:'세탁원',       dept:'지원부', blood:'AB+', height:164, weight:60, chronic:'습진',             pastHistory:'없음',                allergies:'세제',   contact:'010-2600-0016', emergencyName:'권태한', emergency:'010-8899-2233 (모친)',   location:'B-데크 세탁실',               lastMed:'연고',        note:'장갑 착용 필수', isEmergency:false },
 ]
 
 const OTC_MEDS = [

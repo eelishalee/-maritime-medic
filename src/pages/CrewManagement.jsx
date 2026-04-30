@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Search, Plus, UserPlus, Users, Anchor, Cog, Coffee, ShieldAlert, CheckCircle2, ChevronRight, Phone, Heart, Activity, X, Ruler, Scale, MapPin, Calendar, FileText, Pill, User as UserIcon, ChevronDown, Camera, Upload } from 'lucide-react'
+import { Search, Plus, UserPlus, Users, Anchor, Cog, Coffee, ShieldAlert, CheckCircle2, ChevronRight, Phone, Heart, Activity, X, Ruler, Scale, MapPin, Calendar, FileText, Pill, User as UserIcon, ChevronDown, Camera, Upload, PenLine } from 'lucide-react'
 
 // ─── 이미지 자산 매핑 (Vite) ───
 const getPhoto = (name) => new URL(`../assets/photo/${name}`, import.meta.url).href
@@ -14,7 +14,7 @@ const INITIAL_CREW = [
   { id: 'S26-007', name: '강기계', age: 47, role: '1등 기관사', dept: '기관부', blood: 'B-', chronic: '없음', allergies: '벌침', contact: '010-2600-0007', emergencyName: '강준우', emergency: '010-4455-6677 (누나)', avatar: getPhoto('007.png'), isEmergency: false, height: 179, weight: 80, boardingDate: '2024-03-12', location: '제2엔진실 구역 B-1', pastHistory: '없음', dob: '1979-11-18', gender: '남', lastMed: '없음', note: '숙련 정비사' },
   { id: 'S26-008', name: '윤조리', age: 49, role: '조리장', dept: '지원부', blood: 'O+', chronic: '당뇨', allergies: '없음', contact: '010-2600-0008', emergencyName: '조예은', emergency: '010-6677-8899 (배우자)', avatar: getPhoto('008.png'), isEmergency: false, height: 168, weight: 76, boardingDate: '2024-01-05', location: '상부 데크 조리실 (Galley)', pastHistory: '없음', dob: '1977-09-22', gender: '남', lastMed: '메트포르민', note: '식이 관리 필요' },
   { id: 'S26-009', name: '임전기', age: 35, role: '전기사', dept: '기관부', blood: 'AB-', chronic: '없음', allergies: '없음', contact: '010-2600-0009', emergencyName: '윤도현', emergency: '010-2211-0099 (형)', avatar: getPhoto('009.png'), isEmergency: false, height: 176, weight: 73, boardingDate: '2024-05-20', location: '주 발전기실 (Gen. Room)', pastHistory: '없음', dob: '1991-03-12', gender: '남', lastMed: '없음', note: '전기 설비 담당' },
-  { id: 'S26-010', name: '백보급', age: 32, role: '사무장', dept: '지원부', blood: 'A-', chronic: '없음', allergies: '먼지', contact: '010-2600-0010', emergencyName: '장수빈', emergency: '010-3344-5566 (모친)', avatar: getPhoto('010.png'), isEmergency: false, height: 165, weight: 58, boardingDate: '2024-06-15', location: 'A-데크 사무실', pastHistory: '없음', dob: '1994-07-08', gender: '여', lastMed: '없음', note: '물자 관리 담당' },
+  { id: 'S26-010', name: '백보급', age: 32, role: '사무장', dept: '지원부', blood: 'A-', chronic: '없음', allergies: '먼지', contact: '010-2600-0010', emergencyName: '장수빈', emergency: '010-3344-5566 (모친)', avatar: getPhoto('010.png'), isEmergency: false, height: 165, weight: 58, boardingDate: '2024-06-15', location: 'A-데크 사무실', pastHistory: '없음', dob: '1994-07-08', gender: '남', lastMed: '없음', note: '물자 관리 담당' },
   { id: 'S26-011', name: '황갑판', age: 28, role: '갑판원', dept: '항해부', blood: 'B+', chronic: '없음', allergies: '없음', contact: '010-2600-0011', emergencyName: '임지훈', emergency: '010-1100-2233 (동생)', avatar: getPhoto('011.png'), isEmergency: false, height: 182, weight: 85, boardingDate: '2024-07-01', location: '보트 데크 위험물 창고', pastHistory: '없음', dob: '1998-01-25', gender: '남', lastMed: '없음', note: '체력 우수' },
   { id: 'S26-012', name: '서기관', age: 30, role: '3등 기관사', dept: '기관부', blood: 'O+', chronic: '없음', allergies: '땅콩', contact: '010-2600-0012', emergencyName: '한지민', emergency: '010-5544-3322 (친구)', avatar: getPhoto('012.png'), isEmergency: false, height: 173, weight: 70, boardingDate: '2024-08-10', location: '청정기실 (Purifier Room)', pastHistory: '없음', dob: '1996-12-05', gender: '남', lastMed: '없음', note: '초임 사관' },
   { id: 'S26-013', name: '오항해', age: 26, role: '실습 항해사', dept: '항해부', blood: 'A+', chronic: '없음', allergies: '없음', contact: '010-2600-0013', emergencyName: '오세현', emergency: '010-7788-9900 (부친)', avatar: getPhoto('013.png'), isEmergency: false, height: 177, weight: 68, boardingDate: '2024-09-01', location: '항해 브릿지 · 조타 지원', pastHistory: '없음', dob: '2000-04-14', gender: '남', lastMed: '없음', note: '실습 중' },
@@ -35,7 +35,14 @@ export default function CrewManagement({ onSelectPatient }) {
   const [crew, setCrew] = useState(() => {
     try {
       const saved = localStorage.getItem('mdts_crew_list')
-      return saved ? JSON.parse(saved) : INITIAL_CREW
+      if (!saved) return INITIAL_CREW
+      const parsed = JSON.parse(saved)
+      // INITIAL_CREW에 있는 선원은 gender를 항상 기준값으로 덮어씀
+      const merged = parsed.map(c => {
+        const base = INITIAL_CREW.find(b => b.id === c.id)
+        return base ? { ...base, ...c, gender: base.gender } : c
+      })
+      return merged
     } catch { return INITIAL_CREW }
   })
 
@@ -93,22 +100,25 @@ export default function CrewManagement({ onSelectPatient }) {
     })
   }
 
-  const handleDeleteCrew = (id) => {
-    const target = crew.find(c => c.id === id)
-    if (!target) return
-    if (!window.confirm(`[${target.id}] ${target.name} 선원을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return
-    saveCrew(crew.filter(c => c.id !== id))
-  }
-
-  const [editTarget, setEditTarget] = useState(null)
-  const [selectedId, setSelectedId] = useState(null)
+  const [showManage, setShowManage] = useState(false)
+  const [manageTarget, setManageTarget] = useState(null)
+  const [manageConfirmDelete, setManageConfirmDelete] = useState(false)
 
   const handleEditCrew = (e) => {
     e.preventDefault()
-    if (!editTarget.name.trim()) { alert('이름을 입력하세요.'); return }
-    if (!editTarget.role.trim()) { alert('직책을 입력하세요.'); return }
-    saveCrew(crew.map(c => c.id === editTarget.id ? { ...editTarget } : c))
-    setEditTarget(null)
+    if (!manageTarget.name.trim()) { alert('이름을 입력하세요.'); return }
+    if (!manageTarget.role.trim()) { alert('직책을 입력하세요.'); return }
+    saveCrew(crew.map(c => c.id === manageTarget.id ? { ...manageTarget } : c))
+    setShowManage(false)
+    setManageTarget(null)
+  }
+
+  const confirmDeleteCrew = () => {
+    if (!manageTarget) return
+    saveCrew(crew.filter(c => c.id !== manageTarget.id))
+    setManageTarget(null)
+    setManageConfirmDelete(false)
+    setShowManage(false)
   }
 
   const handleSelect = (c) => {
@@ -147,25 +157,9 @@ export default function CrewManagement({ onSelectPatient }) {
         </div>
         
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          {selectedId && (() => {
-            const sel = crew.find(c => c.id === selectedId)
-            return sel ? (
-              <>
-                <button
-                  onClick={() => { setEditTarget({...sel}); setSelectedId(null) }}
-                  style={{ padding: '0 20px', height: '52px', background: 'rgba(56,189,248,0.1)', border: '1.5px solid #38bdf8', borderRadius: '16px', cursor: 'pointer', color: '#38bdf8', fontSize: '15px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 8 }}
-                >
-                  ✏ 수정
-                </button>
-                <button
-                  onClick={() => { handleDeleteCrew(sel.id); setSelectedId(null) }}
-                  style={{ padding: '0 20px', height: '52px', background: 'rgba(255,77,109,0.1)', border: '1.5px solid #ff4d6d', borderRadius: '16px', cursor: 'pointer', color: '#ff4d6d', fontSize: '15px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 8 }}
-                >
-                  <X size={16}/> 삭제
-                </button>
-              </>
-            ) : null
-          })()}
+          <button onClick={() => { setShowManage(true); setManageTarget(null); setManageConfirmDelete(false) }} style={{ padding: '0 24px', height: '52px', background: 'rgba(56,189,248,0.1)', border: '1.5px solid #38bdf8', borderRadius: '16px', cursor: 'pointer', color: '#38bdf8', fontSize: '16px', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 8, transition: '0.3s' }}>
+            <Cog size={20}/> 선원 수정/삭제
+          </button>
           <button onClick={() => setIsAdding(true)} style={{ padding: '0 24px', height: '52px', background: 'linear-gradient(135deg, #0dd9c5 0%, #00a896 100%)', border: 'none', borderRadius: '16px', cursor: 'pointer', color: '#020617', fontSize: '16px', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 10px 25px rgba(13,217,197,0.2)', transition: '0.3s' }}>
             <Plus size={20} strokeWidth={3} /> 신규 선원 등록
           </button>
@@ -212,7 +206,7 @@ export default function CrewManagement({ onSelectPatient }) {
           </thead>
           <tbody>
             {filtered.map((c) => (
-              <tr key={c.id} onClick={() => setSelectedId(prev => prev === c.id ? null : c.id)} style={{ cursor: 'pointer', transition: '0.2s', outline: selectedId === c.id ? '2px solid #0dd9c5' : 'none', borderRadius: 20 }} className="crew-card-row">
+              <tr key={c.id} style={{ transition: '0.2s' }} className="crew-card-row">
                 <td style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px 0 0 20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
                     <div style={{ width: 64, height: 80, borderRadius: '12px', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', background: '#0a1628' }}>
@@ -281,47 +275,176 @@ export default function CrewManagement({ onSelectPatient }) {
         </table>
       </div>
 
-      {/* 선원 수정 모달 */}
-      {editTarget && (
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(2,6,23,0.9)', backdropFilter: 'blur(20px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
-          <div style={{ background: '#0d1117', border: '1.5px solid rgba(56,189,248,0.3)', borderRadius: 24, padding: 40, width: '100%', maxWidth: 700, position: 'relative' }}>
-            <button onClick={() => setEditTarget(null)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: 8, padding: 8, cursor: 'pointer', color: '#64748b' }}><X size={20}/></button>
-            <div style={{ fontSize: 26, fontWeight: 950, color: '#38bdf8', marginBottom: 28 }}>✏ 선원 정보 수정 — {editTarget.name}</div>
-            <form onSubmit={handleEditCrew}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
-                {[
-                  { label: '이름', field: 'name' }, { label: '직책', field: 'role' },
-                  { label: '나이', field: 'age', type: 'number' }, { label: '연락처', field: 'contact' },
-                  { label: '기저질환', field: 'chronic' }, { label: '알레르기', field: 'allergies' },
-                  { label: '복용 약물', field: 'lastMed' }, { label: '위치', field: 'location' },
-                  { label: '비상연락처명', field: 'emergencyName' }, { label: '비상연락처', field: 'emergency' },
-                ].map(({ label, field, type }) => (
-                  <div key={field}>
-                    <div style={{ fontSize: 14, color: '#64748b', fontWeight: 700, marginBottom: 6 }}>{label}</div>
-                    <input
-                      type={type || 'text'}
-                      value={editTarget[field] || ''}
-                      onChange={e => setEditTarget(p => ({ ...p, [field]: e.target.value }))}
-                      style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 16, fontWeight: 600, outline: 'none', boxSizing: 'border-box' }}
-                    />
+      {/* 선원 수정/삭제 통합 관리 모달 */}
+      {showManage && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(2,6,23,0.92)', backdropFilter: 'blur(20px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px' }}>
+          <div style={{ width: '100%', maxWidth: 1300, height: '90vh', display: 'flex', gap: 0, background: '#0a1224', borderRadius: 40, border: '2px solid rgba(56,189,248,0.25)', overflow: 'hidden', boxShadow: '0 40px 100px rgba(0,0,0,0.7)' }}>
+
+            {/* 왼쪽 패널 — 선원 목록 */}
+            <div style={{ width: 300, borderRight: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+              <div style={{ padding: '28px 24px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ fontSize: 20, fontWeight: 950, color: '#38bdf8', marginBottom: 14 }}>선원 선택</div>
+                <div style={{ position: 'relative' }}>
+                  <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#4a6080' }}/>
+                  <input
+                    placeholder="이름 / ID 검색"
+                    onChange={e => {}}
+                    id="manage-search"
+                    style={{ width: '100%', padding: '10px 12px 10px 34px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                  />
+                </div>
+              </div>
+              <div style={{ flex: 1, overflowY: 'auto', padding: '8px 16px' }}>
+                {crew.map(c => {
+                  const isSelected = manageTarget?.id === c.id
+                  return (
+                    <div
+                      key={c.id}
+                      onClick={() => { setManageTarget({...c}); setManageConfirmDelete(false) }}
+                      style={{ padding: '14px 18px', borderRadius: 14, cursor: 'pointer', marginBottom: 5, background: isSelected ? 'rgba(56,189,248,0.12)' : 'rgba(255,255,255,0.02)', border: `1.5px solid ${isSelected ? '#38bdf8' : 'rgba(255,255,255,0.05)'}`, transition: '0.2s', display: 'flex', alignItems: 'center', gap: 10, overflow: 'hidden' }}
+                    >
+                      <span style={{ fontSize: 23, fontWeight: 950, color: isSelected ? '#38bdf8' : '#fff', flexShrink: 0 }}>{c.name}</span>
+                      <span style={{ fontSize: 18, fontWeight: 800, color: isSelected ? '#7dd3fc' : '#0dd9c5', flexShrink: 0 }}>{c.id}</span>
+                      <span style={{ fontSize: 17, fontWeight: 700, color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.dept}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* 오른쪽 패널 — 수정 폼 또는 빈 상태 */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
+              {/* 닫기 버튼 */}
+              <button onClick={() => { setShowManage(false); setManageTarget(null); setManageConfirmDelete(false) }} style={{ position: 'absolute', top: 20, right: 20, width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.07)', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
+                <X size={22}/>
+              </button>
+
+              {!manageTarget ? (
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, color: '#334155' }}>
+                  <Users size={60} strokeWidth={1}/>
+                  <div style={{ fontSize: 20, fontWeight: 800 }}>좌측에서 선원을 선택하세요</div>
+                  <div style={{ fontSize: 15, fontWeight: 600 }}>선택한 선원의 정보를 수정하거나 삭제할 수 있습니다</div>
+                </div>
+              ) : manageConfirmDelete ? (
+                /* 삭제 확인 뷰 */
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', gap: 24 }}>
+                  <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,77,109,0.1)', border: '2px solid #ff4d6d', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ff4d6d' }}>
+                    <X size={40}/>
                   </div>
-                ))}
-                <div>
-                  <div style={{ fontSize: 14, color: '#64748b', fontWeight: 700, marginBottom: 6 }}>부서</div>
-                  <select value={editTarget.dept || '항해부'} onChange={e => setEditTarget(p => ({ ...p, dept: e.target.value }))} style={{ width: '100%', background: '#161b22', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 16, fontWeight: 600, outline: 'none' }}>
-                    {['항해부', '기관부', '지원부'].map(d => <option key={d} value={d}>{d}</option>)}
-                  </select>
+                  <div style={{ fontSize: 28, fontWeight: 950, color: '#fff' }}>선원 삭제 확인</div>
+                  <div style={{ fontSize: 17, color: '#64748b', fontWeight: 700, textAlign: 'center', lineHeight: 1.7 }}>아래 선원을 명부에서 영구 삭제합니다.<br/>이 작업은 되돌릴 수 없습니다.</div>
+                  <div style={{ background: 'rgba(255,77,109,0.06)', border: '1.5px solid rgba(255,77,109,0.2)', borderRadius: 20, padding: '24px 40px', display: 'flex', alignItems: 'center', gap: 24 }}>
+                    <div style={{ width: 72, height: 90, borderRadius: 12, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
+                      <img src={manageTarget.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={manageTarget.name}/>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 26, fontWeight: 950, color: '#fff', marginBottom: 4 }}>{manageTarget.name}</div>
+                      <div style={{ fontSize: 20, color: '#ff4d6d', fontWeight: 900, marginBottom: 4 }}>{manageTarget.id}</div>
+                      <div style={{ fontSize: 16, color: '#64748b', fontWeight: 700 }}>{manageTarget.dept} · {manageTarget.role}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 16, width: '100%', maxWidth: 500 }}>
+                    <button onClick={() => setManageConfirmDelete(false)} style={{ flex: 1, padding: '18px', borderRadius: 16, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', fontSize: 18, fontWeight: 800, cursor: 'pointer' }}>취소</button>
+                    <button onClick={confirmDeleteCrew} style={{ flex: 1, padding: '18px', borderRadius: 16, background: 'linear-gradient(135deg, #ff4d6d 0%, #c0392b 100%)', border: 'none', color: '#fff', fontSize: 18, fontWeight: 950, cursor: 'pointer' }}>영구 삭제</button>
+                  </div>
                 </div>
-                <div>
-                  <div style={{ fontSize: 14, color: '#64748b', fontWeight: 700, marginBottom: 6 }}>특이사항</div>
-                  <input value={editTarget.note || ''} onChange={e => setEditTarget(p => ({ ...p, note: e.target.value }))} style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 16, fontWeight: 600, outline: 'none', boxSizing: 'border-box' }} />
+              ) : (
+                /* 수정 폼 뷰 */
+                <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px 0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 32 }}>
+                    <div style={{ position: 'relative', flexShrink: 0, width: 80, height: 100 }}>
+                      <div style={{ width: 80, height: 100, borderRadius: 14, overflow: 'hidden', border: '2px solid rgba(56,189,248,0.3)' }}>
+                        <img src={manageTarget.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={manageTarget.name}/>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => document.getElementById('manage-avatar-input').click()}
+                        style={{ position: 'absolute', bottom: -8, right: -8, width: 28, height: 28, borderRadius: '50%', background: '#38bdf8', border: '2px solid #0a1224', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 }}
+                      >
+                        <PenLine size={13} color="#020617"/>
+                      </button>
+                      <input
+                        id="manage-avatar-input"
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={e => {
+                          const file = e.target.files[0]
+                          if (!file) return
+                          const reader = new FileReader()
+                          reader.onloadend = () => setManageTarget(p => ({ ...p, avatar: reader.result }))
+                          reader.readAsDataURL(file)
+                          e.target.value = ''
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 39, fontWeight: 950, color: '#fff' }}>{manageTarget.name}</div>
+                      <div style={{ fontSize: 23, color: '#38bdf8', fontWeight: 800 }}>{manageTarget.id} · {manageTarget.dept} · {manageTarget.role}</div>
+                    </div>
+                  </div>
+                  <form onSubmit={handleEditCrew} style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 32 }}>
+                    <div style={{ background: 'rgba(255,255,255,0.01)', padding: '24px', borderRadius: 24, border: '1px solid rgba(255,255,255,0.04)' }}>
+                      <div style={{ fontSize: 17, fontWeight: 900, marginBottom: 18, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: 8 }}><Users size={18}/> 기본 인적사항</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+                        {[{label:'선원 성명',field:'name'},{label:'생년월일',field:'dob'},{label:'성별',field:'gender'}].map(({label,field}) => (
+                          <EditFormGroup key={field} label={label} value={manageTarget[field]||''} onChange={v=>setManageTarget(p=>({...p,[field]:v}))} placeholder="" />
+                        ))}
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginTop: 16 }}>
+                        {[{label:'만 나이',field:'age'},{label:'혈액형',field:'blood'},{label:'신장(cm)',field:'height'},{label:'체중(kg)',field:'weight'}].map(({label,field}) => (
+                          <EditFormGroup key={field} label={label} value={manageTarget[field]||''} onChange={v=>setManageTarget(p=>({...p,[field]:v}))} placeholder="" />
+                        ))}
+                      </div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.01)', padding: '24px', borderRadius: 24, border: '1px solid rgba(255,255,255,0.04)' }}>
+                      <div style={{ fontSize: 17, fontWeight: 900, marginBottom: 18, color: '#fb923c', display: 'flex', alignItems: 'center', gap: 8 }}><Anchor size={18}/> 소속 및 승선 정보</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          <label style={{ fontSize: 19, color: '#64748b', fontWeight: 950 }}>소속 부서</label>
+                          <select value={manageTarget.dept||'항해부'} onChange={e=>setManageTarget(p=>({...p,dept:e.target.value}))} style={{ width: '100%', height: 56, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '0 16px', color: '#0dd9c5', outline: 'none', fontWeight: 800, fontSize: 19, fontFamily: 'inherit', appearance: 'none', cursor: 'pointer', boxSizing: 'border-box' }}>
+                            {['항해부','기관부','지원부'].map(d=><option key={d} value={d} style={{background:'#0a1224'}}>{d}</option>)}
+                          </select>
+                        </div>
+                        {[{label:'직위',field:'role'},{label:'승선 일자',field:'boardingDate'},{label:'현재 위치',field:'location'}].map(({label,field}) => (
+                          <EditFormGroup key={field} label={label} value={manageTarget[field]||''} onChange={v=>setManageTarget(p=>({...p,[field]:v}))} placeholder="" />
+                        ))}
+                      </div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.01)', padding: '24px', borderRadius: 24, border: '1px solid rgba(255,255,255,0.04)' }}>
+                      <div style={{ fontSize: 17, fontWeight: 900, marginBottom: 18, color: '#2dd4bf', display: 'flex', alignItems: 'center', gap: 8 }}><ShieldAlert size={18}/> 의료 정보 및 연락처</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+                        {[{label:'기저질환',field:'chronic'},{label:'알레르기',field:'allergies'},{label:'최근 투약',field:'lastMed'}].map(({label,field}) => (
+                          <EditFormGroup key={field} label={label} value={manageTarget[field]||''} onChange={v=>setManageTarget(p=>({...p,[field]:v}))} placeholder="" />
+                        ))}
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          <label style={{ fontSize: 16, color: '#64748b', fontWeight: 950 }}>과거 병력</label>
+                          <textarea value={manageTarget.pastHistory||''} onChange={e=>setManageTarget(p=>({...p,pastHistory:e.target.value}))} style={{ width:'100%', minHeight:80, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:14, padding:'14px 16px', color:'#fff', outline:'none', fontWeight:700, fontSize:16, resize:'none', fontFamily:'inherit', boxSizing:'border-box' }}/>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          <label style={{ fontSize: 16, color: '#64748b', fontWeight: 950 }}>특이사항</label>
+                          <textarea value={manageTarget.note||''} onChange={e=>setManageTarget(p=>({...p,note:e.target.value}))} style={{ width:'100%', minHeight:80, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:14, padding:'14px 16px', color:'#fff', outline:'none', fontWeight:700, fontSize:16, resize:'none', fontFamily:'inherit', boxSizing:'border-box' }}/>
+                        </div>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr', gap: 16, marginTop: 16 }}>
+                        {[{label:'본인 연락처',field:'contact'},{label:'보호자 성명',field:'emergencyName'},{label:'비상 연락처(관계)',field:'emergency'}].map(({label,field}) => (
+                          <EditFormGroup key={field} label={label} value={manageTarget[field]||''} onChange={v=>setManageTarget(p=>({...p,[field]:v}))} placeholder="" />
+                        ))}
+                      </div>
+                    </div>
+                    {/* 저장 + 삭제 버튼 */}
+                    <div style={{ display: 'flex', gap: 14, paddingBottom: 8 }}>
+                      <button type="button" onClick={() => setManageConfirmDelete(true)} style={{ flex: 1, padding: '20px', background: 'rgba(255,77,109,0.1)', border: '1.5px solid #ff4d6d', borderRadius: 18, color: '#ff4d6d', fontSize: 18, fontWeight: 950, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                        <X size={18}/> 선원 삭제
+                      </button>
+                      <button type="submit" style={{ flex: 2, padding: '20px', background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)', border: 'none', borderRadius: 18, color: '#020617', fontSize: 18, fontWeight: 950, cursor: 'pointer' }}>선원 정보 저장</button>
+                    </div>
+                  </form>
                 </div>
-              </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <button type="button" onClick={() => setEditTarget(null)} style={{ flex: 1, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#64748b', fontSize: 18, fontWeight: 800, cursor: 'pointer' }}>취소</button>
-                <button type="submit" style={{ flex: 2, padding: '14px', borderRadius: 12, background: '#38bdf8', color: '#000', border: 'none', fontSize: 18, fontWeight: 950, cursor: 'pointer' }}>저장</button>
-              </div>
-            </form>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -437,7 +560,22 @@ export default function CrewManagement({ onSelectPatient }) {
       <style>{`
         .crew-card-row:hover td { background: rgba(13,217,197,0.06) !important; }
         .form-input:focus, .form-select:focus { border-color: #0dd9c5 !important; background: rgba(13,217,197,0.05) !important; }
+        div:hover > .avatar-overlay { opacity: 1 !important; }
       `}</style>
+    </div>
+  )
+}
+
+function EditFormGroup({ label, value, onChange, placeholder }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <label style={{ fontSize: 19, color: '#64748b', fontWeight: 950 }}>{label}</label>
+      <input
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        style={{ width: '100%', height: 56, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '0 16px', color: value ? '#38bdf8' : '#fff', outline: 'none', fontWeight: 800, fontSize: 19, fontFamily: 'inherit', boxSizing: 'border-box' }}
+      />
     </div>
   )
 }
