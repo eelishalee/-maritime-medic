@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Search, Plus, UserPlus, Users, Anchor, Cog, Coffee, ShieldAlert, CheckCircle2, ChevronRight, Phone, Heart, Activity, X, Ruler, Scale, MapPin, Calendar, FileText, Pill, User as UserIcon, ChevronDown, Trash2 } from 'lucide-react'
+import { Search, Plus, UserPlus, Users, Anchor, Cog, Coffee, ShieldAlert, CheckCircle2, ChevronRight, Phone, Heart, Activity, X, Ruler, Scale, MapPin, Calendar, FileText, Pill, User as UserIcon, ChevronDown, Trash2, PenLine, Camera } from 'lucide-react'
 import { useAlert } from '../utils/AlertContext'
 
 

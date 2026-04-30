@@ -92,6 +92,42 @@ export default function PatientInfo({ patient }) {
     },2000)
   }
 
+  const [chartTxStatus, setChartTxStatus] = useState('idle')
+  const sendChart = () => {
+    setChartTxStatus('sending')
+    setTimeout(()=>{
+      setChartTxStatus('done')
+      const now=new Date()
+      const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
+      setTxLog(l=>[{time:ts,msg:`환자 차트 전송 완료 (${patient?.name||'환자'})`,ok:true},...l.slice(0,5)])
+      setTimeout(()=>setChartTxStatus('idle'),2500)
+    },2200)
+  }
+
+  const [remoteTxStatus, setRemoteTxStatus] = useState('idle')
+  const requestRemote = () => {
+    setRemoteTxStatus('sending')
+    setTimeout(()=>{
+      setRemoteTxStatus('done')
+      const now=new Date()
+      const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
+      setTxLog(l=>[{time:ts,msg:`원격 진료 요청 전송 — 부산 원격의료센터`,ok:true},...l.slice(0,5)])
+      setTimeout(()=>setRemoteTxStatus('idle'),2500)
+    },1800)
+  }
+
+  const [emergencyTxStatus, setEmergencyTxStatus] = useState('idle')
+  const sendEmergency = () => {
+    setEmergencyTxStatus('sending')
+    setTimeout(()=>{
+      setEmergencyTxStatus('done')
+      const now=new Date()
+      const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
+      setTxLog(l=>[{time:ts,msg:`비상 연락망 발송 → ${patient?.emergencyName||'보호자'}`,ok:true},...l.slice(0,5)])
+      setTimeout(()=>setEmergencyTxStatus('idle'),2500)
+    },1500)
+  }
+
   const addNote = (text) => {
     if (!text.trim()) return
     const now=new Date()
@@ -273,9 +309,9 @@ export default function PatientInfo({ patient }) {
         {/* 전송 버튼 */}
         <div style={{ display:'flex', flexDirection:'column', gap:7 }}>
           <TxB icon={<Activity size={14}/>} label="바이탈 즉시 전송"   sub={`HR ${hr}bpm · BP ${bp} · Temp ${bt}°C`}  color="#0dd9c5" status={txStatus} onClick={sendVitals}/>
-          <TxB icon={<FileText size={14}/>} label="환자 차트 전송"     sub="최신 진료기록 및 처방 포함"                  color="#4fc3f7" onClick={()=>{}}/>
-          <TxB icon={<Radio    size={14}/>} label="원격 진료 요청"     sub="부산 원격의료센터 영상 연결"                  color="#a55eea" onClick={()=>{}}/>
-          <TxB icon={<Phone    size={14}/>} label="비상 연락망 발송"   sub={`${patient.emergency || '비상연락처'}`}     color="#ff9f43" onClick={()=>{}}/>
+          <TxB icon={<FileText size={14}/>} label="환자 차트 전송"     sub="최신 진료기록 및 처방 포함"                  color="#4fc3f7" status={chartTxStatus}   onClick={sendChart}/>
+          <TxB icon={<Radio    size={14}/>} label="원격 진료 요청"     sub="부산 원격의료센터 영상 연결"                  color="#a55eea" status={remoteTxStatus}  onClick={requestRemote}/>
+          <TxB icon={<Phone    size={14}/>} label="비상 연락망 발송"   sub={`${patient.emergency || '비상연락처'}`}     color="#ff9f43" status={emergencyTxStatus} onClick={sendEmergency}/>
         </div>
 
         {/* 전송 로그 */}

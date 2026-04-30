@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, Heart, Thermometer, Activity, ChevronRight, Phone, FileText, User, AlertCircle, Clock, ShieldCheck, Weight, Ruler, HeartPulse, Wind } from 'lucide-react'
+import { Search, Heart, Thermometer, Activity, ChevronRight, Phone, FileText, User, AlertCircle, Clock, ShieldCheck, Weight, Ruler, HeartPulse, Wind, Brain } from 'lucide-react'
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, AreaChart, Area } from 'recharts'
 
 const PATIENTS = [
@@ -270,4 +270,3 @@ function VitalCard({ label, value, unit, icon, color }) {
   )
 }
 
-function Brain({ size, color }) { return <Activity size={size} color={color} /> }
