@@ -1159,6 +1159,7 @@ export default function Settings() {
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
         @keyframes progress-flow { 0% { width: 0%; } 100% { width: 100%; } }
+        select { padding-right: 44px !important; box-sizing: border-box; }
         .kpi-card:hover { transform: translateY(-8px); background: rgba(17, 19, 24, 0.8) !important; }
         .sys-kpi-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.05) !important; }
         .premium-btn:hover { filter: brightness(1.2); }
