@@ -432,9 +432,13 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 1140, width: '100%', position: 'relative', zIndex: 10 }}>
           {triageData.map((t, i) => (
-            <button 
-              key={i} 
-              onClick={() => handleTriageSelect(t)} 
+            <button
+              key={i}
+              onClick={() => handleTriageSelect(t)}
+              onMouseEnter={() => {
+                const guide = ACTION_GUIDES[t.action]
+                if (guide) guide.steps.forEach(s => { if (s.stepImage) { const img = new window.Image(); img.src = s.stepImage } })
+              }}
               style={{ 
                 background: 'rgba(30, 41, 59, 0.4)', backdropFilter: 'blur(12px)', border: '2px solid rgba(255,255,255,0.08)', borderRadius: 32, padding: '32px 32px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: 24, boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
               }} 
@@ -552,8 +556,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                       (activeAction === '기도 확보' && activeDisplayIndex === 1) ? 'scale(1.3)' :
                       (activeAction === '기도 확보' && activeDisplayIndex === 3) ? 'scale(1.25)' :
                       'none',
-                    opacity: imgLoaded ? 1 : 0,
-                    transition: 'opacity 0.3s ease-out, transform 0.3s ease-out'
+                    transition: 'transform 0.3s ease-out'
                   }}
                   alt={currentActionData.steps[activeDisplayIndex].title}
                 />
