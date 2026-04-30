@@ -177,6 +177,14 @@ const FOLLOWUP_GUIDES = {
 export default function Emergency({ patient, initialAction, onNavigate }) {
   const { showAlert } = useAlert()
   const [imgError, setImgError] = useState(false)
+  const [prevPatientId, setPrevPatientId] = useState(patient?.id)
+  
+  // 환자 변경 시 이미지 에러 상태 초기화 (Task 3-4 최적화)
+  if (patient?.id !== prevPatientId) {
+    setPrevPatientId(patient?.id)
+    setImgError(false)
+  }
+
   const [selectedTriage, setSelectedTriage] = useState(null)
   
   const [triageStep, setTriageStep] = useState(() => {
@@ -206,11 +214,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     }
     return null
   })
-
-  // 환자 변경 시 이미지 에러 상태 초기화
-  useEffect(() => {
-    if (imgError) setImgError(false)
-  }, [patient])
 
 
   const [completedSteps, setCompletedSteps] = useState([])
@@ -390,7 +393,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
 
   const [burnTimer, setBurnTimer] = useState(1200)
   const [isBurnTimerActive, setIsBurnTimerActive] = useState(false)
-  const [coldTimer, setColdTimer] = useState(900)
+  const [coldTimer, setColdTimer] = useState(1200)
   const [isColdTimerActive, setIsColdTimerActive] = useState(false)
   const [washTimer, setWashTimer] = useState(300)
   const [isWashTimerActive, setIsWashTimerActive] = useState(false)
@@ -422,11 +425,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   }
 
   const [hoveredAction, setHoveredAction] = useState(null)
-  const [gcs, setGcs] = useState({ e: 4, v: 5, m: 6 })
-
-  const updateGCS = (key, val) => {
-    setGcs(prev => ({ ...prev, [key]: val }))
-  }
 
   const currentActionData = activeAction ? ACTION_GUIDES[activeAction] : null
 
@@ -446,7 +444,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   if (triageStep === 'CHECK') {
     const triageData = [
       { label: '눈을 뜨고 말을 하나요?', desc: '정상 의식', sub: '일반적인 대화 가능', action: '상처 세척', color: '#2dd4bf', icon: <CheckCircle2 size={32}/> },
-      { label: '부르면 대답을 하나요?', desc: '언어 반응', sub: '부르는 소리에 반응', action: '지혈/압박', color: '#fb923c', icon: <Mic size={32}/> },
+      { label: '부르면 대답을 하나요?', desc: '언어 반응', sub: '부르는 소리에 반응', action: '상처 세척', color: '#fb923c', icon: <Mic size={32}/> },
       { label: '꼬집을 때만 반응하나요?', desc: '통증 반응', sub: '강한 자극에만 반응', action: '기도 확보', color: '#fb923c', icon: <Zap size={32}/> },
       { label: '전혀 반응이 없나요?', desc: '무반응 (긴급)', sub: '의식 및 반응 없음', action: '심폐소생술', color: '#f43f5e', icon: <AlertOctagon size={32}/> },
     ]
@@ -674,7 +672,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                   <div style={{ position: 'absolute', top: '30px', fontSize: 22, fontWeight: 900, color: coldTimer === 0 ? '#22c55e' : '#38bdf8', letterSpacing: '-0.5px', transition: 'all 0.5s ease' }}>{coldTimer === 0 ? '찜질 완료' : '냉찜질 시간'}</div>
                   <div style={{ fontSize: 48, fontWeight: 950, color: '#fff', lineHeight: 1, fontFamily: '"Pretendard", sans-serif', marginTop: '10px' }}>{formatBurnTime(coldTimer)}</div>
                   <button 
-                    onClick={(e) => { e.stopPropagation(); setColdTimer(900); setIsColdTimerActive(false); }}
+                    onClick={(e) => { e.stopPropagation(); setColdTimer(1200); setIsColdTimerActive(false); }}
                     style={{ 
                       position: 'absolute',
                       bottom: '15px',
@@ -925,7 +923,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
           {Object.keys(ACTION_GUIDES).map(key => (
             <button
               key={key}
-              onClick={() => {setActiveAction(key); setHoveredAction(null); setCompletedSteps([]); setSelectedTriage(null); setShowCompletionPanel(false); setSelectedStepIndex(null); setIsBurnTimerActive(false); setBurnTimer(1200); setIsColdTimerActive(false); setColdTimer(900); setIsWashTimerActive(false); setWashTimer(300);}}
+              onClick={() => {setActiveAction(key); setHoveredAction(null); setCompletedSteps([]); setSelectedTriage(null); setShowCompletionPanel(false); setSelectedStepIndex(null); setIsBurnTimerActive(false); setBurnTimer(1200); setIsColdTimerActive(false); setColdTimer(1200); setIsWashTimerActive(false); setWashTimer(300);}}
               onMouseEnter={() => setHoveredAction(key)}
               onMouseLeave={() => setHoveredAction(null)}
               style={{ background: activeAction === key ? `linear-gradient(135deg, ${ACTION_GUIDES[key].color}, ${ACTION_GUIDES[key].color}dd)` : `${ACTION_GUIDES[key].color}15`, border: '2px solid', borderColor: activeAction === key ? 'transparent' : `${ACTION_GUIDES[key].color}30`, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
