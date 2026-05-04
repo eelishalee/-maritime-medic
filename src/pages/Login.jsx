@@ -56,11 +56,6 @@ export default function Login({ onLogin }) {
             </h1>
           </div>
 
-          <div style={{ display: 'flex', gap: '50px' }}>
-            <StatItem val="24H" label="실시간 바이탈" />
-            <StatItem val="AI 8종" label="응급처치 분류" />
-            <StatItem val="심층 25단계" label="처치 프로토콜" />
-          </div>
         </div>
 
         {/* 우측 로그인 카드 섹션 (흐르는 빛 효과 구현) */}
@@ -138,14 +133,6 @@ export default function Login({ onLogin }) {
   )
 }
 
-function StatItem({ val, label }) {
-  return (
-    <div>
-      <div style={{ fontSize: '28px', fontWeight: '950', color: '#fff', lineHeight: '1', letterSpacing: '-0.5px' }}>{val}</div>
-      <div style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.4)', marginTop: '4px', fontWeight: '400' }}>{label}</div>
-    </div>
-  )
-}
 
 function LoginInput({ icon, placeholder, value, onChange, focused, onFocus, onBlur }) {
   return (

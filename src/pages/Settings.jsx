@@ -347,7 +347,7 @@ export default function Settings() {
   ])
 
   const [isMedModalOpen, setIsMedModalOpen] = useState(false)
-  const [newMed, setNewMed] = useState({ n: '', c: '', q: 10, m: 5, cat: 'pill' })
+  const [newMed, setNewMed] = useState({ n: '', c: '', q: 10, m: 5, cat: 'pill', e: '-' })
   const [editMed, setEditMed] = useState(null)
 
   const saveEditMed = () => {
@@ -383,7 +383,7 @@ export default function Settings() {
 
   const addMed = () => {
     if (!newMed.n || !newMed.c) return showAlert('약품명과 효능을 입력하세요.', '입력 오류', 'warning')
-    setMeds(prev => [...prev, { ...newMed, id: Date.now(), e: '-' }])
+    setMeds(prev => [...prev, { ...newMed, id: Date.now() }])
     setIsMedModalOpen(false)
     setNewMed({ n: '', c: '', q: 10, m: 5, cat: 'pill' })
     const nowStr = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' })
@@ -827,8 +827,14 @@ export default function Settings() {
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:15 }}>
                   {[...meds].sort((a,b) => a.n.localeCompare(b.n, 'ko')).map(m => {
                     const isLow = m.q <= m.m;
+                    const expDiff = m.e && m.e !== '-' ? Math.ceil((new Date(m.e) - new Date()) / (1000 * 60 * 60 * 24)) : null;
+                    const isExpired = expDiff !== null && expDiff < 0;
+                    const isExpiringSoon = expDiff !== null && expDiff >= 0 && expDiff < 90;
+                    const expColor = isExpired ? C.danger : isExpiringSoon ? C.warning : C.success;
+                    const expLabel = isExpired ? '만료됨' : isExpiringSoon ? '만료임박' : '유효';
+                    const borderColor = isExpired ? C.danger+'88' : isLow ? C.warning+'66' : C.border;
                     return (
-                      <div key={m.id} style={{ background:C.panel, border:`1.5px solid ${isLow ? C.warning+'66' : C.border}`, borderRadius:12, padding:'20px', position:'relative' }}>
+                      <div key={m.id} style={{ background:C.panel, border:`1.5px solid ${borderColor}`, borderRadius:12, padding:'20px', position:'relative' }}>
                         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:4 }}>
                           <div style={{ fontSize:20, color:C.sub, fontWeight:800, display:'flex', alignItems:'center', gap:5 }}>
                             {m.cat === 'pill' ? <Pill size={17}/> : m.cat === 'liquid' ? <Activity size={17}/> : <Shield size={17}/>} {m.c}
@@ -846,6 +852,16 @@ export default function Settings() {
                             <div style={{ fontSize:20, color:C.sub, fontWeight:700 }}>최소 {m.m}</div>
                           </div>
                           <button onClick={()=>updateMed(m.id, 1)} style={{ background:'none', border:'none', color:C.info, cursor:'pointer', fontSize:36, fontWeight:900 }}>+</button>
+                        </div>
+                        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:10 }}>
+                          {expDiff !== null ? (
+                            <>
+                              <span style={{ fontSize:17.2, fontWeight:800, color:expColor, background:`${expColor}18`, border:`1px solid ${expColor}44`, borderRadius:5, padding:'2px 7px' }}>{isExpired ? '만료됨' : isExpiringSoon ? '만료임박' : '유통기한'}</span>
+                              <span style={{ fontSize:17.2, color:C.sub, fontWeight:700 }}>~{m.e}</span>
+                            </>
+                          ) : (
+                            <span style={{ fontSize:17.2, color:C.sub, fontWeight:700 }}>유통기한 없음</span>
+                          )}
                         </div>
                       </div>
                     )
@@ -1148,6 +1164,10 @@ export default function Settings() {
                   <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>최소 재고량</div>
                   <input type="number" value={newMed.m} onChange={e=>setNewMed({...newMed, m:parseInt(e.target.value)})} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none' }} />
                 </div>
+              </div>
+              <div>
+                <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>유통기한</div>
+                <input value={newMed.e} onChange={e=>setNewMed({...newMed, e:e.target.value})} placeholder="예: 2027-05-20  (없으면 -)" style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none', boxSizing:'border-box' }} />
               </div>
             </div>
             <div style={{ display:'flex', gap:18, marginTop:45 }}>
