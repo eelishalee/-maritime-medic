@@ -3,7 +3,8 @@ import {
   HeartPulse, Activity, Stethoscope, Pill, Clock, Plus, 
   ChevronDown, User, History, RotateCcw, AlertCircle, 
   MapPin, Anchor, Phone, AlertTriangle, CheckCircle2, 
-  Sparkles, ShieldAlert, ShieldCheck, Info, Pencil, Zap
+  Sparkles, ShieldAlert, ShieldCheck, Info, Pencil, Zap,
+  Camera, Droplets
 } from 'lucide-react'
 import { useAlert } from '../utils/AlertContext'
 
@@ -14,10 +15,12 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
   const [selectedId, setSelectedId] = useState(initialPatient?.id)
   const [patient, setPatient] = useState(initialPatient)
   const [imgError, setImgError] = useState(false)
+  const [traumaImgError, setTraumaImgError] = useState(false)
   
   // 환자 변경 시 이미지 에러 상태 초기화
   useEffect(() => {
     setImgError(false)
+    setTraumaImgError(false)
   }, [patient])
   
   // ─── 상태 선언 (useEffect 보다 위로 이동하여 호이스팅 문제 해결) ───
@@ -373,11 +376,12 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
       const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
       const mine = records.filter(r => r.patientId === patient?.id)
       if (mine.length > 0) {
-        const last = mine[mine.length - 1]
+        const last = mine[0] // 최신 기록이 배열 맨 앞에 오도록 함 (handleSave 로직상)
         return {
           date: new Date(last.timestamp).toLocaleDateString('ko-KR'),
           title: last.mainComplaint || '진료 기록',
-          detail: `• 증상: ${(last.selectedSymptoms || []).join(', ') || '없음'}\n• 처치: ${(last.prescribedMeds || []).join(', ') || '없음'}\n• 특이: ${last.otherActions || '없음'}`
+          detail: `• 증상: ${(last.selectedSymptoms || []).join(', ') || '없음'}\n• 처치: ${(last.prescribedMeds || []).join(', ') || '없음'}\n• 특이: ${last.otherActions || '없음'}`,
+          fullRecord: last
         }
       }
     } catch {}
@@ -537,7 +541,21 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#00d2ff', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
                 <RotateCcw size={20}/> 최근 진료 이력
               </div>
-              <div style={{ background: 'rgba(0, 210, 255, 0.04)', borderRadius: 16, padding: '20px', border: '1px solid rgba(0, 210, 255, 0.15)' }}>
+              <div onClick={() => {
+                if (displayRecentHistory.fullRecord) {
+                  onNavigate?.('main', { historicalRecord: displayRecentHistory.fullRecord })
+                }
+              }} style={{ 
+                cursor: displayRecentHistory.fullRecord ? 'pointer' : 'default',
+                background: 'rgba(0, 210, 255, 0.04)', 
+                borderRadius: 16, 
+                padding: '20px', 
+                border: '1px solid rgba(0, 210, 255, 0.15)',
+                transition: '0.2s',
+              }}
+              onMouseOver={e => { if(displayRecentHistory.fullRecord) e.currentTarget.style.background = 'rgba(0, 210, 255, 0.1)' }}
+              onMouseOut={e => { if(displayRecentHistory.fullRecord) e.currentTarget.style.background = 'rgba(0, 210, 255, 0.04)' }}
+              >
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
                   <span style={{ fontSize: 17, fontWeight: 850, color: '#00d2ff' }}>{displayRecentHistory.date}</span>
                   <span style={{ fontSize: 15, color: '#4a6080', fontWeight: 700 }}>{displayRecentHistory.title}</span>
@@ -545,6 +563,11 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
                 <div style={{ fontSize: 16, color: '#8da2c0', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
                   {displayRecentHistory.detail}
                 </div>
+                {displayRecentHistory.fullRecord && (
+                  <div style={{ marginTop: 12, textAlign: 'right', fontSize: 13, color: '#38bdf8', fontWeight: 800 }}>
+                    상세 기록보기 (클릭 시 메인 대시보드로 이동) →
+                  </div>
+                )}
               </div>
             </div>
             <div>
@@ -601,52 +624,104 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
         </aside>
 
         <div className="chart-scroll-container" style={{ display: 'flex', flexDirection: 'column', gap: 35, padding: '40px 60px', overflowY: 'auto' }}>
-          <SectionCard title="외상 상처 및 AI 분석 확인" icon={<Camera size={36} color="#38bdf8"/>}>
-            <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: 30 }}>
-              <div style={{ position: 'relative', borderRadius: 24, overflow: 'hidden', border: '2px solid rgba(56,189,248,0.3)', background: '#000', height: 300 }}>
-                <img 
-                  src={`/assets/photo/${patient?.id?.split('-')[1]?.padStart(3, '0') || '001'}.png`} 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} 
-                  alt="Trauma" 
-                />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 40%)' }} />
-                <div style={{ position: 'absolute', bottom: 20, left: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#26de81', boxShadow: '0 0 10px #26de81' }} />
-                  <span style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>AI 분석용 원본 이미지</span>
+          {patient?.id === 'S26-003' && (
+            <SectionCard title="외상 촬영 및 AI 분석" icon={<Camera size={36} color="#38bdf8"/>}>
+              <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: 30 }}>
+                <div style={{ position: 'relative', borderRadius: 24, overflow: 'hidden', border: '2px solid rgba(56,189,248,0.3)', background: '#000', height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {!traumaImgError ? (
+                    <>
+                      <img 
+                        src="/assets/ribs.jpeg" 
+                        onError={() => setTraumaImgError(true)}
+                        style={{ 
+                          width: '100%', 
+                          height: '100%', 
+                          objectFit: 'cover', 
+                          opacity: 0.8, 
+                          transform: 'scale(1.6)' 
+                        }} 
+                        alt="Trauma" 
+                      />
+                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 40%)' }} />
+                    </>
+                  ) : (
+                    <div style={{ 
+                      textAlign: 'center', 
+                      padding: '40px', 
+                      background: 'radial-gradient(circle at center, rgba(56,189,248,0.1) 0%, rgba(0,0,0,1) 100%)',
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 15
+                    }}>
+                      <div style={{ 
+                        width: 80, 
+                        height: 80, 
+                        borderRadius: '50%', 
+                        background: 'rgba(56,189,248,0.05)', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        border: '1.5px solid rgba(56,189,248,0.2)',
+                        marginBottom: 10,
+                        boxShadow: '0 0 30px rgba(56,189,248,0.1)'
+                      }}>
+                        <Camera size={40} color="#38bdf8" style={{ opacity: 0.8 }} />
+                      </div>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: '#f8fafc', letterSpacing: '-0.5px' }}>외상 촬영 및 AI 분석</div>
+                      <div style={{ fontSize: 16, color: '#94a3b8', fontWeight: 600, lineHeight: 1.5, maxWidth: '280px' }}>
+                        실시간 분석을 위한<br/>외상 스캔 신호를 검색하고 있습니다.
+                      </div>
+                      <div style={{ 
+                        marginTop: 20, 
+                        padding: '12px 30px', 
+                        borderRadius: 14, 
+                        background: 'rgba(56,189,248,0.1)', 
+                        border: '1px solid rgba(56,189,248,0.3)',
+                        color: '#38bdf8',
+                        fontSize: 18,
+                        fontWeight: 800,
+                        animation: 'pulse 2s infinite'
+                      }}>
+                        외상 스캔 신호 대기 중...
+                      </div>
+                    </div>
+                  )}
+                  <div style={{ position: 'absolute', bottom: 20, left: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: !traumaImgError ? '#26de81' : '#64748b', boxShadow: !traumaImgError ? '0 0 10px #26de81' : 'none' }} />
+                    <span style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>{!traumaImgError ? 'AI 분석용 원본 이미지' : '연결 대기'}</span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  <div style={{ background: 'rgba(56,189,248,0.05)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 20, padding: '24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 15 }}>
+                      <ShieldCheck size={24} color="#38bdf8" />
+                      <span style={{ fontSize: 22, fontWeight: 900, color: '#38bdf8' }}>AI 정밀 분석 진단명</span>
+                    </div>
+                    <div style={{ fontSize: 26, fontWeight: 950, color: '#fff', marginBottom: 10 }}>
+                      우측 제5,6 늑골 다발성 골절 의심
+                    </div>
+                    <div style={{ fontSize: 18, color: '#94a3b8', fontWeight: 700, lineHeight: 1.6 }}>
+                      판단 근거 : 흉부 타격 부위 피하 기종 의심 및 호흡 시 흉곽 비대칭 운동 감지
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
+                    <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: '15px 20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ fontSize: 15, color: '#64748b', fontWeight: 800, marginBottom: 5 }}>분석 신뢰도</div>
+                      <div style={{ fontSize: 24, fontWeight: 950, color: '#26de81' }}>94.2%</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: '15px 20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ fontSize: 15, color: '#64748b', fontWeight: 800, marginBottom: 5 }}>긴급도 등급</div>
+                      <div style={{ fontSize: 24, fontWeight: 950, color: '#ff4d6d' }}>LEVEL 4 (위험)</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                <div style={{ background: 'rgba(56,189,248,0.05)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 20, padding: '24px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 15 }}>
-                    <ShieldCheck size={24} color="#38bdf8" />
-                    <span style={{ fontSize: 22, fontWeight: 900, color: '#38bdf8' }}>AI 정밀 분석 진단명</span>
-                  </div>
-                  <div style={{ fontSize: 26, fontWeight: 950, color: '#fff', marginBottom: 10 }}>
-                    {patient?.id === 'S26-001' ? '두부 우측 측두부 열상 및 뇌진탕 의심' : 
-                     patient?.id === 'S26-002' ? '좌측 요골 원위부 폐쇄성 골절 의심' :
-                     patient?.id === 'S26-003' ? '우측 제5,6 늑골 다발성 골절 의심' :
-                     patient?.id === 'S26-008' ? '우측 상지 및 안면부 2도 화상' : '다발성 연조직 손상 및 외상'}
-                  </div>
-                  <div style={{ fontSize: 18, color: '#94a3b8', fontWeight: 700, lineHeight: 1.6 }}>
-                    판단 근거 : {patient?.id === 'S26-001' ? '측두부 함몰 흔적은 없으나 약 4cm 길이의 열상 포착 및 의식 혼탁 보고됨' : 
-                               patient?.id === 'S26-002' ? '전완부 하단의 비정상적인 굴곡(Silver-fork) 변형 및 심한 부종 관찰' :
-                               patient?.id === 'S26-003' ? '흉부 타격 부위 피하 기종 의심 및 호흡 시 흉곽 비대칭 운동 감지' :
-                               patient?.id === 'S26-008' ? '표피 박리 및 다수의 수포(Bullae) 형성 확인, 통증 민감도 매우 높음' : '영상 분석 결과 외부 충격에 의한 부종 및 변색 확인'}
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
-                  <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: '15px 20px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div style={{ fontSize: 15, color: '#64748b', fontWeight: 800, marginBottom: 5 }}>분석 신뢰도</div>
-                    <div style={{ fontSize: 24, fontWeight: 950, color: '#26de81' }}>94.2%</div>
-                  </div>
-                  <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: '15px 20px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div style={{ fontSize: 15, color: '#64748b', fontWeight: 800, marginBottom: 5 }}>긴급도 등급</div>
-                    <div style={{ fontSize: 24, fontWeight: 950, color: '#ff4d6d' }}>LEVEL 4 (위험)</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </SectionCard>
+            </SectionCard>
+          )}
 
           <SectionCard id="vital-section" title="현재 활력 징후 확인 (실시간 센서 데이터)" icon={<HeartPulse size={36} color="#ff4d6d"/>} right={
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

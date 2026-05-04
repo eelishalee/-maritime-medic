@@ -128,7 +128,7 @@ export function DashboardVital({ label, value, unit, color, editable, onEdit, li
                 WebkitTextFillColor: 'transparent',
                 letterSpacing: '-1.5px', 
                 whiteSpace: 'nowrap'
-              }}>{value}</span>
+              }}>{(value === null || value === undefined || isNaN(value) && typeof value !== 'string') ? '-' : value}</span>
               <span style={{ 
                 fontSize: 14, 
                 color: 'rgba(0, 255, 204, 0.5)', 

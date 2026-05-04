@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import DashboardView from './Main/components/DashboardView'
 import MainTutorial from './Main/components/MainTutorial'
 
-export default function Main({ patient, onNavigate, onSwitchPatient }) {
+export default function Main({ patient, onNavigate, onSwitchPatient, historicalRecord }) {
   // ─── 튜토리얼 상태 ───
   const [showTutorial, setShowTutorial] = useState(false)
 
@@ -18,39 +18,66 @@ export default function Main({ patient, onNavigate, onSwitchPatient }) {
   }
 
   // ─── 바이탈 데이터 상태 ───
-  const [hr, setHr] = useState(patient?.hr || 82)
-  const [spo2, setSpo2] = useState(patient?.spo2 || 98)
-  const [rr, setRr] = useState(patient?.rr || 17)
-  const [bp, setBp] = useState(patient?.bp || '128/84')
-  const [bt, setBt] = useState(patient?.temp || '36.7')
+  const [hr, setHr] = useState('-')
+  const [spo2, setSpo2] = useState('-')
+  const [rr, setRr] = useState('-')
+  const [bp, setBp] = useState('-')
+  const [bt, setBt] = useState('-')
 
   // ─── AI 어시스턴트 상태 ───
   const [prompt, setPrompt] = useState('')
-  const [chat, setChat] = useState(() => getInitialChat(patient))
+  const [chat, setChat] = useState([])
 
-  // 환자 교체 시 상태 초기화 (Render-time adjustment)
-  const [prevPatientId, setPrevPatientId] = useState(patient?.id)
-  if (patient?.id !== prevPatientId) {
-    setPrevPatientId(patient?.id)
-    
-    // 선원별로 고유한 베이스라인 바이탈 설정
-    const seed = patient?.id?.split('-').pop() || '0'
-    const baseHr = patient?.hr || (70 + (parseInt(seed) % 15))
-    const baseSpo2 = patient?.spo2 || (96 + (parseInt(seed) % 4))
-    const baseRr = patient?.rr || (14 + (parseInt(seed) % 6))
-    const baseBp = patient?.bp || `${115 + (parseInt(seed) % 20)}/${75 + (parseInt(seed) % 15)}`
-    const baseBt = patient?.temp || (36.4 + (parseInt(seed) % 6) / 10).toFixed(1)
+  // ─── 환자 데이터 및 과거 기록 로드 로직 ───
+  const [activePatientWithHistory, setActivePatientWithHistory] = useState(patient)
 
-    setHr(baseHr)
-    setSpo2(baseSpo2)
-    setRr(baseRr)
-    setBp(baseBp)
-    setBt(baseBt)
-    
-    // 채팅 초기화
+  useEffect(() => {
+    if (!patient) return
+
+    let latestRecord = null
+    try {
+      const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
+      latestRecord = records.find(r => r.patientId === patient.id)
+    } catch (e) {}
+
+    if (latestRecord) {
+      // 사이드바 '최근 진료 이력' 카드에 표시될 데이터 주입
+      setActivePatientWithHistory({
+        ...patient,
+        recentHistory: {
+          date: new Date(latestRecord.timestamp).toLocaleDateString('ko-KR'),
+          title: latestRecord.mainComplaint || '진료 기록',
+          detail: `• 증상: ${(latestRecord.selectedSymptoms || []).join(', ') || '없음'}\n• 처치: ${(latestRecord.prescribedMeds || []).join(', ') || '없음'}\n• 특이: ${latestRecord.otherActions || '없음'}`
+        }
+      })
+
+      // 바이탈 동기화 (NaN 방지를 위해 fallback 추가)
+      setHr(latestRecord.vitals?.hr || '-')
+      setSpo2(latestRecord.vitals?.spo2 || '-')
+      setRr(latestRecord.vitals?.rr || '-')
+      setBp(latestRecord.vitals?.bp || '-')
+      setBt(latestRecord.vitals?.temp || '-')
+    } else {
+      setActivePatientWithHistory(patient)
+      
+      const seed = patient.id?.split('-').pop() || '0'
+      const baseHr = patient.hr || (70 + (parseInt(seed) % 15))
+      const baseSpo2 = patient.spo2 || (96 + (parseInt(seed) % 4))
+      const baseRr = patient.rr || (14 + (parseInt(seed) % 6))
+      const baseBp = patient.bp || `${115 + (parseInt(seed) % 20)}/${75 + (parseInt(seed) % 15)}`
+      const baseBt = patient.temp || (36.4 + (parseInt(seed) % 6) / 10).toFixed(1)
+
+      setHr(baseHr)
+      setSpo2(baseSpo2)
+      setRr(baseRr)
+      setBp(baseBp)
+      setBt(baseBt)
+    }
+
+    // 진단 어시스턴트는 항상 초기 환자 상태 기반으로 설정 (이전 기록 불러오지 않음)
     setChat(getInitialChat(patient))
     setPrompt('')
-  }
+  }, [patient?.id, historicalRecord?.timestamp])
 
   // ─── 외상 분석 상태 ───
   const [isScanning, setIsScanning] = useState(false)
@@ -62,15 +89,21 @@ export default function Main({ patient, onNavigate, onSwitchPatient }) {
   useEffect(() => {
     const t = setInterval(() => {
       setHr(h => {
+        if (h === '-') return '-'
         const val = typeof h === 'number' ? h : parseInt(h)
+        if (isNaN(val)) return '-'
         return Math.max(60, Math.min(110, val + Math.round((Math.random() - 0.5) * 2)))
       })
       setSpo2(s => {
+        if (s === '-') return '-'
         const val = parseFloat(s)
+        if (isNaN(val)) return '-'
         return Math.max(94, Math.min(100, val + (Math.random() - 0.5) * 0.2)).toFixed(1)
       })
       setRr(r => {
+        if (r === '-') return '-'
         const val = typeof r === 'number' ? r : parseInt(r)
+        if (isNaN(val)) return '-'
         return Math.max(12, Math.min(22, val + Math.round((Math.random() - 0.5) * 1)))
       })
     }, 3000)
@@ -137,7 +170,7 @@ export default function Main({ patient, onNavigate, onSwitchPatient }) {
   return (
     <>
       <DashboardView
-        activePatient={patient}
+        activePatient={activePatientWithHistory}
         hr={hr}
         spo2={spo2}
         rr={rr}
@@ -177,69 +210,68 @@ function getInitialChat(patient) {
   // 환자별 외상 시나리오 메시지 맵
   const scenarios = {
     'S26-001': [
-      { role: 'ai', text: `이선장 선장님의 바이탈 데이터 동기화가 완료되었습니다.\n\n[외상 초기 분석]\n• 사고: 항해 브릿지 계단에서 미끄러져 머리 우측 측두부 강타\n• 두피 열상 약 4cm, 출혈 중등도\n• 일시적 의식 혼탁 후 회복 — 뇌진탕 의심\n• 기저 고혈압으로 두개내압 상승 위험 고려 필요` },
-      { role: 'ai', text: `[MDTS 긴급 권고]\n• 두부 고정 유지, 절대 안정 지시\n• 두피 열상 직접 압박 후 멸균 거즈 고정\n• 동공 반응·구토·의식 수준 15분 간격 모니터링\n• 아스피린 계열 금지 (혈압 약과 병용 위험) → 아세트아미노펜 투여\n\n[CONFIDENCE: 95%] [GUIDE: SOP-HEAD-01]` },
+      { role: 'ai', text: `이선장 선장님의 바이탈 데이터 동기화가 완료되었습니다.\n\n[상태 요약]\n• 사고: 항해 브릿지 계단에서 미끄러져 머리 오른쪽을 강하게 부딪힘\n• 상처: 머리 가죽이 약 4cm 찢어져 피가 나고 있음\n• 상태: 잠시 정신이 흐릿했다가 돌아옴 — 충격으로 인한 뇌진탕 증세 관찰\n• 혈압이 높으므로 머리 내부 압력이 올라가지 않도록 주의가 필요함` },
+      { role: 'ai', text: `[MDTS 권고사항]\n• 머리를 움직이지 않게 하고 조용히 쉬게 하세요\n• 상처 부위를 깨끗한 거즈로 꾹 눌러서 피를 멈추게 하세요\n• 15분마다 눈동자 움직임, 구토 여부, 정신이 맑은지 확인하세요\n• 아스피린은 피하고 타이레놀(아세트아미노펜)을 주시는 것이 안전합니다\n\n[신뢰도: 95%] [가이드: 머리 부상 대응]` },
       { role: 'user', text: '처치 내용 기록해줘' },
-      { role: 'ai', text: `[시행된 처치 내역 — 이선장 / 11:15~11:40]
+      { role: 'ai', text: `[기록된 처치 내역 — 이선장 / 11:15~11:40]
 
-① 지혈 처치
-   → 멸균 거즈 직접 압박 15분 → 출혈 통제 확인
-   → 탄력 붕대로 두부 고정 드레싱 완료
+① 지혈(피 멈춤) 처치
+   → 거즈로 15분간 꾹 눌러 피가 멈춘 것을 확인
+   → 붕대로 머리를 감싸 고정 완료
 
-② 약물 투여
-   → 아세트아미노펜 500mg 경구 (아스피린 금기 확인)
-   → 암로디핀 5mg 정규 복용 유지
+② 약 먹임
+   → 타이레놀 500mg 한 알 복용 (혈압약과 같이 먹어도 안전함 확인)
+   → 평소 드시는 혈압약 그대로 복용 유지
 
-③ 신경학적 평가
-   → 동공 반응 양측 정상, 복시 없음
-   → GCS 15점 — 의식 완전 회복
+③ 상태 확인
+   → 눈동자 움직임 양쪽 모두 정상, 사물이 두 개로 보이지 않음
+   → 정신이 완전히 맑아진 상태임 (정상 대화 가능)
 
-④ 모니터링 지시
-   → 15분 간격 동공·의식·혈압 체크
-   → 구토·두통 악화 시 즉시 재평가` },
+④ 관찰 지시
+   → 15분마다 정신 상태와 혈압 체크
+   → 토하거나 두통이 심해지면 즉시 다시 알려주세요` },
     ],
     'S26-002': [
-      { role: 'ai', text: `김항해 1등 항해사의 바이탈 데이터 동기화가 완료되었습니다.\n\n[외상 초기 분석]\n• 사고: 화물 갑판 컨테이너 고박 작업 중 와이어 로프 반동으로 좌측 전완부 타격\n• 좌측 요골 골절 의심 — 심한 부종 및 변형 관찰\n• 개방성 상처 없음, 신경·혈관 손상 여부 확인 필요\n• 알레르기(페니실린) 확인 완료 — 감염 예방 항생제 대체 처방 필요` },
-      { role: 'ai', text: `[MDTS 긴급 권고]\n• 부목으로 팔꿈치~손목 전체 고정 후 심장보다 높게 거상\n• 냉찜질 20분 적용 (얼음 직접 접촉 금지)\n• 페니실린 계열 항생제 절대 금지 → 아목시실린 대체 불가, 세팔로스포린 투여 검토\n• 맥박 및 말초 혈액순환 30분 간격 재확인\n\n[CONFIDENCE: 93%] [GUIDE: SOP-FX-02]` },
+      { role: 'ai', text: `김항해 1등 항해사의 바이탈 데이터 동기화가 완료되었습니다.\n\n[상태 요약]\n• 사고: 화물 고박 작업 중 튕겨 나온 와이어에 왼쪽 팔뚝을 강하게 맞음\n• 손상: 왼쪽 손목 위 뼈가 부러진 것으로 보임 — 많이 부어 있고 팔 모양이 휘어짐\n• 상태: 겉으로 드러난 상처는 없으나, 손끝까지 피가 잘 통하는지 확인이 필요함\n• 주의: 페니실린 항생제에 부작용이 있으므로 약 사용 시 주의해야 함` },
+      { role: 'ai', text: `[MDTS 권고사항]\n• 부목을 대서 팔꿈치부터 손목까지 움직이지 않게 고정하고 심장보다 높게 들어주세요\n• 부기를 빼기 위해 20분 정도 찬찜질을 하세요 (얼음을 살에 직접 대지는 마세요)\n• 페니실린 약은 절대 쓰지 말고 다른 종류의 항생제를 사용하세요\n• 30분마다 손가락 끝이 저린지, 맥박이 잘 뛰는지 확인하세요\n\n[신뢰도: 93%] [가이드: 뼈 부러짐 대응]` },
       { role: 'user', text: '처치 내용 기록해줘' },
-      { role: 'ai', text: `[시행된 처치 내역 — 김항해 / 13:22~13:55]
+      { role: 'ai', text: `[기록된 처치 내역 — 김항해 / 13:22~13:55]
 
-① 골절 고정
-   → 팔꿈치~손목 전체 부목 고정 완료
-   → 삼각건으로 심장 위 거상 유지
+① 뼈 고정
+   → 팔 전체에 부목을 대어 고정 완료
+   → 삼각건을 이용해 팔을 가슴 높이로 매달아 둠
 
-② 냉찜질
-   → 수건 감싼 냉팩 20분 적용 (얼음 직접 접촉 방지)
+② 찬찜질
+   → 수건으로 감싼 찬 팩을 20분간 적용함
 
-③ 약물 투여
-   → 이부프로펜 400mg 경구 투여
-   → 페니실린 계열 항생제 영구 금기 등록
+③ 약 먹임
+   → 진통제(이부프로펜) 400mg 복용
+   → 페니실린 부작용 환자로 영구 등록함
 
-④ 말초 순환 확인
-   → 30분 후 요골 맥박 정상, 손가락 감각 회복
-   → 원격 의료 자문 요청 전송 완료` },
+④ 손끝 확인
+   → 30분 후 맥박 정상 확인, 손가락 감각 돌아옴
+   → 육지에 있는 의사에게 상담 요청 보냄` },
     ],
     'S26-003': [
-      { role: 'ai', text: `박기관 기관장님의 바이탈 데이터 동기화가 완료되었습니다.\n\n[외상 초기 분석]\n• 사고: 엔진 제어실 (ECR) 3층 철제 계단에서 약 2.5m 낙하\n• 우측 흉부 강한 압통 — 늑골 골절 의심 (5·6번 갈비뼈)\n• 호흡 시 통증 악화, 얕은 호흡 패턴 관찰\n• 기저 고혈압·고지혈증 / 아스피린 알레르기 확인` },
-      { role: 'ai', text: `[MDTS 긴급 권고]\n• 흉부 탄력 압박 붕대 고정 유지\n• 아스피린 투여 절대 금지 → 아세트아미노펜 500mg으로 대체\n• SpO₂ 95% 미만 즉시 산소 마스크 착용\n• 기흉 진행 징후(호흡음 감소·청색증) 지속 청진 필요\n\n[CONFIDENCE: 96%] [GUIDE: SOP-RIB-05]` },
+      { role: 'ai', text: `박기관 기관장님의 바이탈 데이터 동기화가 완료되었습니다.\n\n[상태 요약]\n• 사고: 계단 3층 높이(약 2.5m)에서 바닥으로 떨어짐\n• 손상: 오른쪽 가슴을 누르면 몹시 아파함 — 갈비뼈가 여러 개 부러진 것으로 의심됨\n• 상태: 숨을 쉴 때마다 가슴이 아파서 얕고 빠르게 숨을 몰아쉬는 상태임\n• 주의: 고혈압이 있고 아스피린에 알레르기가 있음` },
+      { role: 'ai', text: `[MDTS 권고사항]\n• 가슴 주위를 압박 붕대로 감싸서 통증을 줄여주세요\n• 아스피린은 절대 주지 말고 타이레놀 500mg으로 대체하세요\n• 환자가 편안하게 숨을 쉴 수 있도록 상체를 45도 정도 일으켜 세워주세요\n• 숨소리가 작아지거나 입술이 파래지는지 계속 지켜보세요\n\n[신뢰도: 96%] [가이드: 가슴 부상 대응]` },
       { role: 'user', text: '처치 내용 기록해줘' },
-      { role: 'ai', text: `[시행된 처치 내역 — 박기관 / 14:38~15:10]
+      { role: 'ai', text: `[기록된 처치 내역 — 박기관 / 14:38~15:10]
 
-① 흉부 고정
-   → 탄력 압박 붕대로 우측 흉부 고정 완료
-   → 반좌위(Semi-Fowler) 자세 유지 지시
+① 가슴 고정
+   → 탄력 붕대로 오른쪽 가슴 부위를 고정함
+   → 환자가 숨쉬기 편하게 상체를 약간 일으킨 자세 유지
 
-② 약물 투여
-   → 아스피린 알레르기 확인 → 투여 금지
-   → 아세트아미노펜 500mg 경구 투여
+② 약 먹임
+   → 아스피린 대신 타이레놀 500mg 한 알 복용함
 
-③ 산소 공급 준비
-   → SpO₂ 97% 현재 유지 — 마스크 대기
-   → 95% 미만 시 즉시 산소 마스크 착용 지시
+③ 호흡 관찰
+   → 현재 산소 수치는 정상임
+   → 호흡 곤란 증상이 심해지는지 밀착 감시 중
 
-④ 흉부 청진
-   → 양측 호흡음 청진 정상 — 기흉 현재 배제
-   → 30분 간격 재청진 예정` },
+④ 숨소리 확인
+   → 양쪽 폐의 숨소리가 모두 들림 — 폐에 구멍이 난 증거는 없음
+   → 30분마다 숨소리 다시 체크 예정` },
     ],
     'S26-004': [
       { role: 'ai', text: `최갑판 갑판장의 바이탈 데이터 동기화가 완료되었습니다.\n\n[외상 초기 분석]\n• 사고: 선수 갑판 중량물 하역 중 800kg 파렛트 낙하로 좌측 하퇴부 압궤\n• 좌측 경골 골절 의심 — 심한 변형 및 부종\n• 기저 허리디스크로 척추 2차 손상 가능성 주의\n• 쇼크 전구 증상(창백·냉한·빈맥) 모니터링 중` },
