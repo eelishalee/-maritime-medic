@@ -7,13 +7,15 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
   const [showTutorial, setShowTutorial] = useState(false)
 
   useEffect(() => {
-    // [테스트 모드] 확인을 위해 매번 노출되도록 설정
-    const t = setTimeout(() => setShowTutorial(true), 600)
-    return () => clearTimeout(t)
+    const seen = sessionStorage.getItem('mdts_tutorial_seen')
+    if (!seen) {
+      const t = setTimeout(() => setShowTutorial(true), 600)
+      return () => clearTimeout(t)
+    }
   }, [])
 
   const finishTutorial = () => {
-    // localStorage.setItem('mdts_tutorial_seen_v2', 'true') // 테스트 중에는 저장하지 않음
+    sessionStorage.setItem('mdts_tutorial_seen', 'true')
     setShowTutorial(false)
   }
 

@@ -56,7 +56,7 @@ export default function App() {
     setPage(newPage)
   }
 
-  if (!auth) return <Login onLogin={setAuth} />
+  if (!auth) return <Login onLogin={(val) => { sessionStorage.removeItem('mdts_tutorial_seen'); setAuth(val) }} />
 
   return (
     <AlertProvider>

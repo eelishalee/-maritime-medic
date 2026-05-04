@@ -19,7 +19,7 @@ const STEPS = [
   {
     id: 'tuto-ai-chat',
     title: 'AI 증상 분석 및 조치 안내',
-    text: '전문 의료 지식이 없어도 당황하지 마세요. 환자의 상태를 입력하면 AI가 비의료인도 이해하기 쉬운 언어로 최적의 응급 처치와 상비약 사용 권고안을 실시간으로 안내합니다.',
+    text: '환자 상태를 입력하면 AI가 최적의 응급 처치와 상비약 사용법을 실시간으로 안내합니다.',
     icon: <Sparkles color="#38bdf8" size={24}/>,
     pos: 'top'
   },
@@ -28,21 +28,29 @@ const STEPS = [
     title: '긴급 응급처치 액션',
     text: '심정지 등 초응급 상황 발생 시, 즉시 단계별 처치 가이드가 제공되는 전용 응급 모드를 활성화하여 신속하게 대응할 수 있습니다.',
     icon: <AlertTriangle color="#f43f5e" size={24}/>,
-    pos: 'top-right'
+    pos: 'left',
+    maxWidth: 380,
+    offsetY: -360,
+    offsetX: 40
   },
   {
     id: 'tuto-timeline',
     title: '상황 대응 타임라인',
     text: '사고 발생 시점부터 현재까지의 모든 처치 이력과 바이탈 변화를 시간순으로 기록하고 확인합니다.',
     icon: <Clock color="#38bdf8" size={24}/>,
-    pos: 'left'
+    pos: 'left',
+    maxWidth: 380,
+    offsetX: 80
   },
   {
     id: 'tuto-trauma-btn',
     title: 'AI 외상 촬영 분석',
     text: '카메라로 외상 부위를 촬영하면 AI가 상처의 종류와 심각도를 분석하여 최적의 처치법을 제안합니다.',
     icon: <Camera color="#38bdf8" size={24}/>,
-    pos: 'top-left'
+    pos: 'top-left',
+    maxWidth: 380,
+    offsetY: -40,
+    offsetX: -100
   }
 ]
 
@@ -138,8 +146,10 @@ export default function MainTutorial({ onFinish }) {
       {/* 가이드 카드 */}
       <div style={{
         position: 'absolute',
-        ...getCardPos(cur.pos, spotlight),
-        width: 340,
+        ...getCardPos(cur.pos, spotlight, cur.offsetY ?? 0, cur.offsetX ?? 0, cur.maxWidth ?? 560),
+        minWidth: 320,
+        maxWidth: cur.maxWidth ?? 560,
+        width: 'max-content',
         background: 'rgba(15, 23, 42, 0.95)',
         backdropFilter: 'blur(10px)',
         border: '1px solid rgba(255,255,255,0.1)',
@@ -150,20 +160,20 @@ export default function MainTutorial({ onFinish }) {
         zIndex: 100000
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-          <span style={{ fontSize: 13, fontWeight: 800, color: '#38bdf8', letterSpacing: '1px' }}>GUIDE {step + 1}/{STEPS.length}</span>
+          <span style={{ fontSize: 17, fontWeight: 800, color: '#38bdf8', letterSpacing: '1px' }}>GUIDE {step + 1}/{STEPS.length}</span>
           <button onClick={onFinish} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: 4 }}><X size={18}/></button>
         </div>
 
-        <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 10 }}>{cur.title}</div>
-        <div style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.6, marginBottom: 24, fontWeight: 500 }}>{cur.text}</div>
+        <div style={{ fontSize: 27, fontWeight: 900, color: '#fff', marginBottom: 10, wordBreak: 'keep-all' }}>{cur.title}</div>
+        <div style={{ fontSize: 20, color: '#94a3b8', lineHeight: 1.6, marginBottom: 24, fontWeight: 500, wordBreak: 'keep-all', whiteSpace: 'pre-wrap' }}>{cur.text}</div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {step > 0 ? (
-            <button onClick={prev} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>이전 단계</button>
+            <button onClick={prev} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: 19, fontWeight: 700, cursor: 'pointer' }}>이전 단계</button>
           ) : <div />}
-          <button onClick={next} style={{ 
-            padding: '10px 20px', borderRadius: 8, background: '#38bdf8', color: '#000', 
-            border: 'none', fontWeight: 900, fontSize: 15, cursor: 'pointer', 
+          <button onClick={next} style={{
+            padding: '10px 20px', borderRadius: 8, background: '#38bdf8', color: '#000',
+            border: 'none', fontWeight: 900, fontSize: 20, cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 6,
             transition: 'all 0.2s'
           }}>
@@ -182,15 +192,23 @@ export default function MainTutorial({ onFinish }) {
   )
 }
 
-function getCardPos(pos, spotlight) {
-  const margin = 25
+function getCardPos(pos, spotlight, offsetY = 0, offsetX = 0, cardW = 560) {
+  const margin = 20
+  const cardH = 280
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const pad = 10
+
+  const clampL = (l) => Math.max(pad, Math.min(l + offsetX, vw - cardW - pad))
+  const clampT = (t) => Math.max(pad, Math.min(t + offsetY, vh - cardH - pad))
+
   switch (pos) {
-    case 'right': return { top: spotlight.top, left: spotlight.left + spotlight.width + margin }
-    case 'left': return { top: spotlight.top, right: window.innerWidth - spotlight.left + margin }
-    case 'bottom': return { top: spotlight.top + spotlight.height + margin, left: spotlight.left + (spotlight.width / 2) - 190 }
-    case 'top': return { bottom: window.innerHeight - spotlight.top + margin, left: spotlight.left + (spotlight.width / 2) - 190 }
-    case 'top-right': return { bottom: window.innerHeight - spotlight.top + margin, left: spotlight.left }
-    case 'top-left': return { bottom: window.innerHeight - spotlight.top + margin, right: window.innerWidth - (spotlight.left + spotlight.width) }
-    default: return { top: spotlight.top, left: spotlight.left + spotlight.width + margin }
+    case 'right': return { top: clampT(spotlight.top), left: clampL(spotlight.left + spotlight.width + margin) }
+    case 'left':  return { top: clampT(spotlight.top), left: clampL(spotlight.left - cardW - margin) }
+    case 'bottom': return { top: clampT(spotlight.top + spotlight.height + margin), left: clampL(spotlight.left + spotlight.width / 2 - cardW / 2) }
+    case 'top': return { top: clampT(spotlight.top - margin - cardH), left: clampL(spotlight.left + spotlight.width / 2 - cardW / 2) }
+    case 'top-right': return { top: clampT(spotlight.top - margin - cardH), left: clampL(spotlight.left) }
+    case 'top-left': return { top: clampT(spotlight.top - margin - cardH), left: clampL(spotlight.left + spotlight.width - cardW) }
+    default: return { top: clampT(spotlight.top), left: clampL(spotlight.left + spotlight.width + margin) }
   }
 }

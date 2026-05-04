@@ -479,9 +479,9 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
               >
                 <div style={{ width: 72, height: 72, borderRadius: 22, background: `${t.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.color, border: `2.5px solid ${t.color}40`, flexShrink: 0, boxShadow: `0 0 20px ${t.color}15` }}>{t.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 21, fontWeight: 900, color: t.color, letterSpacing: '1.5px', marginBottom: 6, opacity: 0.9, whiteSpace: 'nowrap' }}>{t.sub}</div>
-                  <div style={{ fontSize: 26, fontWeight: 950, color: '#fff', marginBottom: 4, letterSpacing: '-0.5px', whiteSpace: 'nowrap' }}>{t.label}</div>
-                  <div style={{ fontSize: 20, color: '#94a3b8', fontWeight: 700, whiteSpace: 'nowrap' }}>{t.desc}</div>
+                  <div style={{ fontSize: 29, fontWeight: 900, color: t.color, letterSpacing: '1.5px', marginBottom: 6, opacity: 0.9, whiteSpace: 'nowrap' }}>{t.sub}</div>
+                  <div style={{ fontSize: 36, fontWeight: 950, color: '#fff', marginBottom: 4, letterSpacing: '-0.5px', whiteSpace: 'nowrap' }}>{t.label}</div>
+                  <div style={{ fontSize: 28, color: '#94a3b8', fontWeight: 700, whiteSpace: 'nowrap' }}>{t.desc}</div>
                 </div>
                 <ChevronRight size={32} color="#1e293b" style={{ opacity: 0.5, flexShrink: 0 }} />
                 <div className="btn-glow" style={{ position: 'absolute', inset: 0, background: `linear-gradient(135deg, ${t.color}15, transparent)`, opacity: 0, transition: '0.3s' }} />
