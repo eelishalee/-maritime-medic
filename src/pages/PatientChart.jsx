@@ -406,14 +406,27 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
   // 작업 위치: location(선원관리) 직접 매핑
   const displayWorkLocation = patient?.location || patient?.workLocation || '미지정'
 
-  // 비상 연락망: emergencyName + emergency(선원관리) 파싱
+  // 비상 연락망: PROTECTOR_MAP 기반 강제 매핑 및 파싱 (DashboardView와 동일하게)
   const displayEmergency = (() => {
-    const name = patient?.emergencyName || '미지정'
-    const raw = patient?.emergency || ''
-    const parts = raw.split(' ')
-    const phone = parts[0] || '-'
-    const relation = parts[1] ? parts[1].replace(/[()]/g, '') : '-'
-    return { name, phone, relation }
+    let display = { name: '미지정', phone: '-', relation: '-' };
+    const PROTECTOR_MAP = {
+      'S26-001': '김도윤', 'S26-002': '김도장', 'S26-003': '양정희', 'S26-004': '박지호',
+      'S26-005': '정민준', 'S26-006': '정하윤', 'S26-007': '강준우', 'S26-008': '조예은',
+      'S26-009': '임도현', 'S26-010': '장수빈', 'S26-011': '황지훈', 'S26-012': '한지민',
+      'S26-013': '오세현', 'S26-014': '나혜지', 'S26-015': '송다희', 'S26-016': '김한혜'
+    };
+    const forcedName = PROTECTOR_MAP[patient?.id];
+    
+    if (patient?.emergencyName || forcedName) {
+      display.name = forcedName || patient.emergencyName;
+      if (patient?.emergency && typeof patient.emergency === 'string') {
+        const parts = patient.emergency.split(' ');
+        display.phone = parts[0] || '-';
+        display.relation = parts[1] ? parts[1].replace(/[()]/g, '') : '가족';
+      }
+      return display;
+    }
+    return display;
   })()
 
   return (

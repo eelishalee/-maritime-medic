@@ -380,7 +380,7 @@ export default function DashboardView({
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
-            <InfoItem label="나이/성별" value={`${activePatient?.age || 55}세 / 남`} size="xl_ultra" />
+            <InfoItem label="나이/성별" value={`${activePatient?.age || 55}세 / ${activePatient?.gender || '남'}`} size="xl_ultra" />
             <InfoItem label="혈액형" value={activePatient?.blood || 'A+형'} size="xl_ultra" />
             <InfoItem label="신장" value={`${activePatient?.height || 178} cm`} size="xl_ultra" />
             <InfoItem label="몸무게" value={`${activePatient?.weight || 82} kg`} size="xl_ultra" />
@@ -389,31 +389,68 @@ export default function DashboardView({
         
         <div style={{ flex: 1, overflowY: 'auto', padding: '28px 28px 120px 28px', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 32 }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#fb923c', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><Activity size={20}/> 기저 질환</div>
-            <div style={{ fontSize: 19, fontWeight: 750, color: '#fed7aa', background: 'rgba(251,146,60,0.06)', padding: '16px', borderRadius: 16, border: '1px solid rgba(251,146,60,0.15)' }}>{activePatient?.chronic || '기록 없음'}</div>
-          </div>
-          <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><History size={20}/> 과거력</div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0', lineHeight: 1.6, background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)' }}>{activePatient?.history ? activePatient.history.split('\n').map((line, i) => <div key={i}>{line}</div>) : '기록 없음'}</div>
+            <div style={{ fontSize: 19, fontWeight: 750, color: '#e2e8f0', lineHeight: 1.6, background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)' }}>
+              {(activePatient?.pastHistory || activePatient?.history || activePatient?.chronic || '기록 없음').split('\n').map((line, i) => <div key={i}>{line}</div>)}
+            </div>
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#00d2ff', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><RotateCcw size={20}/> 최근 진료 이력</div>
-            <div style={{ background: 'rgba(0, 210, 255, 0.04)', borderRadius: 16, padding: '20px', border: '1px solid rgba(0, 210, 255, 0.15)' }}>
+            <div 
+              onClick={() => {
+                // 이미 메인이므로 상세 기록 재현 상태임
+              }}
+              style={{ 
+                cursor: activePatient?.recentHistory ? 'pointer' : 'default',
+                background: 'rgba(0, 210, 255, 0.04)', 
+                borderRadius: 16, 
+                padding: '20px', 
+                border: '1px solid rgba(0, 210, 255, 0.15)',
+                transition: '0.2s',
+              }}
+              onMouseOver={e => { if(activePatient?.recentHistory) e.currentTarget.style.background = 'rgba(0, 210, 255, 0.1)' }}
+              onMouseOut={e => { if(activePatient?.recentHistory) e.currentTarget.style.background = 'rgba(0, 210, 255, 0.04)' }}
+            >
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                <span style={{ fontSize: 17, fontWeight: 850, color: '#00d2ff' }}>{activePatient?.recentHistory?.date || '2026-03-15'}</span>
-                <span style={{ fontSize: 15, color: '#4a6080', fontWeight: 700 }}>{activePatient?.recentHistory?.title || '단순 감기'}</span>
+                <span style={{ fontSize: 17, fontWeight: 850, color: '#00d2ff' }}>{activePatient?.recentHistory?.date || '기록 없음'}</span>
+                <span style={{ fontSize: 15, color: '#4a6080', fontWeight: 700 }}>{activePatient?.recentHistory?.title || '-'}</span>
               </div>
-              <div style={{ fontSize: 16, color: '#8da2c0', whiteSpace: 'pre-line', lineHeight: 1.5 }}>{activePatient?.recentHistory?.detail || '- 처방 : 타이레놀 500mg\n- 특이사황 : 알레르기 반응 없음'}</div>
+              <div style={{ fontSize: 16, color: '#8da2c0', whiteSpace: 'pre-line', lineHeight: 1.6 }}>{activePatient?.recentHistory?.detail || '저장된 진료 기록이 없습니다.'}</div>
+              {activePatient?.recentHistory && (
+                <div style={{ marginTop: 12, textAlign: 'right', fontSize: 13, color: '#38bdf8', fontWeight: 800 }}>
+                  상세 기록 재현 중...
+                </div>
+              )}
             </div>
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#f43f5e', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><AlertCircle size={20}/> 알레르기 / 주의사항</div>
-            <div style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', borderRadius: 16, padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>{(activePatient?.allergies || '없음').split(',').map((a, i) => (<div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f43f5e' }} /><span style={{ fontSize: 17, fontWeight: 750, color: '#fda4af' }}>{a.trim()}</span></div>))}</div>
+            <div style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', borderRadius: 16, padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {(activePatient?.allergies || '없음').split(',').map((a, i) => (<div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f43f5e' }} /><span style={{ fontSize: 17, fontWeight: 750, color: '#fda4af' }}>{a.trim()}</span></div>))}
+            </div>
           </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#26de81', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><Phone size={20}/> 보호자 연락처</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#fb923c', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><Pill size={20}/> 복용 중인 약물</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {(() => {
+                const meds = activePatient?.meds?.length > 0 ? activePatient.meds : (activePatient?.lastMed && activePatient.lastMed !== '없음' ? activePatient.lastMed.split(',').map(m => ({ name: m.trim(), purpose: '처방약' })) : []);
+                return meds.length > 0 ? meds.map((drug, i) => (
+                  <div key={i} style={{ background: 'rgba(251,146,60,0.05)', border: '1px solid rgba(251,146,60,0.15)', borderRadius: 14, padding: '14px 18px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 17, fontWeight: 850, color: '#fed7aa' }}>{drug.name}</span>
+                      <span style={{ fontSize: 14, color: '#fb923c', fontWeight: 800 }}>{drug.purpose}</span>
+                    </div>
+                  </div>
+                )) : (
+                  <div style={{ padding: '14px 18px', background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.05)', color: '#64748b', fontSize: 16, fontWeight: 700 }}>복용 중인 약물 없음</div>
+                );
+              })()}
+            </div>
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#26de81', fontSize: 18, fontWeight: 800, marginBottom: 14 }}><Phone size={20}/> 비상 연락망</div>
             <div style={{ background: 'rgba(38,222,129,0.06)', border: '1px solid rgba(38,222,129,0.2)', borderRadius: 16, padding: '18px 20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}><span style={{ fontSize: 22, fontWeight: 950, color: '#fff' }}>{emergency.name}</span><span style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, background: 'rgba(38,222,129,0.15)', color: '#26de81', fontWeight: 800 }}>{emergency.relation}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}><span style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{emergency.name}</span><span style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, background: 'rgba(38,222,129,0.15)', color: '#26de81', fontWeight: 800 }}>{emergency.relation}</span></div>
               <div style={{ fontSize: 20, fontWeight: 900, color: '#26de81', letterSpacing: '0.5px' }}>{emergency.phone}</div>
             </div>
           </div>
