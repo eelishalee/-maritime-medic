@@ -601,6 +601,53 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
         </aside>
 
         <div className="chart-scroll-container" style={{ display: 'flex', flexDirection: 'column', gap: 35, padding: '40px 60px', overflowY: 'auto' }}>
+          <SectionCard title="외상 상처 및 AI 분석 확인" icon={<Camera size={36} color="#38bdf8"/>}>
+            <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: 30 }}>
+              <div style={{ position: 'relative', borderRadius: 24, overflow: 'hidden', border: '2px solid rgba(56,189,248,0.3)', background: '#000', height: 300 }}>
+                <img 
+                  src={`/assets/photo/${patient?.id?.split('-')[1]?.padStart(3, '0') || '001'}.png`} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} 
+                  alt="Trauma" 
+                />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 40%)' }} />
+                <div style={{ position: 'absolute', bottom: 20, left: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#26de81', boxShadow: '0 0 10px #26de81' }} />
+                  <span style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>AI 분석용 원본 이미지</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <div style={{ background: 'rgba(56,189,248,0.05)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 20, padding: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 15 }}>
+                    <ShieldCheck size={24} color="#38bdf8" />
+                    <span style={{ fontSize: 22, fontWeight: 900, color: '#38bdf8' }}>AI 정밀 분석 진단명</span>
+                  </div>
+                  <div style={{ fontSize: 26, fontWeight: 950, color: '#fff', marginBottom: 10 }}>
+                    {patient?.id === 'S26-001' ? '두부 우측 측두부 열상 및 뇌진탕 의심' : 
+                     patient?.id === 'S26-002' ? '좌측 요골 원위부 폐쇄성 골절 의심' :
+                     patient?.id === 'S26-003' ? '우측 제5,6 늑골 다발성 골절 의심' :
+                     patient?.id === 'S26-008' ? '우측 상지 및 안면부 2도 화상' : '다발성 연조직 손상 및 외상'}
+                  </div>
+                  <div style={{ fontSize: 18, color: '#94a3b8', fontWeight: 700, lineHeight: 1.6 }}>
+                    판단 근거 : {patient?.id === 'S26-001' ? '측두부 함몰 흔적은 없으나 약 4cm 길이의 열상 포착 및 의식 혼탁 보고됨' : 
+                               patient?.id === 'S26-002' ? '전완부 하단의 비정상적인 굴곡(Silver-fork) 변형 및 심한 부종 관찰' :
+                               patient?.id === 'S26-003' ? '흉부 타격 부위 피하 기종 의심 및 호흡 시 흉곽 비대칭 운동 감지' :
+                               patient?.id === 'S26-008' ? '표피 박리 및 다수의 수포(Bullae) 형성 확인, 통증 민감도 매우 높음' : '영상 분석 결과 외부 충격에 의한 부종 및 변색 확인'}
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
+                  <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: '15px 20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div style={{ fontSize: 15, color: '#64748b', fontWeight: 800, marginBottom: 5 }}>분석 신뢰도</div>
+                    <div style={{ fontSize: 24, fontWeight: 950, color: '#26de81' }}>94.2%</div>
+                  </div>
+                  <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: '15px 20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div style={{ fontSize: 15, color: '#64748b', fontWeight: 800, marginBottom: 5 }}>긴급도 등급</div>
+                    <div style={{ fontSize: 24, fontWeight: 950, color: '#ff4d6d' }}>LEVEL 4 (위험)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SectionCard>
+
           <SectionCard id="vital-section" title="현재 활력 징후 확인 (실시간 센서 데이터)" icon={<HeartPulse size={36} color="#ff4d6d"/>} right={
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               {[{ label: '정상', color: '#26de81' }, { label: '관찰', color: '#38bdf8' }, { label: '주의', color: '#fb923c' }, { label: '위험', color: '#ff4d6d' }].map(({ label, color }) => (
