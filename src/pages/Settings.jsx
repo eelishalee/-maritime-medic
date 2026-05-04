@@ -183,6 +183,7 @@ export default function Settings() {
   const [isEditingCoords, setIsEditingCoords] = useState(false)
   const [tempCoords, setTempCoords] = useState({ lat: '', lng: '' })
   const [activities, setActivities] = useState([...SYS_LOGS_INITIAL].reverse())
+  const [medEnv, setMedEnv] = useState({ temp: 22.4, humi: 45.8 })
   const [updateStatus, setUpdateStatus] = useState('IDLE')
   const [deviceInfo, setDeviceInfo] = useState([
     { l: '선박명', v: SHIP_INFO.name, k: 'shipName' },
@@ -222,6 +223,14 @@ export default function Settings() {
           const newTime = `${new Date().getHours()}시 ${new Date().getMinutes()}분`;
           return [...prev.slice(1), { h: newTime, v: newVal }];
         });
+      }
+
+      // 온습도 실시간 변동 (5초마다)
+      if (new Date().getSeconds() % 5 === 0) {
+        setMedEnv(p => ({
+          temp: +(p.temp + (Math.random() - 0.5) * 0.2).toFixed(1),
+          humi: +(p.humi + (Math.random() - 0.5) * 0.4).toFixed(1)
+        }))
       }
     }, 1000); 
     return () => clearInterval(t) 
@@ -347,8 +356,14 @@ export default function Settings() {
   ])
 
   const [isMedModalOpen, setIsMedModalOpen] = useState(false)
-  const [newMed, setNewMed] = useState({ n: '', c: '', q: 10, m: 5, cat: 'pill', e: '-' })
+  const todayStr = new Date().toISOString().split('T')[0]
+  const [newMed, setNewMed] = useState({ n: '', c: '', q: 10, m: 5, cat: 'pill', e: todayStr })
   const [editMed, setEditMed] = useState(null)
+
+  const openNewMedModal = () => {
+    setNewMed({ n: '', c: '', q: 10, m: 5, cat: 'pill', e: todayStr })
+    setIsMedModalOpen(true)
+  }
 
   const saveEditMed = () => {
     if (!editMed.n || !editMed.c) return showAlert('약품명과 효능을 입력하세요.', '입력 오류', 'warning')
@@ -817,14 +832,14 @@ export default function Settings() {
               )}
             </GPanel>
           </div>
-          <div style={{ marginTop: 25 }}>
+          <div style={{ marginTop: 25, display:'grid', gridTemplateColumns:'1fr 340px', gap:20 }}>
             <GPanel
               title="필수 의료 약품 및 소모품 재고 관리" 
               icon={<Pill size={22} color={C.warning}/>}
-              right={<Btn color={C.warning} small onClick={()=>setIsMedModalOpen(true)}>+</Btn>}
+              right={<Btn color={C.warning} small onClick={openNewMedModal}>+</Btn>}
             >
               <div style={{ maxHeight: 380, overflowY: 'auto', paddingRight: 10 }}>
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:15 }}>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:15 }}>
                   {[...meds].sort((a,b) => a.n.localeCompare(b.n, 'ko')).map(m => {
                     const isLow = m.q <= m.m;
                     const expDiff = m.e && m.e !== '-' ? Math.ceil((new Date(m.e) - new Date()) / (1000 * 60 * 60 * 24)) : null;
@@ -840,7 +855,10 @@ export default function Settings() {
                             {m.cat === 'pill' ? <Pill size={17}/> : m.cat === 'liquid' ? <Activity size={17}/> : <Shield size={17}/>} {m.c}
                           </div>
                           <div style={{ display:'flex', gap:4 }}>
-                            <button onClick={()=>setEditMed({...m})} style={{ background:'rgba(56,189,248,0.1)', border:'1px solid rgba(56,189,248,0.3)', borderRadius:6, padding:'3px 8px', color:C.info, fontSize:13, fontWeight:800, cursor:'pointer' }}>수정</button>
+                            <button onClick={()=>{
+                              const initialE = (m.e === '-' || !m.e) ? todayStr : m.e;
+                              setEditMed({...m, e: initialE});
+                            }} style={{ background:'rgba(56,189,248,0.1)', border:'1px solid rgba(56,189,248,0.3)', borderRadius:6, padding:'3px 8px', color:C.info, fontSize:13, fontWeight:800, cursor:'pointer' }}>수정</button>
                             <button onClick={()=>deleteMed(m.id)} style={{ background:'rgba(255,77,109,0.1)', border:'1px solid rgba(255,77,109,0.3)', borderRadius:6, padding:'3px 8px', color:C.danger, fontSize:13, fontWeight:800, cursor:'pointer' }}>삭제</button>
                           </div>
                         </div>
@@ -866,6 +884,21 @@ export default function Settings() {
                       </div>
                     )
                   })}
+                </div>
+              </div>
+            </GPanel>
+
+            <GPanel title="의약품 보관 환경" icon={<Sparkles size={22} color={C.success}/>}>
+              <div style={{ display:'flex', flexDirection:'column', gap:20, height:'100%', justifyContent:'center' }}>
+                <div style={{ background:'rgba(255,255,255,0.02)', border:`1px solid ${C.border}`, borderRadius:20, padding:30, textAlign:'center', position:'relative', overflow:'hidden' }}>
+                  <div style={{ fontSize:22, color:C.sub, fontWeight:800, marginBottom:15, display:'flex', alignItems:'center', justifyContent:'center', gap:10 }}><Activity size={20} color={C.success}/> 실시간 온도</div>
+                  <div style={{ fontSize:72, fontWeight:950, color:C.success, letterSpacing:'-2px' }}>{medEnv.temp}<span style={{ fontSize:32, color:C.sub, marginLeft:8 }}>°C</span></div>
+                  <div style={{ fontSize:18, color:C.success, fontWeight:700, marginTop:10, opacity:0.8 }}>상태 : 최적 (15~25°C)</div>
+                </div>
+                <div style={{ background:'rgba(255,255,255,0.02)', border:`1px solid ${C.border}`, borderRadius:20, padding:30, textAlign:'center' }}>
+                  <div style={{ fontSize:22, color:C.sub, fontWeight:800, marginBottom:15, display:'flex', alignItems:'center', justifyContent:'center', gap:10 }}><Sparkles size={20} color={C.info}/> 실시간 습도</div>
+                  <div style={{ fontSize:72, fontWeight:950, color:C.info, letterSpacing:'-2px' }}>{medEnv.humi}<span style={{ fontSize:32, color:C.sub, marginLeft:8 }}>%</span></div>
+                  <div style={{ fontSize:18, color:C.info, fontWeight:700, marginTop:10, opacity:0.8 }}>상태 : 건조 (40~60%)</div>
                 </div>
               </div>
             </GPanel>
@@ -1108,11 +1141,11 @@ export default function Settings() {
               {[
                 { label:'약품명', field:'n', placeholder:'예: 타이레놀' },
                 { label:'효능/분류', field:'c', placeholder:'예: 해열진통' },
-                { label:'유통기한', field:'e', placeholder:'예: 2027-05-20 또는 -' },
+                { label:'유통기한 (YYYY-MM-DD)', field:'e', placeholder:'2027-05-20 (없으면 -)' },
               ].map(({ label, field, placeholder }) => (
                 <div key={field}>
                   <div style={{ fontSize:16, color:C.sub, fontWeight:800, marginBottom:8 }}>{label}</div>
-                  <input value={editMed[field] || ''} onChange={e=>setEditMed(p=>({...p,[field]:e.target.value}))} placeholder={placeholder} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:18, fontWeight:700, outline:'none', boxSizing:'border-box' }} />
+                  <input value={editMed[field] || ''} onChange={e=>setEditMed(p=>({...p,[field]:e.target.value}))} placeholder={field === 'e' ? todayStr : placeholder} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 18px', color:'#fff', fontSize:18, fontWeight:700, outline:'none', boxSizing:'border-box' }} />
                 </div>
               ))}
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
@@ -1166,8 +1199,8 @@ export default function Settings() {
                 </div>
               </div>
               <div>
-                <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>유통기한</div>
-                <input value={newMed.e} onChange={e=>setNewMed({...newMed, e:e.target.value})} placeholder="예: 2027-05-20  (없으면 -)" style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none', boxSizing:'border-box' }} />
+                <div style={{ fontSize:18, color:C.sub, marginBottom:12, fontWeight:800 }}>유통기한 (YYYY-MM-DD)</div>
+                <input value={newMed.e} onChange={e=>setNewMed({...newMed, e:e.target.value})} placeholder={todayStr + " (없으면 -)"} style={{ width:'100%', background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', color:'#fff', fontSize:20, fontWeight:700, outline:'none', boxSizing:'border-box' }} />
               </div>
             </div>
             <div style={{ display:'flex', gap:18, marginTop:45 }}>

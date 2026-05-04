@@ -199,7 +199,7 @@ export default function CrewManagement({ onSelectPatient }) {
         <div style={{ position: 'relative', flex: 1, maxWidth: '600px' }}>
           <Search style={{ position: 'absolute', left: 18, top: '50%', transform: 'translateY(-50%)', color: '#4a6080' }} size={18} />
           <input 
-            placeholder="선원 이름, 고유 ID, 담당 직위로 검색..." 
+            placeholder="선원 이름, 고유 ID, 담당 직책으로 검색..." 
             value={query} 
             onChange={e => setQuery(e.target.value)} 
             style={{ width: '100%', padding: '14px 20px 14px 48px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', color: '#fff', fontSize: '15px', outline: 'none', transition: '0.3s', boxSizing: 'border-box', fontFamily: 'inherit' }} 
@@ -211,7 +211,7 @@ export default function CrewManagement({ onSelectPatient }) {
         <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 10px', padding: '0 20px' }}>
           <thead>
             <tr style={{ background: '#020617', position: 'sticky', top: 0, zIndex: 10 }}>
-              {['선원 프로필', '소속 및 직위', '신체 정보', '기저질환', '알레르기', '긴급 연락망', '환자 관리'].map((h, i) => (
+              {['선원 프로필', '소속 및 직책', '신체 정보', '기저질환', '알레르기', '긴급 연락망', '환자 관리'].map((h, i) => (
                 <th key={i} style={{ padding: '20px 24px', textAlign: 'center', fontSize: '26px', color: '#64748b', fontWeight: 950 }}>{h}</th>
               ))}
             </tr>
@@ -411,7 +411,7 @@ export default function CrewManagement({ onSelectPatient }) {
                     <div style={{ background: 'rgba(255,255,255,0.01)', padding: '24px', borderRadius: 24, border: '1px solid rgba(255,255,255,0.04)' }}>
                       <div style={{ fontSize: 17, fontWeight: 900, marginBottom: 18, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: 8 }}><Users size={18}/> 기본 인적사항</div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-                        {[{label:'선원 성명',field:'name'},{label:'생년월일',field:'dob'},{label:'성별',field:'gender'}].map(({label,field}) => (
+                        {[{label:'성명',field:'name'},{label:'생년월일',field:'dob'},{label:'성별',field:'gender'}].map(({label,field}) => (
                           <EditFormGroup key={field} label={label} value={manageTarget[field]||''} onChange={v=>setManageTarget(p=>({...p,[field]:v}))} placeholder="" />
                         ))}
                       </div>
@@ -423,14 +423,14 @@ export default function CrewManagement({ onSelectPatient }) {
                     </div>
                     <div style={{ background: 'rgba(255,255,255,0.01)', padding: '24px', borderRadius: 24, border: '1px solid rgba(255,255,255,0.04)' }}>
                       <div style={{ fontSize: 17, fontWeight: 900, marginBottom: 18, color: '#fb923c', display: 'flex', alignItems: 'center', gap: 8 }}><Anchor size={18}/> 소속 및 승선 정보</div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                           <label style={{ fontSize: 19, color: '#64748b', fontWeight: 950 }}>소속 부서</label>
                           <select value={manageTarget.dept||'항해부'} onChange={e=>setManageTarget(p=>({...p,dept:e.target.value}))} style={{ width: '100%', height: 56, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '0 16px', color: '#0dd9c5', outline: 'none', fontWeight: 800, fontSize: 19, fontFamily: 'inherit', appearance: 'none', cursor: 'pointer', boxSizing: 'border-box' }}>
                             {['항해부','기관부','지원부'].map(d=><option key={d} value={d} style={{background:'#0a1224'}}>{d}</option>)}
                           </select>
                         </div>
-                        {[{label:'직위',field:'role'},{label:'승선 일자',field:'boardingDate'},{label:'현재 위치',field:'location'}].map(({label,field}) => (
+                        {[{label:'직책',field:'role'},{label:'승선 일자',field:'boardingDate'}].map(({label,field}) => (
                           <EditFormGroup key={field} label={label} value={manageTarget[field]||''} onChange={v=>setManageTarget(p=>({...p,[field]:v}))} placeholder="" />
                         ))}
                       </div>
@@ -442,14 +442,10 @@ export default function CrewManagement({ onSelectPatient }) {
                           <EditFormGroup key={field} label={label} value={manageTarget[field]||''} onChange={v=>setManageTarget(p=>({...p,[field]:v}))} placeholder="" />
                         ))}
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginTop: 16 }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                          <label style={{ fontSize: 16, color: '#64748b', fontWeight: 950 }}>과거 병력</label>
+                          <label style={{ fontSize: 16, color: '#64748b', fontWeight: 950 }}>과거 이력</label>
                           <textarea value={manageTarget.pastHistory||''} onChange={e=>setManageTarget(p=>({...p,pastHistory:e.target.value}))} style={{ width:'100%', minHeight:80, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:14, padding:'14px 16px', color:'#fff', outline:'none', fontWeight:700, fontSize:16, resize:'none', fontFamily:'inherit', boxSizing:'border-box' }}/>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                          <label style={{ fontSize: 16, color: '#64748b', fontWeight: 950 }}>특이사항</label>
-                          <textarea value={manageTarget.note||''} onChange={e=>setManageTarget(p=>({...p,note:e.target.value}))} style={{ width:'100%', minHeight:80, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:14, padding:'14px 16px', color:'#fff', outline:'none', fontWeight:700, fontSize:16, resize:'none', fontFamily:'inherit', boxSizing:'border-box' }}/>
                         </div>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr', gap: 16, marginTop: 16 }}>
@@ -521,7 +517,7 @@ export default function CrewManagement({ onSelectPatient }) {
                     <Users size={22}/> 기본 인적사항
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
-                    <FormGroup label="선원 성명" value={newCrew.name} onChange={v => setNewCrew({...newCrew, name: v})} placeholder="실명 입력" icon={<UserIcon size={18}/>} />
+                    <FormGroup label="성명" value={newCrew.name} onChange={v => setNewCrew({...newCrew, name: v})} placeholder="실명 입력" icon={<UserIcon size={18}/>} />
                     <FormGroup label="생년월일" type="date" value={newCrew.dob} onDateClick={() => setDateEditor({ field: 'dob', label: '생년월일', value: newCrew.dob })} icon={<Calendar size={18}/>} />
                     <SelectGroup label="성별" value={newCrew.gender} onChange={v => setNewCrew({...newCrew, gender: v})} options={['남', '여']} icon={<UserIcon size={18}/>} />
                   </div>
@@ -537,11 +533,10 @@ export default function CrewManagement({ onSelectPatient }) {
                   <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 24, color: '#fb923c', display: 'flex', alignItems: 'center', gap: 10 }}>
                     <Anchor size={22}/> 소속 및 승선 정보
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
                     <SelectGroup label="소속 부서" value={newCrew.dept} onChange={v => setNewCrew({...newCrew, dept: v})} options={['항해부', '기관부', '지원부']} icon={<Anchor size={18}/>} />
-                    <FormGroup label="직위" value={newCrew.role} onChange={v => setNewCrew({...newCrew, role: v})} placeholder="예: 기관장" />
+                    <FormGroup label="직책" value={newCrew.role} onChange={v => setNewCrew({...newCrew, role: v})} placeholder="예: 기관장" />
                     <FormGroup label="승선 일자" type="date" value={newCrew.boardingDate} onDateClick={() => setDateEditor({ field: 'boardingDate', label: '승선 일자', value: newCrew.boardingDate })} icon={<Calendar size={18}/>} />
-                    <FormGroup label="현재 위치" value={newCrew.location} onChange={v => setNewCrew({...newCrew, location: v})} placeholder="예: 브릿지" icon={<MapPin size={18}/>} />
                   </div>
                 </div>
 
@@ -554,14 +549,10 @@ export default function CrewManagement({ onSelectPatient }) {
                     <FormGroup label="알레르기" value={newCrew.allergies} onChange={v => setNewCrew({...newCrew, allergies: v})} placeholder="알레르기 입력" icon={<Heart size={18}/>} />
                     <FormGroup label="최근 투약" value={newCrew.lastMed} onChange={v => setNewCrew({...newCrew, lastMed: v})} placeholder="약물명 입력" icon={<Pill size={18}/>} />
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20, marginTop: 20 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      <label style={{ fontSize: 18, color: '#64748b', fontWeight: 950 }}>과거 병력 및 수술 이력</label>
+                      <label style={{ fontSize: 18, color: '#64748b', fontWeight: 950 }}>과거 이력</label>
                       <textarea value={newCrew.pastHistory} onChange={e => setNewCrew({...newCrew, pastHistory: e.target.value})} placeholder="상세 내용 입력..." style={{ width: '100%', minHeight: 100, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '16px 20px', color: '#fff', outline: 'none', fontWeight: 700, fontSize: 18, resize: 'none', fontFamily: 'inherit' }} />
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      <label style={{ fontSize: 18, color: '#64748b', fontWeight: 950 }}>관리 특이사항 (메모)</label>
-                      <textarea value={newCrew.note} onChange={e => setNewCrew({...newCrew, note: e.target.value})} placeholder="주의사항 입력..." style={{ width: '100%', minHeight: 100, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '16px 20px', color: '#fff', outline: 'none', fontWeight: 700, fontSize: 18, resize: 'none', fontFamily: 'inherit' }} />
                     </div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr', gap: 20, marginTop: 20 }}>

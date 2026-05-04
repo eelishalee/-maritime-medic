@@ -1,7 +1,22 @@
 import { useState, useEffect } from 'react'
 import DashboardView from './Main/components/DashboardView'
+import MainTutorial from './Main/components/MainTutorial'
 
 export default function Main({ patient, onNavigate, onSwitchPatient }) {
+  // ─── 튜토리얼 상태 ───
+  const [showTutorial, setShowTutorial] = useState(false)
+
+  useEffect(() => {
+    // [테스트 모드] 확인을 위해 매번 노출되도록 설정
+    const t = setTimeout(() => setShowTutorial(true), 600)
+    return () => clearTimeout(t)
+  }, [])
+
+  const finishTutorial = () => {
+    // localStorage.setItem('mdts_tutorial_seen_v2', 'true') // 테스트 중에는 저장하지 않음
+    setShowTutorial(false)
+  }
+
   // ─── 바이탈 데이터 상태 ───
   const [hr, setHr] = useState(patient?.hr || 82)
   const [spo2, setSpo2] = useState(patient?.spo2 || 98)
@@ -120,31 +135,34 @@ export default function Main({ patient, onNavigate, onSwitchPatient }) {
   }
 
   return (
-    <DashboardView
-      activePatient={patient}
-      hr={hr}
-      spo2={spo2}
-      rr={rr}
-      bp={bp}
-      bt={bt}
-      chat={chat}
-      prompt={prompt}
-      setPrompt={setPrompt}
-      handlePromptAnalysis={handlePromptAnalysis}
-      startEmergencyAction={startEmergencyAction}
-      handleTraumaAnalysis={handleTraumaAnalysis}
-      isScanning={isScanning}
-      setIsScanning={setIsScanning}
-      scanProgress={scanProgress}
-      scanStatus={scanStatus}
-      setScanStatus={setScanStatus}
-      scanError={scanError}
-      setScanError={setScanError}
-      confirmTraumaAnalysis={confirmTraumaAnalysis}
-      setBp={setBp}
-      setBt={setBt}
-      onSwitchPatient={onSwitchPatient}
-    />
+    <>
+      <DashboardView
+        activePatient={patient}
+        hr={hr}
+        spo2={spo2}
+        rr={rr}
+        bp={bp}
+        bt={bt}
+        chat={chat}
+        prompt={prompt}
+        setPrompt={setPrompt}
+        handlePromptAnalysis={handlePromptAnalysis}
+        startEmergencyAction={startEmergencyAction}
+        handleTraumaAnalysis={handleTraumaAnalysis}
+        isScanning={isScanning}
+        setIsScanning={setIsScanning}
+        scanProgress={scanProgress}
+        scanStatus={scanStatus}
+        setScanStatus={setScanStatus}
+        scanError={scanError}
+        setScanError={setScanError}
+        confirmTraumaAnalysis={confirmTraumaAnalysis}
+        setBp={setBp}
+        setBt={setBt}
+        onSwitchPatient={onSwitchPatient}
+      />
+      {showTutorial && <MainTutorial onFinish={finishTutorial} />}
+    </>
   )
 }
 

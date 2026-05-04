@@ -450,9 +450,8 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
       <div style={{ position: 'relative', zIndex: 100, background: 'rgba(7, 15, 30, 0.98)', backdropFilter: 'blur(15px)', borderBottom: '1.5px solid rgba(255,255,255,0.1)', padding: '16px 60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
           <div ref={selectRef} style={{ position: 'relative', width: '360px' }}>
-            <div onClick={() => setIsSelectOpen(!isSelectOpen)} style={{ background: 'rgba(56,189,248,0.05)', border: `2px solid ${isSelectOpen ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, borderRadius: '16px', color: '#fff', padding: '12px 20px', fontSize: '22px', fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: '0.3s' }}>
+            <div onClick={() => setIsSelectOpen(!isSelectOpen)} style={{ background: 'rgba(56,189,248,0.05)', border: `2px solid ${isSelectOpen ? '#38bdf8' : 'rgba(255,255,255,0.1)'}`, borderRadius: '16px', color: '#fff', padding: '12px 20px', fontSize: '22px', fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', transition: '0.3s' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><User size={24} color="#38bdf8" /><span>{patient.name} ({patient.role})</span></div>
-              <ChevronDown size={24} style={{ transform: isSelectOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.3s', color: '#38bdf8' }} />
             </div>
             {isSelectOpen && (
               <div style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(20px)', border: '1.5px solid rgba(56,189,248,0.3)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', zIndex: 1000, maxHeight: 300, overflowY: 'auto' }}>
@@ -576,20 +575,6 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
                 )) : (
                     <div style={{ padding: '14px 18px', background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.05)', color: '#64748b', fontSize: 16, fontWeight: 700 }}>복용 중인 약물 없음</div>
                 )}
-              </div>
-            </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#38bdf8', fontSize: 18, fontWeight: 800, marginBottom: 14 }}>
-                <MapPin size={20}/> 환자 작업 위치
-              </div>
-              <div style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 16, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(56,189,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Anchor size={22} color="#38bdf8" />
-                </div>
-                <div>
-                  <div style={{ fontSize: 18, fontWeight: 850, color: '#fff' }}>{displayWorkLocation}</div>
-                  <div style={{ fontSize: 14, color: '#4a6080', fontWeight: 700, marginTop: 2 }}>선박 내 상세 위치 연동 중</div>
-                </div>
               </div>
             </div>
             <div>
