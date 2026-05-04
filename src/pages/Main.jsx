@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import DashboardView from './Main/components/DashboardView'
 import MainTutorial from './Main/components/MainTutorial'
+
 
 export default function Main({ patient, onNavigate, onSwitchPatient, historicalRecord }) {
   // ─── 튜토리얼 상태 ───
@@ -86,6 +87,29 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
   const [scanProgress, setScanProgress] = useState(0)
   const [scanStatus, setScanStatus] = useState(null) // 'scanning' | 'success' | 'error'
   const [scanError, setScanError] = useState(null)
+  const [lowConfidencePopup, setLowConfidencePopup] = useState(false)
+  const isScanningRef = useRef(false)
+  const scanTimerRef = useRef(null)
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === '2' && isScanningRef.current) {
+        e.preventDefault()
+        if (scanTimerRef.current) {
+          clearInterval(scanTimerRef.current)
+          scanTimerRef.current = null
+        }
+        isScanningRef.current = false
+        setIsScanning(false)
+        setScanStatus(null)
+        setLowConfidencePopup(true)
+      }
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [])
+
+
 
   // ─── 실시간 바이탈 시뮬레이션 (모든 바이탈에 미세 변화 적용) ───
   useEffect(() => {
@@ -133,25 +157,21 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
 
   // ─── 외상 촬영 및 분석 ───
   const handleTraumaAnalysis = () => {
+    isScanningRef.current = true
     setIsScanning(true)
     setScanStatus('scanning')
     setScanProgress(0)
     setScanError(null)
     
     let p = 0
-    const timer = setInterval(() => {
+    scanTimerRef.current = setInterval(() => {
       p += Math.random() * 8 + 4
       if (p >= 100) {
-        clearInterval(timer)
+        clearInterval(scanTimerRef.current)
+        scanTimerRef.current = null
         setScanProgress(100)
-        
         setTimeout(() => {
-          if (Math.random() < 0.2) {
-            setScanStatus('error')
-            setScanError('이미지 해상도가 낮거나 조명이 부족하여 분석을 완료할 수 없습니다.')
-          } else {
-            setScanStatus('success')
-          }
+          setScanStatus('success')
         }, 600)
       } else {
         setScanProgress(p)
@@ -160,6 +180,7 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
   }
 
   const confirmTraumaAnalysis = () => {
+    isScanningRef.current = false
     setIsScanning(false)
     setScanStatus(null)
     onNavigate && onNavigate('emergency', { 
@@ -185,18 +206,48 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
         startEmergencyAction={startEmergencyAction}
         handleTraumaAnalysis={handleTraumaAnalysis}
         isScanning={isScanning}
-        setIsScanning={setIsScanning}
+        setIsScanning={(v) => { isScanningRef.current = v; setIsScanning(v) }}
         scanProgress={scanProgress}
         scanStatus={scanStatus}
         setScanStatus={setScanStatus}
         scanError={scanError}
         setScanError={setScanError}
         confirmTraumaAnalysis={confirmTraumaAnalysis}
+        onLowConfidenceAlert={() => setLowConfidencePopup(true)}
         setBp={setBp}
         setBt={setBt}
         onSwitchPatient={onSwitchPatient}
       />
       {showTutorial && <MainTutorial onFinish={finishTutorial} />}
+
+
+      {lowConfidencePopup && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 99998,
+          background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <div style={{
+            background: 'rgba(2, 15, 25, 0.98)', border: '2px solid rgba(139,92,246,0.4)',
+            borderRadius: 32, padding: '52px 56px', maxWidth: 520, width: '90%',
+            boxShadow: '0 0 80px rgba(139,92,246,0.2)', textAlign: 'center',
+            animation: 'fadeInUp 0.3s ease-out'
+          }}>
+            <div style={{
+              width: 80, height: 80, borderRadius: '50%',
+              background: 'rgba(139,92,246,0.1)', border: '2px solid #8b5cf6',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 28px', fontSize: 36
+            }}>🩺</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', lineHeight: 1.5, marginBottom: 20 }}>
+              정확한 판단을 위해<br/>의료진 확인이 필요한 상태입니다.
+            </div>
+            <div style={{ fontSize: 17, color: '#94a3b8', lineHeight: 1.8, fontWeight: 600 }}>
+              현재 상태는 AI 분석만으로는<br/>판단이 조심스러운 단계입니다.
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

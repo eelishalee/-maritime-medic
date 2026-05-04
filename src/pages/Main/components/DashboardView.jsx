@@ -108,11 +108,12 @@ export default function DashboardView({
   activePatient, hr, spo2, rr, bp, bt, chat, prompt, setPrompt,
   handlePromptAnalysis, startEmergencyAction, handleTraumaAnalysis,
   isScanning, scanProgress, scanStatus, setScanStatus, scanError,
-  confirmTraumaAnalysis, setIsScanning,
+  confirmTraumaAnalysis, setIsScanning, onLowConfidenceAlert,
   setBp, setBt, onSwitchPatient
 }) {
   const videoRef = useRef(null)
   const streamRef = useRef(null)
+  const scanOverlayRef = useRef(null)
 
   // ─── 환자 선택 드롭다운 상태 ───
   const [isSelectOpen, setIsSelectOpen] = useState(false)
@@ -270,7 +271,9 @@ export default function DashboardView({
     <div style={{ flex: 1, display: 'flex', overflow: 'hidden', height: '100%', position: 'relative', background: '#020408', cursor: 'default' }}>
 
       {isScanning && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#000', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#000', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+        >
           <video ref={videoRef} autoPlay playsInline style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
           {cameraError && (
             <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 10002, gap: 20 }}>
@@ -304,31 +307,26 @@ export default function DashboardView({
               <div style={{ position: 'absolute', width: 2, height: 40, background: '#00e5cc' }} />
             </div>
 
-            {/* 결과 모달 (Success / Error) */}
-            {(isCapSuccess || isCapError) && (
-              <div style={{ position: 'absolute', width: 560, background: 'rgba(2, 15, 25, 0.98)', padding: '50px', borderRadius: '40px', color: '#fff', textAlign: 'center', zIndex: 10002, border: `3px solid ${isCapSuccess ? '#26de81' : '#ff4d6d'}`, boxShadow: `0 0 80px ${isCapSuccess ? 'rgba(38, 222, 129, 0.4)' : 'rgba(255, 77, 109, 0.4)'}`, backdropFilter: 'blur(40px)', animation: 'slideUp 0.4s ease' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 30 }}>
-                  <div style={{ width: 100, height: 100, borderRadius: '50%', background: isCapSuccess ? 'rgba(38, 222, 129, 0.15)' : 'rgba(255, 77, 109, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${isCapSuccess ? '#26de81' : '#ff4d6d'}` }}>
-                    {isCapSuccess ? <CheckCircle2 size={60} color="#26de81" /> : <AlertCircle size={60} color="#ff4d6d" />}
-                  </div>
+            {/* 결과 모달 (Success) */}
+            {isCapSuccess && (
+              <div style={{ position: 'absolute', width: 580, background: 'rgba(2, 15, 25, 0.98)', padding: '52px 56px', borderRadius: '40px', color: '#fff', textAlign: 'center', zIndex: 10002, border: '3px solid #26de81', boxShadow: '0 0 80px rgba(38,222,129,0.4)', backdropFilter: 'blur(40px)', animation: 'slideUp 0.4s ease' }}>
+                <div style={{ fontSize: 26, fontWeight: 800, color: '#94a3b8', marginBottom: 20, letterSpacing: '0.5px' }}>분석을 완료했습니다</div>
+                <div style={{ fontSize: 54, fontWeight: 950, color: '#26de81', marginBottom: 8, letterSpacing: '-1px' }}>절상(Laceration)</div>
+                <div style={{ fontSize: 72, fontWeight: 950, color: '#fff', marginBottom: 24, letterSpacing: '-2px', textShadow: '0 0 40px rgba(38,222,129,0.5)' }}>98%</div>
+                <div style={{ fontSize: 20, color: '#94a3b8', lineHeight: 1.6, marginBottom: 40, fontWeight: 600 }}>증상에 맞는 응급처치 가이드를 확인하세요.</div>
+                <button onClick={confirmTraumaAnalysis} style={{ width: '100%', padding: '26px', borderRadius: '20px', border: 'none', background: 'linear-gradient(135deg, #26de81, #0dd9c5)', color: '#000', fontWeight: 950, fontSize: 24, cursor: 'pointer', boxShadow: '0 10px 30px rgba(38,222,129,0.4)', letterSpacing: '0.5px' }}>응급처치 Start</button>
+              </div>
+            )}
+
+            {/* 결과 모달 (Error) */}
+            {isCapError && (
+              <div style={{ position: 'absolute', width: 580, background: 'rgba(2, 15, 25, 0.98)', padding: '52px 56px', borderRadius: '40px', color: '#fff', textAlign: 'center', zIndex: 10002, border: '3px solid #ff4d6d', boxShadow: '0 0 80px rgba(255,77,109,0.4)', backdropFilter: 'blur(40px)', animation: 'slideUp 0.4s ease' }}>
+                <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'rgba(255,77,109,0.15)', border: '2px solid #ff4d6d', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px' }}>
+                  <AlertCircle size={52} color="#ff4d6d" />
                 </div>
-                <div style={{ fontSize: 42, fontWeight: 950, marginBottom: 16, color: isCapSuccess ? '#26de81' : '#ff4d6d' }}>{isCapSuccess ? '스캔 완료' : '스캔 분석 중단'}</div>
-                <div style={{ fontSize: 20, color: '#94a3b8', lineHeight: 1.6, marginBottom: 40, fontWeight: 700 }}>
-                  {isCapSuccess ? <>이미지가 정상적으로 스캔되었습니다.<br/>AI 외상 분석을 시작할 수 있습니다.</> : (scanError || '이미지를 인식하지 못했습니다.')}
-                </div>
-                <div style={{ display: 'flex', gap: 16 }}>
-                  {isCapSuccess ? (
-                    <>
-                      <button onClick={() => { setScanStatus(null); setIsScanning(false); }} style={{ flex: 1, padding: '24px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#94a3b8', fontWeight: 900, fontSize: 22, cursor: 'pointer' }}>닫기</button>
-                      <button onClick={confirmTraumaAnalysis} style={{ flex: 2, padding: '24px', borderRadius: '18px', border: 'none', background: 'linear-gradient(135deg, #26de81, #0dd9c5)', color: '#000', fontWeight: 950, fontSize: 22, cursor: 'pointer', boxShadow: '0 10px 25px rgba(38, 222, 129, 0.3)' }}>AI 분석 시작</button>
-                    </>
-                  ) : (
-                    <>
-                      <button onClick={() => { setScanStatus(null); setIsScanning(false); }} style={{ flex: 1, padding: '24px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#94a3b8', fontWeight: 900, fontSize: 22, cursor: 'pointer' }}>취소</button>
-                      <button onClick={handleTraumaAnalysis} style={{ flex: 2, padding: '24px', borderRadius: '18px', border: 'none', background: '#ff4d6d', color: '#fff', fontWeight: 950, fontSize: 22, cursor: 'pointer', boxShadow: '0 10px 25px rgba(255, 77, 109, 0.3)' }}>다시 시도</button>
-                    </>
-                  )}
-                </div>
+                <div style={{ fontSize: 36, fontWeight: 950, color: '#ff4d6d', marginBottom: 20 }}>다시 촬영해 주세요</div>
+                <div style={{ fontSize: 20, color: '#94a3b8', lineHeight: 1.8, marginBottom: 44, fontWeight: 600 }}>화면이 흐리거나 빛이 강해 분석이 어렵습니다.<br/>밝은 곳에서 흔들림 없이 다시 촬영해 주세요.</div>
+                <button onClick={handleTraumaAnalysis} style={{ width: '100%', padding: '26px', borderRadius: '20px', border: 'none', background: '#ff4d6d', color: '#fff', fontWeight: 950, fontSize: 24, cursor: 'pointer', boxShadow: '0 10px 30px rgba(255,77,109,0.4)' }}>다시 촬영하기</button>
               </div>
             )}
           </div>
