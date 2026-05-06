@@ -46,110 +46,110 @@ const ACTION_GUIDES = {
   },
   '찰과상': {
     title: '찰과상 (Abrasions)',
-    description: '피부가 거친 표면에 마찰되어 표피만 벗겨진 얕은 상처. 출혈은 적으나 이물질·박테리아가 묻기 쉽고 따끔한 통증을 동반한다.',
+    description: '넘어지거나 긁혀서 피부 표면이 쓸린 상처입니다. 피는 많이 나지 않지만, 모래·먼지가 파고들어 곪을 수 있어 깨끗이 씻는 것이 가장 중요합니다.',
     diagnosis: '찰과상 (Abrasion)',
     severity: 'LOW',
     riskLevel: '1',
     legalBasis: 'WHO 선내의료지침 Ch.7',
     steps: [
-      { title: '이물질 세척', desc: '흐르는 생리식염수(또는 깨끗한 물)로 상처 속 이물질을 5~10분간 충분히 씻어내십시오.', tip: '이 단계를 클릭하면 세척 타이머가 시작됩니다. 상처 속 흙이나 오염 물질이 남으면 감염의 원인이 됩니다.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-01.png' },
-      { title: '소독 연고 도포', desc: '상처 부위를 깨끗한 거즈로 닦은 후 소독 연고를 멸균 면봉으로 얇게 도포하십시오.', tip: '상처에 직접 손을 대지 마십시오.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-02.png' },
-      { title: '통기성 거즈 보호', desc: '통기성 거즈로 상처를 덮어 외부 오염으로부터 보호하십시오.', stepImage: '/assets/Abrasions/Abrasion-03.png' },
-      { title: '드레싱 교체 및 재평가', desc: '24시간마다 드레싱을 교체하십시오. 발적·고름·열감 등 감염 징후 발생 시 즉시 의료진에게 보고하십시오.', tip: '감염 징후: 붉어짐, 고름, 열감, 악취.', stepImage: '/assets/Abrasions/Abrasion-04.png' }
+      { title: '상처를 깨끗이 씻기', desc: '흐르는 깨끗한 물이나 식염수로 상처 속 흙·먼지를 5~10분간 충분히 씻어내십시오.', tip: '이 단계를 클릭하면 세척 타이머가 시작됩니다. 이물질이 남아 있으면 나중에 곪는 원인이 됩니다.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-01.png' },
+      { title: '소독 연고 바르기', desc: '깨끗한 거즈로 물기를 닦은 뒤, 소독 연고를 면봉으로 얇게 발라 주십시오.', tip: '손으로 상처를 직접 만지지 마십시오. 장갑을 꼭 착용하세요.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-02.png' },
+      { title: '거즈로 덮어 보호하기', desc: '바람이 통하는 거즈를 상처 위에 덮어 먼지나 오염으로부터 보호하십시오.', stepImage: '/assets/Abrasions/Abrasion-03.png' },
+      { title: '하루마다 확인 및 교체', desc: '하루에 한 번 거즈를 교체하고 상처 상태를 확인하십시오. 상처 주변이 빨개지거나 고름이 나오면 즉시 의료진에게 알리십시오.', tip: '곪는 신호: 주변이 빨개짐, 고름, 열감, 냄새.', stepImage: '/assets/Abrasions/Abrasion-04.png' }
     ],
-    dos: ['처치 전 위생 장갑을 반드시 착용하십시오', '24시간마다 드레싱을 교체하십시오', '상처 주변 피부를 청결히 유지하십시오'],
-    donts: ['상처에 알코올 등 소독액을 직접 붓지 마십시오', '상처에 솜(탈지면)을 직접 대지 마십시오', '가루약이나 민간요법을 사용하지 마십시오'],
-    warning: '발적·고름·열감 등 감염 징후 발생 시 즉시 의료진에게 보고하십시오.',
+    dos: ['처치 전 반드시 장갑을 착용하십시오', '하루에 한 번 거즈를 교체하십시오', '상처 주변을 항상 깨끗하게 유지하십시오'],
+    donts: ['알코올·소독약을 상처 안에 직접 붓지 마십시오', '솜을 상처에 직접 붙이지 마십시오', '된장·치약 등 민간요법을 사용하지 마십시오'],
+    warning: '상처 주변이 빨개지거나 고름이 생기면 곪은 것입니다. 즉시 의료진에게 보고하십시오.',
     color: '#22c55e'
   },
   '타박상': {
     title: '타박상 (Bruises)',
-    description: '외부 충격으로 피부는 찢어지지 않았으나 피하 모세혈관이 터져 멍·부종·통증이 발생한 상태. 골절·내부 출혈이 동반될 수 있다.',
+    description: '부딪히거나 맞아서 생긴 멍입니다. 피부는 찢어지지 않았지만 피부 속 혈관이 터져 멍이 들고 붓습니다. 심하면 뼈가 부러진 경우도 있으니 주의가 필요합니다.',
     diagnosis: '타박상 (Contusion)',
     severity: 'LOW',
     riskLevel: '1',
     legalBasis: '선원법 시행규칙 [별표 5의5]',
     steps: [
-      { title: '냉찜질 — 초기 48시간', desc: '초기 48시간 동안 냉찜질을 20분 적용, 20분 휴식 반복으로 시행하십시오.', tip: '이 단계를 클릭하면 냉찜질 타이머(20분)가 시작됩니다. 얼음은 수건에 싸서 피부에 직접 닿지 않게 하십시오.', stepImage: '/assets/Bruises/Bruise-01.png' },
-      { title: '환부 거상', desc: '환부를 심장보다 높게 올려 부종을 최소화하십시오.', stepImage: '/assets/Bruises/Bruise-02.png' },
-      { title: '온찜질 — 48시간 이후', desc: '48시간 이후에는 온찜질로 혈액 순환을 촉진하여 회복을 도우십시오.', stepImage: '/assets/Bruises/Bruise-03.png' },
-      { title: '골절 의심 시 부목 고정', desc: '통증·부종 악화 또는 변형이 보이면 골절을 의심하고 즉시 부목으로 고정하십시오.', tip: '변형, 비정상적인 움직임, 심한 통증은 골절 신호입니다.', stepImage: '/assets/Bruises/Bruise-04.png' }
+      { title: '차갑게 식히기 — 처음 48시간', desc: '처음 48시간 동안 얼음팩(수건에 싸서)을 20분 올려두고, 20분 쉬는 것을 반복하십시오.', tip: '이 단계를 클릭하면 냉찜질 타이머(20분)가 시작됩니다. 얼음이 피부에 직접 닿으면 동상이 생길 수 있습니다.', stepImage: '/assets/Bruises/Bruise-01.png' },
+      { title: '다친 부위 높이 올려두기', desc: '다친 부위를 심장보다 높은 위치에 올려두면 붓기가 줄어듭니다.', stepImage: '/assets/Bruises/Bruise-02.png' },
+      { title: '따뜻하게 하기 — 48시간 이후', desc: '48시간이 지난 뒤에는 따뜻한 찜질로 혈액 순환을 도와 빠른 회복을 도우십시오.', stepImage: '/assets/Bruises/Bruise-03.png' },
+      { title: '뼈 부러짐 의심 시 고정', desc: '통증이 심해지거나 부위가 더 붓고 모양이 이상하면 뼈가 부러진 것일 수 있습니다. 움직이지 않도록 즉시 고정하십시오.', tip: '모양이 틀어지거나 살짝만 건드려도 극심하게 아프면 골절 신호입니다.', stepImage: '/assets/Bruises/Bruise-04.png' }
     ],
-    dos: ['초기 48시간은 냉찜질로 부종을 억제하십시오', '환부를 심장보다 높게 유지하십시오', '통증 악화 시 골절 가능성을 확인하십시오'],
-    donts: ['초기 48시간 내에 온찜질을 하지 마십시오', '멍든 부위를 강하게 주무르지 마십시오', '변형이 보이면 억지로 맞추려 하지 마십시오'],
-    warning: '통증·부종 악화 또는 변형이 보이면 골절로 간주하여 즉시 부목 고정 후 의료진에게 보고하십시오.',
+    dos: ['처음 48시간은 냉찜질로 붓기를 줄이십시오', '다친 부위를 심장보다 높게 올려두십시오', '통증이 심해지면 뼈 부러짐 가능성을 의심하십시오'],
+    donts: ['처음 48시간 안에는 뜨거운 찜질을 하지 마십시오', '멍든 곳을 세게 주무르지 마십시오', '모양이 이상해도 직접 맞추려 하지 마십시오'],
+    warning: '통증이 심해지거나 모양이 이상하게 변하면 뼈가 부러진 것일 수 있습니다. 즉시 고정하고 의료진에게 보고하십시오.',
     color: '#22c55e'
   },
   '화상': {
     title: '화상 (Burns)',
-    description: '열·화학물질·전기·복사로 인한 피부·조직 손상. 1도(홍반), 2도(수포), 3도(괴사)로 구분되며 면적·깊이가 클수록 쇼크 위험이 커진다.',
+    description: '뜨거운 것, 화학약품, 전기 등에 닿아 피부가 손상된 상태입니다. 빨갛게 변하거나(1도), 물집이 생기거나(2도), 피부가 녹는(3도) 단계로 나뉘며 범위가 넓을수록 위험합니다.',
     diagnosis: '화상 (Burn Injury)',
     severity: 'HIGH',
     riskLevel: '3',
     legalBasis: '선원법 시행규칙 [별표 5의5] 화상처치',
     steps: [
-      { title: '흐르는 찬물로 냉각 (20분)', desc: '즉시 흐르는 찬물로 20분 이상 냉각하십시오. 수압은 약하게 유지하십시오.', tip: '이 단계를 클릭하면 냉각 타이머가 시작됩니다. 얼음물은 절대 금기입니다.', stepImage: '/assets/Fracture_Dislocation/Burn-01.png' },
-      { title: '수포 보호 및 거즈 덮기', desc: '수포를 절대 터뜨리지 말고 멸균 거즈로 느슨하게 덮으십시오.', tip: '수포가 터지면 감염 위험이 크게 높아집니다.', stepImage: '/assets/Fracture_Dislocation/Burn-02.png' },
-      { title: '압박 요소 제거', desc: '옷·반지·시계 등 압박 요소를 부종이 생기기 전에 신속히 제거하십시오. 피부에 달라붙은 옷은 억지로 떼지 마십시오.', stepImage: '/assets/Fracture_Dislocation/Burn-03.png' },
-      { title: '회항·이송 결정', desc: '2도 이상 또는 손바닥 이상 면적이면 즉시 회항·이송을 결정하십시오. 연고·기름 도포는 절대 금지합니다.', tip: '처치 내용과 환자 상태 변화를 기록하여 보존하십시오.', stepImage: '/assets/Fracture_Dislocation/Burn-04.png' }
+      { title: '찬물로 식히기 (20분)', desc: '즉시 흐르는 찬물로 20분 이상 식혀 주십시오. 물줄기는 약하게 하여 살이 더 다치지 않게 하십시오.', tip: '이 단계를 클릭하면 냉각 타이머가 시작됩니다. 얼음이나 얼음물은 절대 사용하지 마십시오.', stepImage: '/assets/Fracture_Dislocation/Burn-01.png' },
+      { title: '물집 건드리지 말고 거즈 덮기', desc: '물집은 절대 터뜨리지 마십시오. 멸균 거즈를 상처 위에 느슨하게 올려 덮어 주십시오.', tip: '물집이 터지면 세균이 들어가 심하게 곪을 수 있습니다.', stepImage: '/assets/Fracture_Dislocation/Burn-02.png' },
+      { title: '옷·반지·시계 등 제거', desc: '부위가 붓기 전에 옷, 반지, 시계 등을 빠르게 제거하십시오. 피부에 달라붙은 옷은 억지로 떼지 말고 가위로 주변만 자르십시오.', stepImage: '/assets/Fracture_Dislocation/Burn-03.png' },
+      { title: '배 돌리기(회항) 결정', desc: '물집이 생기거나 손바닥보다 넓은 화상은 즉시 배를 돌려 병원으로 이송해야 합니다. 연고·기름·된장 등은 절대 바르지 마십시오.', tip: '처치 내용과 환자 상태 변화를 기록해 두십시오.', stepImage: '/assets/Fracture_Dislocation/Burn-04.png' }
     ],
-    dos: ['물집이 터지지 않도록 최대한 조심하십시오', '화학 화상 시 오염된 옷을 즉시 제거하십시오', '환부를 심장보다 높게 유지하십시오'],
-    donts: ['민간요법(된장, 소주, 치약, 연고, 기름)은 절대 금물입니다', '얼음을 직접 환부에 대거나 문지르지 마십시오', '수포를 터뜨리지 마십시오'],
-    warning: '2도 이상 또는 손바닥 이상 면적의 화상은 즉시 회항·이송하십시오. 안면 화상이나 연기 흡입 시 산소를 공급하십시오.',
+    dos: ['물집이 터지지 않도록 조심하십시오', '화학물질에 의한 화상은 오염된 옷을 즉시 제거하십시오', '다친 부위를 심장보다 높게 올려 두십시오'],
+    donts: ['된장·소주·치약·연고·기름은 절대 바르지 마십시오', '얼음을 직접 상처에 대지 마십시오', '물집을 터뜨리지 마십시오'],
+    warning: '물집이 생기거나 손바닥보다 넓은 화상은 즉시 배를 돌려 이송하십시오. 얼굴에 화상을 입거나 연기를 마셨다면 산소를 공급하십시오.',
     color: '#f59e0b'
   },
   '절상': {
     title: '절상 (Cut)',
-    description: '칼·유리 등 날카로운 물체에 베여 가장자리가 비교적 깨끗한 상처. 깊이에 따라 혈관·신경·힘줄 손상이 동반될 수 있다.',
+    description: '칼이나 유리처럼 날카로운 것에 베인 상처입니다. 상처 가장자리가 깔끔하게 잘려 있으며, 깊이 베이면 혈관이나 힘줄까지 다칠 수 있습니다.',
     diagnosis: '절상 (Incised Wound)',
     severity: 'MEDIUM',
     riskLevel: '2',
     legalBasis: 'WHO 선내의료지침 Ch.7',
     steps: [
-      { title: '직접 압박 지혈 (5~10분)', desc: '멸균 거즈로 직접 압박하여 5~10분간 지혈하십시오. 거즈가 피에 젖어도 떼지 말고 위에 계속 덧대십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-01.png' },
-      { title: '세척 및 소독', desc: '지혈 후 생리식염수로 상처를 충분히 세척하고 소독하십시오.', tip: '상처 내부에 알코올 등을 직접 붓지 마십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-02.png' },
-      { title: '스테리스트립 접합', desc: '깊이 1cm 미만은 스테리스트립(상처 접합 테이프)으로 상처 가장자리를 맞추어 접합하십시오.', stepImage: '/assets/Cut/Cut-03.png' },
-      { title: '임시 접합 후 의료진 의뢰', desc: '깊이 1cm 이상이거나 벌어진 상처는 스테리스트립으로 임시 접합 후 즉시 원격 의료진에게 보고하십시오. 봉합(봉합사 사용)은 의료면허자만 시행 가능합니다.', tip: '6시간 초과 시 감염 위험이 높아져 봉합이 어려울 수 있어 신속한 보고가 중요합니다.', stepImage: '/assets/Cut/Cut-04.png' }
+      { title: '거즈로 눌러 피 멈추기 (5~10분)', desc: '깨끗한 거즈를 상처에 대고 5~10분간 꾹 눌러 피를 멈추십시오. 거즈가 피에 젖어도 떼지 말고 위에 계속 덧대십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-01.png' },
+      { title: '깨끗한 물로 씻기', desc: '피가 멈추면 깨끗한 물이나 식염수로 상처를 충분히 씻어내십시오.', tip: '알코올 등 소독약을 상처 안에 직접 붓지 마십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-02.png' },
+      { title: '상처 테이프로 임시 접합', desc: '상처가 1cm보다 얕고 벌어지지 않으면 상처 접합 테이프(스테리스트립)로 가장자리를 맞붙여 주십시오.', stepImage: '/assets/Cut/Cut-03.png' },
+      { title: '깊은 상처는 의료진에게 즉시 알리기', desc: '1cm 이상 깊거나 벌어진 상처는 테이프로 임시로 맞붙인 뒤 즉시 원격 의료진에게 알리십시오. 바늘로 꿰매는 것은 반드시 의료진이 해야 합니다.', tip: '6시간 안에 처치하지 않으면 나중에 꿰매기가 어려워집니다.', stepImage: '/assets/Cut/Cut-04.png' }
     ],
-    dos: ['지혈 거즈를 최소 5~10분간 압박 유지하십시오', '깊은 상처는 스테리스트립 임시 접합 후 즉시 의료진에게 보고하십시오', '상처 가장자리를 스테리스트립으로 맞추어 임시 접합하십시오'],
-    donts: ['지혈 중 거즈를 교체하기 위해 떼지 마십시오', '봉합사를 이용한 봉합은 직접 시도하지 마십시오', '힘줄이나 뼈가 보이면 억지로 건드리지 마십시오'],
-    warning: '깊이 1cm 이상 또는 벌어진 상처는 스테리스트립 임시 접합 후 원격 의료진에게 즉시 보고하십시오. 봉합사 봉합은 의료면허자만 시행 가능합니다.',
+    dos: ['거즈를 최소 5~10분간 꾹 눌러 피를 멈추십시오', '깊은 상처는 임시 접합 후 즉시 의료진에게 알리십시오', '상처 가장자리를 테이프로 맞붙이십시오'],
+    donts: ['피가 멈추기 전에 거즈를 떼지 마십시오', '바늘로 꿰매는 것을 직접 시도하지 마십시오', '힘줄이나 뼈가 보여도 직접 건드리지 마십시오'],
+    warning: '1cm 이상 깊거나 벌어진 상처는 테이프로 임시 접합 후 즉시 의료진에게 보고하십시오. 바느질(봉합)은 반드시 의료진만 할 수 있습니다.',
     color: '#f97316'
   },
   '열상': {
     title: '열상 (Laceration)',
-    description: '둔기 충격으로 피부가 불규칙하게 찢어진 상처. 가장자리가 들쭉날쭉하고 조직 손상·오염이 심해 감염·흉터 위험이 높다.',
+    description: '딱딱한 것에 세게 부딪히거나 찢겨서 피부가 울퉁불퉁하게 찢어진 상처입니다. 상처 안쪽이 오염되기 쉽고 곪을 위험이 높습니다.',
     diagnosis: '열상 (Laceration)',
     severity: 'HIGH',
     riskLevel: '3',
     legalBasis: '선원법 시행규칙 [별표 5의5]',
     steps: [
-      { title: '강한 직접 압박 지혈', desc: '강한 직접 압박으로 지혈하십시오. 동맥성 출혈은 근위부 압박을 추가하십시오.', tip: '거즈가 젖어도 떼지 말고 계속 덧대어 압박하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-01.png' },
-      { title: '오염 제거 세척', desc: '다량의 생리식염수로 충분히 세척하여 오염 물질을 제거하십시오.', tip: '불규칙한 상처 안쪽까지 충분히 씻어내는 것이 중요합니다.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-02.png' },
-      { title: '임시 접합 및 원격 의료진 보고', desc: '스테리스트립으로 임시 접합 후 즉시 원격 의료진에게 보고하십시오. 깊이 1cm 이상의 봉합은 의료면허자만 시행 가능하므로 직접 시도하지 마십시오.', tip: '의료진 연결 전까지 멸균 드레싱으로 상처를 덮어 보호하십시오.', stepImage: '/assets/Laceration/Laceration-03.png' },
-      { title: '파상풍·감염 징후 관찰', desc: '파상풍 예방 여부를 확인하고 항생제 투여를 고려하십시오. 24~48시간 동안 감염 징후를 집중 관찰하십시오.', tip: '붉어짐·고름·열감·악취는 즉각적인 의료 개입이 필요한 감염 신호입니다.', stepImage: '/assets/Laceration/Laceration-04.png' }
+      { title: '강하게 눌러 피 멈추기', desc: '거즈를 상처에 대고 있는 힘껏 꾹 눌러 피를 멈추십시오. 피가 많이 솟구치면 상처 더 위쪽 부분도 함께 눌러 주십시오.', tip: '거즈가 젖어도 떼지 말고 위에 계속 덧대어 눌러 주십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-01.png' },
+      { title: '깨끗한 물로 충분히 씻기', desc: '식염수나 깨끗한 물을 많이 사용하여 상처 안쪽을 충분히 씻어내십시오.', tip: '찢겨서 울퉁불퉁한 상처 안쪽까지 꼼꼼히 씻어야 합니다.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-02.png' },
+      { title: '임시 접합 후 의료진에게 즉시 알리기', desc: '상처 접합 테이프로 임시로 맞붙인 뒤 즉시 원격 의료진에게 알리십시오. 바늘로 꿰매는 것은 반드시 의료진이 해야 합니다.', tip: '의료진 연결 전까지 거즈로 덮어 상처를 보호하십시오.', stepImage: '/assets/Laceration/Laceration-03.png' },
+      { title: '파상풍·감염 확인', desc: '파상풍 주사를 맞은 적이 있는지 확인하십시오. 48시간 동안 상처 주변이 빨개지거나 고름이 나오지 않는지 살펴봐야 합니다.', tip: '빨개짐·고름·열감·냄새가 나면 즉시 의료진에게 보고하십시오.', stepImage: '/assets/Laceration/Laceration-04.png' }
     ],
-    dos: ['강한 압박으로 지혈을 우선 시행하십시오', '다량의 생리식염수로 충분히 세척하십시오', '파상풍 예방 접종 여부를 반드시 확인하십시오'],
-    donts: ['봉합사를 이용한 봉합을 직접 시도하지 마십시오', '감염이 의심될 경우 밀봉하지 마십시오', '들쭉날쭉한 가장자리를 억지로 맞추지 마십시오'],
-    warning: '동맥성 출혈이 지속되면 지혈대를 사용하십시오. 봉합은 원격 의료진 지시 하에서만 시행하십시오.',
+    dos: ['강하게 눌러 피를 먼저 멈추십시오', '물을 많이 사용해 충분히 씻어내십시오', '파상풍 주사 접종 여부를 반드시 확인하십시오'],
+    donts: ['바늘로 꿰매는 것을 직접 시도하지 마십시오', '감염이 의심되면 상처를 밀봉하지 마십시오', '울퉁불퉁한 가장자리를 억지로 맞추지 마십시오'],
+    warning: '피가 계속 솟구치면 지혈대를 사용하십시오. 바느질(봉합)은 반드시 의료진만 할 수 있습니다.',
     color: '#ef4444'
   },
   '자창': {
     title: '자창 (Stab Wound)',
-    description: '뾰족한 물체가 깊이 찔러 생긴 상처. 외부 출혈은 적어 보여도 장기·혈관·신경 손상과 내부 출혈로 쇼크에 빠질 수 있는 가장 위험한 외상.',
+    description: '칼이나 못처럼 뾰족한 것에 찔린 상처입니다. 겉으로 피가 적게 나도 몸 안의 장기나 혈관이 다쳐 있을 수 있어 6종 외상 중 가장 위험합니다.',
     diagnosis: '자창 (Penetrating Stab Wound)',
     severity: 'CRITICAL',
     riskLevel: '4',
     legalBasis: '선원법 시행규칙 [별표 5의5]',
     steps: [
-      { title: '박힌 물체 절대 제거 금지', desc: '박힌 물체는 절대 제거하지 마십시오. 수건·거즈로 주변을 고정만 하십시오.', tip: '물체가 혈관 압박 역할을 하고 있어 제거 시 대량 출혈이 발생할 수 있습니다.', stepImage: '/assets/StabWound/Stab-01.png' },
-      { title: '압박 지혈 및 폐쇄식 드레싱', desc: '주변을 거즈로 둘러 압박 지혈하십시오. 흉부 자창은 폐쇄식 드레싱(3면 밀봉, 1면 개방)을 적용하십시오.', tip: '흉부 자창: 3면만 붙이고 1면은 열어두어 공기 배출구를 만드십시오.', stepImage: '/assets/StabWound/Stab-02.png' },
-      { title: '쇼크 방지 및 금식', desc: '환자를 보온하고 하지를 거상하여 쇼크를 방지하십시오. 음식·음료 섭취를 금지(금식)하십시오.', tip: '쇼크 징후: 창백, 냉습한 피부, 빠른 맥박, 의식 저하.', stepImage: '/assets/StabWound/Stab-03.png' },
-      { title: '즉시 회항 및 이송', desc: '즉시 회항을 결정하고 의료진에 우선 보고하며 최단 경로로 병원 이송하십시오.', tip: '자창은 외견상 가벼워 보여도 내부 손상이 치명적일 수 있습니다.', stepImage: '/assets/StabWound/Stab-04.png' }
+      { title: '박힌 것 절대 빼지 말고 고정', desc: '칼 등 박힌 물체는 절대 빼지 마십시오. 수건이나 거즈로 주변을 받쳐 물체가 흔들리지 않도록 고정만 하십시오.', tip: '박힌 물체가 혈관을 막고 있어, 뽑으면 피가 한꺼번에 쏟아질 수 있습니다.', stepImage: '/assets/StabWound/Stab-01.png' },
+      { title: '주변 눌러 지혈 / 가슴이면 테이프 처치', desc: '물체 주변을 거즈로 둘러 피를 멈추십시오. 가슴에 찔렸다면 테이프를 3면만 붙이고 1면은 열어두어 공기가 빠져나올 수 있게 하십시오.', tip: '가슴에 테이프를 4면 모두 막으면 폐에 공기가 차서 더 위험해집니다.', stepImage: '/assets/StabWound/Stab-02.png' },
+      { title: '따뜻하게 덮고 다리 높이기 / 금식', desc: '담요 등으로 환자를 따뜻하게 덮고, 다리를 높게 올려 쇼크를 예방하십시오. 음식과 물은 절대 주지 마십시오.', tip: '쇼크 신호: 얼굴이 창백해짐, 피부가 차갑고 축축함, 맥박이 빨라짐, 정신이 흐릿해짐.', stepImage: '/assets/StabWound/Stab-03.png' },
+      { title: '즉시 배 돌리고 이송', desc: '지금 당장 배를 돌려 병원으로 향하십시오. 먼저 의료진에게 연락하여 지시를 받으십시오.', tip: '겉으로는 가벼워 보여도 몸 안이 크게 다쳐 생명이 위험할 수 있습니다.', stepImage: '/assets/StabWound/Stab-04.png' }
     ],
-    dos: ['박힌 물체는 고정만 하고 절대 제거하지 마십시오', '흉부 자창은 폐쇄식 드레싱을 적용하십시오', '즉시 회항을 결정하고 의료진에 보고하십시오'],
-    donts: ['박힌 물체를 제거하지 마십시오', '환자에게 음식·음료를 주지 마십시오', '출혈이 적다고 안심하지 마십시오'],
-    warning: '자창은 외견상 가벼워 보여도 내부 장기 손상으로 즉사할 수 있습니다. 즉시 회항하여 최단 경로로 이송하십시오.',
+    dos: ['박힌 물체는 고정만 하고 절대 빼지 마십시오', '가슴 찔림은 테이프를 3면만 붙이십시오', '즉시 배를 돌리고 의료진에게 연락하십시오'],
+    donts: ['박힌 물체를 절대 빼지 마십시오', '환자에게 음식이나 물을 주지 마십시오', '피가 적다고 괜찮다고 생각하지 마십시오'],
+    warning: '겉으로 피가 적어도 몸 안에서 크게 출혈 중일 수 있습니다. 지체 없이 배를 돌려 가장 빠른 경로로 병원에 이송하십시오.',
     color: '#dc2626'
   },
   '기도 확보': {
@@ -739,7 +739,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                 </div>
                 <h2 style={{ fontSize: 46, fontWeight: 950, letterSpacing: '-2px', margin: '0 0 6px 0' }}>{currentActionData.title}</h2>
                 {currentActionData.description && (
-                  <p style={{ fontSize: 16, color: '#94a3b8', fontWeight: 600, margin: '0 0 4px 0', lineHeight: 1.6 }}>{currentActionData.description}</p>
+                  <p style={{ fontSize: 24, color: '#94a3b8', fontWeight: 600, margin: '0 0 4px 0', lineHeight: 1.6 }}>{currentActionData.description}</p>
                 )}
                 {currentActionData.legalBasis && (
                   <div style={{ fontSize: 13, color: '#475569', fontWeight: 700 }}>📋 법적 근거 : {currentActionData.legalBasis}</div>
@@ -795,7 +795,8 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
           ) : (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: 20 }}>
               <div style={{ width: 100, height: 100, borderRadius: '50%', background: 'rgba(56,189,248,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}><Activity size={52} color="#38bdf8"/></div>
-              <p style={{ fontSize: 22, color: '#475569', fontWeight: 700 }}>하단 버튼에서 처치 항목을 선택하십시오.</p>
+              <p style={{ fontSize: 42, fontWeight: 950, color: '#fff', marginBottom: 12 }}>지금 환자에게 무슨 일이 생겼나요?</p>
+              <p style={{ fontSize: 29, color: '#64748b', fontWeight: 700 }}>아래에서 상황과 가장 가까운 항목을 누르면<br/>단계별 처치 방법을 바로 안내해 드립니다.</p>
             </div>
           )}
         </section>
