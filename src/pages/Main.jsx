@@ -3,20 +3,19 @@ import DashboardView from './Main/components/DashboardView'
 import MainTutorial from './Main/components/MainTutorial'
 
 
-export default function Main({ patient, onNavigate, onSwitchPatient, historicalRecord }) {
+export default function Main({ patient, onNavigate, onSwitchPatient, historicalRecord, tutorialShown, setTutorialShown }) {
   // ─── 튜토리얼 상태 ───
   const [showTutorial, setShowTutorial] = useState(false)
 
   useEffect(() => {
-    const seen = sessionStorage.getItem('mdts_tutorial_seen')
-    if (!seen) {
+    if (!tutorialShown) {
       const t = setTimeout(() => setShowTutorial(true), 600)
       return () => clearTimeout(t)
     }
-  }, [])
+  }, [tutorialShown])
 
   const finishTutorial = () => {
-    sessionStorage.setItem('mdts_tutorial_seen', 'true')
+    setTutorialShown(true)
     setShowTutorial(false)
   }
 

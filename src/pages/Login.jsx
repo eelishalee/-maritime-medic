@@ -46,14 +46,23 @@ export default function Login({ onLogin }) {
             <h1 style={{ fontSize: '56px', fontWeight: '950', lineHeight: '1.2', letterSpacing: '-2px', margin: 0, color: '#fff' }}>
               선박용 엣지 AI<br />
               <span style={{
-                fontSize: '56px', // 크기 명시적 일치
+                fontSize: '56px',
                 background: 'linear-gradient(90deg, #39ff6a 0%, #00ffcc 55%, #00e5ff 100%)',
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                display: 'inline-block' // 그라데이션 렌더링 최적화
+                display: 'inline-block'
               }}>
-                응급진단 및 처치 가이드 KIT
+                응급 가이드 솔루션
               </span>
             </h1>
+            <p style={{ 
+              fontSize: '18px', 
+              color: '#94a3b8', 
+              lineHeight: '1.6', 
+              marginTop: '24px', 
+              fontWeight: 500,
+              maxWidth: '560px'
+            }}>
+              본 서비스에서 제공하는 분석 결과는 AI 알고리즘에 기초한 참고용 정보이며<br />의사의 확진을 대체할 수 없습니다.            </p>
           </div>
 
         </div>
@@ -117,14 +126,6 @@ export default function Login({ onLogin }) {
           </div>
         </div>
 
-      </div>
-
-      {/* 면책 문구 추가 */}
-      <div style={{ position: 'absolute', bottom: '40px', left: '60px', zIndex: 10, maxWidth: '600px', opacity: 0.6 }}>
-        <p style={{ fontSize: '14px', color: '#8da2c0', lineHeight: '1.6', margin: 0, fontWeight: 500 }}>
-          본 서비스에서 제공하는 분석 결과는 AI 알고리즘에 기초한 참고용 정보이며, 의사의 확진을 대체할 수 없습니다.<br />
-          실제 응급 상황 발생 시 반드시 원격 의료 지도 또는 의료진의 지시에 따라주십시오.
-        </p>
       </div>
 
       <style>{`

@@ -45,6 +45,7 @@ export default function App() {
   })
 
   const [emergencyData, setEmergencyData] = useState(null)
+  const [hasShownTutorial, setHasShownTutorial] = useState(false)
 
   // 페이지 전환 로직
   const handleNavigate = (newPage, data = null) => {
@@ -66,11 +67,11 @@ export default function App() {
             activePage={page}
             onNavigate={handleNavigate}
             auth={{ shipNo: auth.ship || 'MV KOREA STAR', deviceNo: auth.device || 'MED-001' }}
-            onLogout={() => setAuth(null)}
+            onLogout={() => { setAuth(null); setHasShownTutorial(false); }}
             isOnline={false}
           />
           <div style={{ flex: 1, overflow: 'hidden' }}>
-            {page === 'main'      && <Main patient={activePatient} onNavigate={handleNavigate} onSwitchPatient={setActivePatient} />}
+            {page === 'main'      && <Main patient={activePatient} onNavigate={handleNavigate} onSwitchPatient={setActivePatient} tutorialShown={hasShownTutorial} setTutorialShown={setHasShownTutorial} />}
             {page === 'crew'      && (
               <CrewManagement onSelectPatient={p => { setActivePatient(p); handleNavigate('chart') }} />
             )}
