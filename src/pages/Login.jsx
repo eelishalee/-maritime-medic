@@ -119,6 +119,14 @@ export default function Login({ onLogin }) {
 
       </div>
 
+      {/* 면책 문구 추가 */}
+      <div style={{ position: 'absolute', bottom: '40px', left: '60px', zIndex: 10, maxWidth: '600px', opacity: 0.6 }}>
+        <p style={{ fontSize: '14px', color: '#8da2c0', lineHeight: '1.6', margin: 0, fontWeight: 500 }}>
+          본 서비스에서 제공하는 분석 결과는 AI 알고리즘에 기초한 참고용 정보이며, 의사의 확진을 대체할 수 없습니다.<br />
+          실제 응급 상황 발생 시 반드시 원격 의료 지도 또는 의료진의 지시에 따라주십시오.
+        </p>
+      </div>
+
       <style>{`
         @keyframes borderRotate {
           from { transform: rotate(0deg); }
