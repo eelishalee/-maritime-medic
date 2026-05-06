@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react'
-import { Brain, Heart, Zap, Shield, ShieldAlert, Cpu, AlertCircle, Wind, Clock, Video, Pill, History, User, Info, Activity, Scissors, Plus, Thermometer, Mic, X, ChevronRight, HeartPulse, ChevronLeft, CheckCircle2, AlertTriangle, ArrowDown, FileText, Ruler, Droplets, MapPin, Phone, Upload, Camera, Edit3, Bone, Flame, RefreshCw, Send, Check, LayoutDashboard, AlertOctagon } from 'lucide-react'
+import { Brain, Heart, Zap, Shield, ShieldAlert, Cpu, AlertCircle, Wind, Clock, Video, Pill, History, User, Info, Activity, Scissors, Plus, Thermometer, Mic, X, ChevronRight, HeartPulse, ChevronLeft, CheckCircle2, AlertTriangle, ArrowDown, FileText, Ruler, Droplets, MapPin, Phone, Upload, Camera, Edit3, Bone, Flame, RefreshCw, Send, Check, LayoutDashboard} from 'lucide-react'
 import { useAlert } from '../utils/AlertContext'
 import { CardiacIllustration, TraumaIllustration, UnconsciousIllustration, RespiratoryIllustration } from '../components/EmergencyIllustrations'
 import CameraModal from '../components/CameraModal'
 
+const SEVERITY_COLORS = { LOW: '#22c55e', MEDIUM: '#f97316', HIGH: '#ef4444', CRITICAL: '#dc2626' }
+
 const ACTION_GUIDES = {
   '심폐소생술': {
     title: '심폐소생술 및 AED 사용',
+    description: '심장이 멈추거나 호흡이 없는 경우 즉시 시행하는 생명유지 처치입니다.',
     diagnosis: '심정지(Cardiac Arrest) 의심',
+    severity: null,
     riskLevel: '4',
-    protocol: 'SOP-CPR-01',
+    legalBasis: null,
     hasMetronome: true,
     steps: [
       { title: '의식 및 호흡 확인', desc: '어깨를 두드리며 "괜찮으세요?"라고 묻고, 가슴이 오르내리는지 10초간 확인하십시오.', tip: '숨을 안 쉬면 즉시 시작합니다.', stepImage: '/assets/Fracture_Dislocation/CPR-01.png' },
@@ -24,9 +28,11 @@ const ACTION_GUIDES = {
   },
   '하임리히법': {
     title: '기도 이물질 제거 (하임리히법)',
+    description: '기도가 이물질로 막혀 말을 못 하거나 호흡이 불가능한 경우 즉시 시행합니다.',
     diagnosis: '기도 폐쇄(Airway Obstruction)',
+    severity: null,
     riskLevel: '4',
-    protocol: 'SOP-HEI-07',
+    legalBasis: null,
     steps: [
       { title: '의식 및 상태 확인', desc: '환자 뒤로 가서 말을 걸어보세요. 목을 감싸고 말을 전혀 못 하면 즉시 처치를 시작합니다.', tip: '환자가 기침을 할 수 있다면 계속하게 하세요.', stepImage: '/assets/Fracture_Dislocation/Heimlich_Maneuver-01.png' },
       { title: '자세 잡고 지탱하기', desc: '환자 뒤에 서서 양팔로 허리를 감싸고, 내 한쪽 다리를 환자 다리 사이에 넣어 환자가 쓰러질 때를 대비해 지탱하세요.', stepImage: '/assets/Fracture_Dislocation/Heimlich_Maneuver-02.png' },
@@ -38,11 +44,121 @@ const ACTION_GUIDES = {
     warning: '환자가 의식을 잃으면 즉시 기도를 확보하고 심폐소생술(CPR)로 전환하십시오.',
     color: '#ef4444'
   },
-  '기도 확보': {
-    title: '기도 유지 및 호흡 보조',
-    diagnosis: '호흡 곤란 및 기도 폐쇄 위험',
+  '찰과상': {
+    title: '찰과상 (Abrasions)',
+    description: '피부가 거친 표면에 마찰되어 표피만 벗겨진 얕은 상처. 출혈은 적으나 이물질·박테리아가 묻기 쉽고 따끔한 통증을 동반한다.',
+    diagnosis: '찰과상 (Abrasion)',
+    severity: 'LOW',
+    riskLevel: '1',
+    legalBasis: 'WHO 선내의료지침 Ch.7',
+    steps: [
+      { title: '이물질 세척', desc: '흐르는 생리식염수(또는 깨끗한 물)로 상처 속 이물질을 5~10분간 충분히 씻어내십시오.', tip: '이 단계를 클릭하면 세척 타이머가 시작됩니다. 상처 속 흙이나 오염 물질이 남으면 감염의 원인이 됩니다.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-01.png' },
+      { title: '소독 연고 도포', desc: '상처 부위를 깨끗한 거즈로 닦은 후 소독 연고를 멸균 면봉으로 얇게 도포하십시오.', tip: '상처에 직접 손을 대지 마십시오.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-02.png' },
+      { title: '통기성 거즈 보호', desc: '통기성 거즈로 상처를 덮어 외부 오염으로부터 보호하십시오.', stepImage: '/assets/Abrasions/Abrasion-03.png' },
+      { title: '드레싱 교체 및 재평가', desc: '24시간마다 드레싱을 교체하십시오. 발적·고름·열감 등 감염 징후 발생 시 즉시 의료진에게 보고하십시오.', tip: '감염 징후: 붉어짐, 고름, 열감, 악취.', stepImage: '/assets/Abrasions/Abrasion-04.png' }
+    ],
+    dos: ['처치 전 위생 장갑을 반드시 착용하십시오', '24시간마다 드레싱을 교체하십시오', '상처 주변 피부를 청결히 유지하십시오'],
+    donts: ['상처에 알코올 등 소독액을 직접 붓지 마십시오', '상처에 솜(탈지면)을 직접 대지 마십시오', '가루약이나 민간요법을 사용하지 마십시오'],
+    warning: '발적·고름·열감 등 감염 징후 발생 시 즉시 의료진에게 보고하십시오.',
+    color: '#22c55e'
+  },
+  '타박상': {
+    title: '타박상 (Bruises)',
+    description: '외부 충격으로 피부는 찢어지지 않았으나 피하 모세혈관이 터져 멍·부종·통증이 발생한 상태. 골절·내부 출혈이 동반될 수 있다.',
+    diagnosis: '타박상 (Contusion)',
+    severity: 'LOW',
+    riskLevel: '1',
+    legalBasis: '선원법 시행규칙 [별표 5의5]',
+    steps: [
+      { title: '냉찜질 — 초기 48시간', desc: '초기 48시간 동안 냉찜질을 20분 적용, 20분 휴식 반복으로 시행하십시오.', tip: '이 단계를 클릭하면 냉찜질 타이머(20분)가 시작됩니다. 얼음은 수건에 싸서 피부에 직접 닿지 않게 하십시오.', stepImage: '/assets/Bruises/Bruise-01.png' },
+      { title: '환부 거상', desc: '환부를 심장보다 높게 올려 부종을 최소화하십시오.', stepImage: '/assets/Bruises/Bruise-02.png' },
+      { title: '온찜질 — 48시간 이후', desc: '48시간 이후에는 온찜질로 혈액 순환을 촉진하여 회복을 도우십시오.', stepImage: '/assets/Bruises/Bruise-03.png' },
+      { title: '골절 의심 시 부목 고정', desc: '통증·부종 악화 또는 변형이 보이면 골절을 의심하고 즉시 부목으로 고정하십시오.', tip: '변형, 비정상적인 움직임, 심한 통증은 골절 신호입니다.', stepImage: '/assets/Bruises/Bruise-04.png' }
+    ],
+    dos: ['초기 48시간은 냉찜질로 부종을 억제하십시오', '환부를 심장보다 높게 유지하십시오', '통증 악화 시 골절 가능성을 확인하십시오'],
+    donts: ['초기 48시간 내에 온찜질을 하지 마십시오', '멍든 부위를 강하게 주무르지 마십시오', '변형이 보이면 억지로 맞추려 하지 마십시오'],
+    warning: '통증·부종 악화 또는 변형이 보이면 골절로 간주하여 즉시 부목 고정 후 의료진에게 보고하십시오.',
+    color: '#22c55e'
+  },
+  '화상': {
+    title: '화상 (Burns)',
+    description: '열·화학물질·전기·복사로 인한 피부·조직 손상. 1도(홍반), 2도(수포), 3도(괴사)로 구분되며 면적·깊이가 클수록 쇼크 위험이 커진다.',
+    diagnosis: '화상 (Burn Injury)',
+    severity: 'HIGH',
     riskLevel: '3',
-    protocol: 'SOP-AIR-03',
+    legalBasis: '선원법 시행규칙 [별표 5의5] 화상처치',
+    steps: [
+      { title: '흐르는 찬물로 냉각 (20분)', desc: '즉시 흐르는 찬물로 20분 이상 냉각하십시오. 수압은 약하게 유지하십시오.', tip: '이 단계를 클릭하면 냉각 타이머가 시작됩니다. 얼음물은 절대 금기입니다.', stepImage: '/assets/Fracture_Dislocation/Burn-01.png' },
+      { title: '수포 보호 및 거즈 덮기', desc: '수포를 절대 터뜨리지 말고 멸균 거즈로 느슨하게 덮으십시오.', tip: '수포가 터지면 감염 위험이 크게 높아집니다.', stepImage: '/assets/Fracture_Dislocation/Burn-02.png' },
+      { title: '압박 요소 제거', desc: '옷·반지·시계 등 압박 요소를 부종이 생기기 전에 신속히 제거하십시오. 피부에 달라붙은 옷은 억지로 떼지 마십시오.', stepImage: '/assets/Fracture_Dislocation/Burn-03.png' },
+      { title: '회항·이송 결정', desc: '2도 이상 또는 손바닥 이상 면적이면 즉시 회항·이송을 결정하십시오. 연고·기름 도포는 절대 금지합니다.', tip: '처치 내용과 환자 상태 변화를 기록하여 보존하십시오.', stepImage: '/assets/Fracture_Dislocation/Burn-04.png' }
+    ],
+    dos: ['물집이 터지지 않도록 최대한 조심하십시오', '화학 화상 시 오염된 옷을 즉시 제거하십시오', '환부를 심장보다 높게 유지하십시오'],
+    donts: ['민간요법(된장, 소주, 치약, 연고, 기름)은 절대 금물입니다', '얼음을 직접 환부에 대거나 문지르지 마십시오', '수포를 터뜨리지 마십시오'],
+    warning: '2도 이상 또는 손바닥 이상 면적의 화상은 즉시 회항·이송하십시오. 안면 화상이나 연기 흡입 시 산소를 공급하십시오.',
+    color: '#f59e0b'
+  },
+  '절상': {
+    title: '절상 (Cut)',
+    description: '칼·유리 등 날카로운 물체에 베여 가장자리가 비교적 깨끗한 상처. 깊이에 따라 혈관·신경·힘줄 손상이 동반될 수 있다.',
+    diagnosis: '절상 (Incised Wound)',
+    severity: 'MEDIUM',
+    riskLevel: '2',
+    legalBasis: 'WHO 선내의료지침 Ch.7',
+    steps: [
+      { title: '직접 압박 지혈 (5~10분)', desc: '멸균 거즈로 직접 압박하여 5~10분간 지혈하십시오. 거즈가 피에 젖어도 떼지 말고 위에 계속 덧대십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-01.png' },
+      { title: '세척 및 소독', desc: '지혈 후 생리식염수로 상처를 충분히 세척하고 소독하십시오.', tip: '상처 내부에 알코올 등을 직접 붓지 마십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-02.png' },
+      { title: '스테리스트립 접합', desc: '깊이 1cm 미만은 스테리스트립(상처 접합 테이프)으로 상처 가장자리를 맞추어 접합하십시오.', stepImage: '/assets/Cut/Cut-03.png' },
+      { title: '임시 접합 후 의료진 의뢰', desc: '깊이 1cm 이상이거나 벌어진 상처는 스테리스트립으로 임시 접합 후 즉시 원격 의료진에게 보고하십시오. 봉합(봉합사 사용)은 의료면허자만 시행 가능합니다.', tip: '6시간 초과 시 감염 위험이 높아져 봉합이 어려울 수 있어 신속한 보고가 중요합니다.', stepImage: '/assets/Cut/Cut-04.png' }
+    ],
+    dos: ['지혈 거즈를 최소 5~10분간 압박 유지하십시오', '깊은 상처는 스테리스트립 임시 접합 후 즉시 의료진에게 보고하십시오', '상처 가장자리를 스테리스트립으로 맞추어 임시 접합하십시오'],
+    donts: ['지혈 중 거즈를 교체하기 위해 떼지 마십시오', '봉합사를 이용한 봉합은 직접 시도하지 마십시오', '힘줄이나 뼈가 보이면 억지로 건드리지 마십시오'],
+    warning: '깊이 1cm 이상 또는 벌어진 상처는 스테리스트립 임시 접합 후 원격 의료진에게 즉시 보고하십시오. 봉합사 봉합은 의료면허자만 시행 가능합니다.',
+    color: '#f97316'
+  },
+  '열상': {
+    title: '열상 (Laceration)',
+    description: '둔기 충격으로 피부가 불규칙하게 찢어진 상처. 가장자리가 들쭉날쭉하고 조직 손상·오염이 심해 감염·흉터 위험이 높다.',
+    diagnosis: '열상 (Laceration)',
+    severity: 'HIGH',
+    riskLevel: '3',
+    legalBasis: '선원법 시행규칙 [별표 5의5]',
+    steps: [
+      { title: '강한 직접 압박 지혈', desc: '강한 직접 압박으로 지혈하십시오. 동맥성 출혈은 근위부 압박을 추가하십시오.', tip: '거즈가 젖어도 떼지 말고 계속 덧대어 압박하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-01.png' },
+      { title: '오염 제거 세척', desc: '다량의 생리식염수로 충분히 세척하여 오염 물질을 제거하십시오.', tip: '불규칙한 상처 안쪽까지 충분히 씻어내는 것이 중요합니다.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-02.png' },
+      { title: '임시 접합 및 원격 의료진 보고', desc: '스테리스트립으로 임시 접합 후 즉시 원격 의료진에게 보고하십시오. 깊이 1cm 이상의 봉합은 의료면허자만 시행 가능하므로 직접 시도하지 마십시오.', tip: '의료진 연결 전까지 멸균 드레싱으로 상처를 덮어 보호하십시오.', stepImage: '/assets/Laceration/Laceration-03.png' },
+      { title: '파상풍·감염 징후 관찰', desc: '파상풍 예방 여부를 확인하고 항생제 투여를 고려하십시오. 24~48시간 동안 감염 징후를 집중 관찰하십시오.', tip: '붉어짐·고름·열감·악취는 즉각적인 의료 개입이 필요한 감염 신호입니다.', stepImage: '/assets/Laceration/Laceration-04.png' }
+    ],
+    dos: ['강한 압박으로 지혈을 우선 시행하십시오', '다량의 생리식염수로 충분히 세척하십시오', '파상풍 예방 접종 여부를 반드시 확인하십시오'],
+    donts: ['봉합사를 이용한 봉합을 직접 시도하지 마십시오', '감염이 의심될 경우 밀봉하지 마십시오', '들쭉날쭉한 가장자리를 억지로 맞추지 마십시오'],
+    warning: '동맥성 출혈이 지속되면 지혈대를 사용하십시오. 봉합은 원격 의료진 지시 하에서만 시행하십시오.',
+    color: '#ef4444'
+  },
+  '자창': {
+    title: '자창 (Stab Wound)',
+    description: '뾰족한 물체가 깊이 찔러 생긴 상처. 외부 출혈은 적어 보여도 장기·혈관·신경 손상과 내부 출혈로 쇼크에 빠질 수 있는 가장 위험한 외상.',
+    diagnosis: '자창 (Penetrating Stab Wound)',
+    severity: 'CRITICAL',
+    riskLevel: '4',
+    legalBasis: '선원법 시행규칙 [별표 5의5]',
+    steps: [
+      { title: '박힌 물체 절대 제거 금지', desc: '박힌 물체는 절대 제거하지 마십시오. 수건·거즈로 주변을 고정만 하십시오.', tip: '물체가 혈관 압박 역할을 하고 있어 제거 시 대량 출혈이 발생할 수 있습니다.', stepImage: '/assets/StabWound/Stab-01.png' },
+      { title: '압박 지혈 및 폐쇄식 드레싱', desc: '주변을 거즈로 둘러 압박 지혈하십시오. 흉부 자창은 폐쇄식 드레싱(3면 밀봉, 1면 개방)을 적용하십시오.', tip: '흉부 자창: 3면만 붙이고 1면은 열어두어 공기 배출구를 만드십시오.', stepImage: '/assets/StabWound/Stab-02.png' },
+      { title: '쇼크 방지 및 금식', desc: '환자를 보온하고 하지를 거상하여 쇼크를 방지하십시오. 음식·음료 섭취를 금지(금식)하십시오.', tip: '쇼크 징후: 창백, 냉습한 피부, 빠른 맥박, 의식 저하.', stepImage: '/assets/StabWound/Stab-03.png' },
+      { title: '즉시 회항 및 이송', desc: '즉시 회항을 결정하고 의료진에 우선 보고하며 최단 경로로 병원 이송하십시오.', tip: '자창은 외견상 가벼워 보여도 내부 손상이 치명적일 수 있습니다.', stepImage: '/assets/StabWound/Stab-04.png' }
+    ],
+    dos: ['박힌 물체는 고정만 하고 절대 제거하지 마십시오', '흉부 자창은 폐쇄식 드레싱을 적용하십시오', '즉시 회항을 결정하고 의료진에 보고하십시오'],
+    donts: ['박힌 물체를 제거하지 마십시오', '환자에게 음식·음료를 주지 마십시오', '출혈이 적다고 안심하지 마십시오'],
+    warning: '자창은 외견상 가벼워 보여도 내부 장기 손상으로 즉사할 수 있습니다. 즉시 회항하여 최단 경로로 이송하십시오.',
+    color: '#dc2626'
+  },
+  '기도 확보': {
+    title: '기도 확보 및 호흡 보조',
+    description: '의식 저하 또는 호흡 곤란 환자의 기도를 유지하여 자가 호흡을 돕습니다.',
+    diagnosis: '호흡 곤란 및 기도 폐쇄 위험',
+    severity: null,
+    riskLevel: '3',
+    legalBasis: null,
     steps: [
       { title: '머리 기울이기-턱 올리기', desc: '한 손을 이마에 대고 머리를 뒤로 젖히며, 다른 손가락으로 턱뼈를 들어 올려 기도를 확보하십시오.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-01.png' },
       { title: '입안 이물질 제거', desc: '눈에 보이는 구토물이나 이물질이 있다면 머리를 옆으로 돌려 손가락으로 가볍게 제거하십시오.', stepImage: '/assets/Fracture_Dislocation/Airway_Management-02.png' },
@@ -52,43 +168,15 @@ const ACTION_GUIDES = {
     dos: ['환자가 자가 호흡 중이면 옆으로 눕히세요', '구토 시 즉시 몸 전체를 옆으로 돌리세요'],
     donts: ['의식이 없는 환자에게 물을 먹이지 마세요', '머리 밑에 베개를 넣어 기도를 꺾지 마세요'],
     warning: '호흡음이 거칠거나 청색증이 보이면 즉시 심폐소생술을 준비하십시오.',
-    color: '#ef4444'
+    color: '#38bdf8'
   },
-  '지혈/압박': {
-    title: '출혈 부위 직접 압박',
-    diagnosis: '외상성 대량 출혈(Hemorrhage)',
-    riskLevel: '3',
-    protocol: 'SOP-BLD-02',
-    steps: [
-      { title: '상처 노출 및 확인', desc: '옷을 가위로 잘라 상처 부위를 완전히 드러내고 정확한 출혈 지점을 확인하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-01.png' },
-      { title: '직접 압박 시행', desc: '멸균 거즈나 깨끗한 천을 대고 손바닥 전체로 체중을 실어 강하게 누르십시오.', tip: '거즈가 피에 젖어도 떼지 말고 위에 계속 덧대세요.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-02.png' },
-      { title: '지혈대(T-kit) 적용', desc: '대량 출혈이 직접 압박으로 멈추지 않을 때만 상처 5~10cm 위쪽(심장 방향)에 지혈대를 감고 막대를 돌려 고정하십시오.', tip: '최종 수단이며, 착용 시각을 환자의 이마 등에 반드시 기록하십시오.', stepImage: '/assets/Fracture_Dislocation/Bleeding_Control-03.png?v=2' }    ],
-    dos: ['출혈 부위를 심장보다 높게 유지하세요', '지혈대 사용 시 착용 시각을 환자의 몸에 기록하세요', '피부에 직접 닿게 꽉 조이십시오'],
-    donts: ['상처에 박힌 칼 등을 억지로 뽑지 마세요', '가루약, 된장 등 이물질을 바르지 마세요', '지혈대를 옷 위에 감지 마세요'],
-    warning: '지혈대는 최후의 수단이며, 한 번 조이면 의료진의 지시 없이 절대 풀지 마십시오.',
-    color: '#ff3b5c'
-  },
-  '화상': {
-    title: '피부 속 열기 배출 및 조직 손상 방지',
-    diagnosis: '열상성 화상(Burn Injury)',
-    riskLevel: '2',
-    protocol: 'SOP-BRN-08',
-    steps: [
-      { title: '흐르는 물 냉각 (20분)', desc: '12~25℃ 찬물에 20분 이상 식히십시오. 수압은 약하게 유지하여 추가적인 조직 손상을 방지하십시오.', tip: '이 단계를 클릭하면 냉각 타이머가 시작됩니다. 얼음물은 절대 금기입니다.', stepImage: '/assets/Fracture_Dislocation/Burn-01.png' },
-      { title: '의복 및 장신구 제거', desc: '가위로 옷을 자르되, 피부에 달라붙은 옷은 억지로 떼지 말고 주변만 자르십시오.', tip: '부종이 생기기 전에 반지, 시계 등을 신속히 제거하는 것이 필수입니다.', stepImage: '/assets/Fracture_Dislocation/Burn-02.png' },
-      { title: '화상 연고 및 드레싱', desc: '처치 부위의 열감이 주변 피부와 비슷해진 것을 확인한 후, 멸균 면봉으로 연고를 얹듯이 바르십시오. 랩이나 거즈는 절대 꽉 조이지 않게 느슨하게 덮으십시오.', tip: '화기가 남은 상태에서 연고를 바르면 열이 갇혀 상처가 깊어집니다.', stepImage: '/assets/Fracture_Dislocation/Burn-03.png' },
-      { title: '환부 거상 및 보고', desc: '환부를 심장보다 높게 유지하고, 환자에게 수분을 공급하십시오. 즉시 긴급 의료 지원을 요청(육상 의료 지원팀 연계)하고 환자 상태를 상세히 기록하십시오.', tip: '처치 내용과 환자 상태 변화를 기록하여 보존하십시오.', stepImage: '/assets/Fracture_Dislocation/Burn-04.png' }
-      ],
-    dos: ['물집이 터지지 않도록 최대한 조심하세요', '통증 완화를 위해 수평을 유지하며 안정시키세요', '화학 화상 시 오염된 옷을 즉시 제거하세요'],
-    donts: ['민간요법(된장, 소주, 치약 등)은 절대 금물입니다', '얼음을 직접 환부에 대거나 문지르지 마세요', '환부에 직접 손을 대지 마세요'],
-    warning: '안면 화상이나 연기 흡입 시 산소를 공급하십시오. 화학 화상 시에는 더 많은 양의 물로 씻어내십시오.',
-    color: '#f59e0b'
-  },
-  '익수 / 저체온': {
-    title: '익수자 구조 및 체온 관리',
+  '익수/저체온': {
+    title: '익수 및 저체온 처치',
+    description: '익수 또는 장기간 저온 노출로 인한 심부 체온 저하 상태. 작은 충격에도 심정지가 올 수 있어 매우 신중하게 다루어야 합니다.',
     diagnosis: '심부 저체온증(Hypothermia)',
+    severity: null,
     riskLevel: '2',
-    protocol: 'SOP-HYP-05',
+    legalBasis: null,
     steps: [
       { title: '젖은 의복 제거', desc: '바람이 없는 따뜻하고 건조한 곳으로 이동하고, 젖은 옷을 가위로 잘라 제거한 뒤 마른 수건으로 몸을 닦으십시오.', stepImage: '/assets/Fracture_Dislocation/Drowning_Hypothermia-01.png' },
       { title: '중심 체온 가온', desc: '담요로 몸을 감싸고, 온팩을 겨드랑이, 사타구니, 목 등 굵은 혈관 부위에 대십시오.', stepImage: '/assets/Fracture_Dislocation/Drowning_Hypothermia-02.png' },
@@ -97,37 +185,7 @@ const ACTION_GUIDES = {
     dos: ['의식이 있다면 따뜻하고 단 음료를 주십시오', '환자를 아주 조심스럽게(수평으로) 옮기십시오'],
     donts: ['팔다리를 문지르거나 주무르지 마세요', '뜨거운 물에 환자를 직접 담그지 마세요'],
     warning: '심한 저체온증 환자는 작은 충격에도 심정지가 올 수 있으니 달걀 다루듯 조심하십시오.',
-    color: '#f97316'
-  },
-  '골절 / 탈구': {
-    title: '골절 부위 고정 및 보호',
-    diagnosis: '골절 및 신경 손상 의심',
-    riskLevel: '1',
-    protocol: 'SOP-FRC-04',
-    steps: [
-      { title: '상처 확인 및 안정화', desc: '다친 부위를 손으로 받쳐 움직이지 않게 고정하고, 환자가 통증을 가장 적게 느끼는 편안한 자세를 유지하게 하십시오.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-01.png' },
-      { title: '부목 고정', desc: '나무판자나 종이박스로 다친 관절의 위아래를 충분히 포함하도록 대고 끈이나 붕대로 움직이지 않게 묶으십시오.', tip: '너무 꽉 조여 혈액 순환을 방해하지 않도록 주의하십시오.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-02.png' },
-      { title: '냉찜질 (부종 방지)', desc: '부종과 통증을 줄이기 위해 얼음팩을 수건에 싸서 환부에 15분간 대어 주십시오. 얼음이 피부에 직접 닿지 않게 하십시오.', tip: '냉찜질은 혈관을 수축시켜 내부 출혈과 붓기를 완화합니다.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-03.png' },
-      { title: '순환 확인 및 보고', desc: '손발가락 끝의 혈색과 온도를 확인하며 환부를 고정 상태로 유지하십시오. 즉시 긴급 의료 지원을 요청(육상 의료 지원팀 연계)하십시오.', tip: '감각이 없거나 창백해지면 부목을 즉시 느슨하게 조정하십시오.', stepImage: '/assets/Fracture_Dislocation/Fracture_Dislocation-04.png' }
-    ],
-    dos: ['뼈가 튀어나왔다면 멸균 거즈로 먼저 덮으세요', '다친 부위를 심장보다 높게 올리십시오', '환자가 안정을 취하도록 돕고 체온을 유지하세요'],
-    donts: ['부러진 뼈를 맞추려 하거나 억지로 밀어 넣지 마세요', '탈구된 관절을 직접 끼우려 하지 마세요', '환자를 일으켜 세우거나 걷게 하지 마세요'],
-    warning: '척추 손상이 의심되거나 의식이 없는 경우 환자를 절대로 움직이지 마십시오.',
     color: '#38bdf8'
-  },
-  '상처 세척': {
-    title: '외상 부위 세척 및 감염 방지',
-    diagnosis: '국소 외상 및 찰과상',
-    riskLevel: '1',
-    protocol: 'SOP-WND-06',
-    steps: [
-      { title: '충분한 세척 (5~10분)', desc: '흐르는 수돗물이나 멸균 식염수로 5~10분간 상처 속 이물질을 충분히 씻어내십시오.', tip: '상처 속 흙이나 오염 물질이 남으면 감염의 원인이 됩니다.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-01.png' },
-      { title: '연고 및 멸균 드레싱', desc: '깨끗한 거즈로 주변 물기를 닦고 항생제 연고를 바른 뒤 멸균 거즈로 환부를 덮으십시오.', tip: '상처에 직접 손을 대지 말고 멸균 면봉을 사용하십시오.', stepImage: '/assets/Fracture_Dislocation/Wound_Cleaning-02.png' }
-    ],
-    dos: ['처치 전 위생 장갑을 반드시 착용하세요', '거즈가 없다면 깨끗한 손수건을 사용하세요', '상처 주변 피부를 청결히 유지하세요'],
-    donts: ['상처 내부에 소독액(알코올 등)을 직접 붓지 마세요', '상처에 가루약이나 된장 등을 바르지 마세요', '상처에 솜(탈지면)을 직접 대지 마세요'],
-    warning: '깊은 자상, 동물에 물린 상처, 녹슨 금속에 의한 상처는 세척 후 즉시 의료진의 처치를 받으십시오.',
-    color: '#10b981'
   }
 }
 
@@ -142,35 +200,45 @@ const FOLLOWUP_GUIDES = {
     '목 통증 또는 삼킴 곤란이 지속되면 원격 의료팀에 보고하십시오.',
     '의식 상태 및 산소포화도를 30분간 집중 관찰하십시오.',
   ],
-  '기도 확보': [
-    '회복 자세를 유지하며 호흡음을 30초마다 확인하십시오.',
-    '구토 발생 즉시 기도를 다시 확보하십시오.',
-    '의식 수준 변화를 기록하여 의료진에게 전달하십시오.',
+  '찰과상': [
+    '24시간마다 드레싱을 교체하고 감염 징후를 확인하십시오.',
+    '발적·고름·열감·악취 등 감염 징후 발생 시 즉시 의료진에게 보고하십시오.',
+    '상처 회복 경과를 매일 사진으로 기록하십시오.',
   ],
-  '지혈/압박': [
-    '지혈 상태를 유지하며 드레싱이 젖으면 위에 덧대십시오.',
-    '지혈대 착용 시각을 기록하고 2시간 초과 전 의료진에게 보고하십시오.',
-    '쇼크 징후(창백, 냉습, 의식 저하)를 지속 모니터링하십시오.',
+  '타박상': [
+    '초기 48시간 이후에는 온찜질로 전환하여 혈액 순환을 촉진하십시오.',
+    '부종·변형·통증 악화 시 골절 가능성을 재평가하십시오.',
+    '바이탈을 모니터링하며 내부 출혈 징후를 관찰하십시오.',
   ],
   '화상': [
     '냉각 완료 후 멸균 드레싱 상태를 유지하십시오.',
     '환부를 심장보다 높게 유지하고 수분을 보충하십시오.',
     '수포 파열 방지 및 2차 감염 여부를 지속 관찰하십시오.',
   ],
-  '익수 / 저체온': [
+  '절상': [
+    '스테리스트립 또는 드레싱 상태를 매일 확인하십시오.',
+    '24~48시간 내 감염 징후(붉어짐, 고름, 열감)를 집중 관찰하십시오.',
+    '봉합이 필요한 경우 원격 의료진 지시를 받을 때까지 임시 접합 상태를 유지하십시오.',
+  ],
+  '열상': [
+    '봉합 부위 감염 징후를 24~48시간 집중 관찰하십시오.',
+    '항생제 투여 일정을 준수하십시오.',
+    '파상풍 예방 접종 여부를 확인하고 필요 시 처치하십시오.',
+  ],
+  '자창': [
+    '이송 전까지 활력징후를 5분마다 측정·기록하십시오.',
+    '쇼크 징후(창백, 냉습, 의식 저하) 발생 시 즉시 CPR을 준비하십시오.',
+    '박힌 물체는 의료진 도착 전까지 절대 제거하지 마십시오.',
+  ],
+  '기도 확보': [
+    '회복 자세를 유지하며 호흡음을 30초마다 확인하십시오.',
+    '구토 발생 즉시 기도를 다시 확보하십시오.',
+    '의식 수준 변화를 기록하여 의료진에게 전달하십시오.',
+  ],
+  '익수/저체온': [
     '체온을 30분마다 측정하고 기록하십시오.',
     '담요 보온을 유지하고 따뜻한 수분을 지속 공급하십시오.',
     '의식 변화 또는 심부정맥 징후 발생 시 즉시 CPR을 준비하십시오.',
-  ],
-  '골절 / 탈구': [
-    '부목 상태와 말단 혈색을 15분마다 확인하십시오.',
-    '부종 증가 시 부목을 느슨하게 조정하십시오.',
-    '척추 손상 가능성이 있는 경우 절대 이동하지 마십시오.',
-  ],
-  '상처 세척': [
-    '드레싱 상태를 8시간마다 점검하고 교체하십시오.',
-    '붉어짐·고름·악취 등 감염 징후를 매일 확인하십시오.',
-    '상처가 깊거나 오염이 심하면 원격 의료팀에 추가 상담하십시오.',
   ],
 }
 
@@ -185,27 +253,15 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     setImgError(false)
   }
 
-  const [selectedTriage, setSelectedTriage] = useState(null)
-  
-  const [triageStep, setTriageStep] = useState(() => {
-    if (initialAction) {
-      const mapping = {
-        'CARDIAC': '심폐소생술',
-        'TRAUMA': '지혈/압박',
-        'UNCONSCIOUS': '기도 확보',
-        'RESPIRATORY': '기도 확보'
-      }
-      const targetAction = mapping[initialAction] || initialAction
-      if (ACTION_GUIDES[targetAction]) return 'GUIDE'
-    }
-    return 'CHECK'
-  })
+  const [triageStep, setTriageStep] = useState('GUIDE')
 
   const [activeAction, setActiveAction] = useState(() => {
     if (initialAction) {
       const mapping = {
         'CARDIAC': '심폐소생술',
-        'TRAUMA': '지혈/압박',
+        'CPR': '심폐소생술',
+        'Heimlich': '하임리히법',
+        'TRAUMA': '열상',
         'UNCONSCIOUS': '기도 확보',
         'RESPIRATORY': '기도 확보'
       }
@@ -373,22 +429,12 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     }
   }
 
-  const handleTriageSelect = (triage) => {
-    setSelectedTriage(triage)
-    setActiveAction(triage.action)
-    setTriageStep('GUIDE')
-    
-    const now = new Date().toLocaleTimeString('ko-KR', { hour12: false })
-    setSessionLogs([{ time: now, text: `의식 수준 판별 완료: ${triage.label} (${triage.desc})`, type: 'INFO' }, ...sessionLogs])
-  }
-
   const handleResetSession = () => {
     setActiveAction(null)
     setCompletedSteps([])
-    setSelectedTriage(null)
     setShowCompletionPanel(false)
     setSelectedStepIndex(null)
-    setTriageStep('CHECK')
+    setTriageStep('GUIDE')
   }
 
   const [burnTimer, setBurnTimer] = useState(1200)
@@ -441,63 +487,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const displayImageIndex = hoveredAction && hoveredAction !== activeAction ? 0 : activeDisplayIndex
   const displayStepImage = displayActionData?.steps[displayImageIndex]?.stepImage
 
-  if (triageStep === 'CHECK') {
-    const triageData = [
-      { label: '눈을 뜨고 말을 하나요?', desc: '정상 의식', sub: '일반적인 대화 가능', action: '상처 세척', color: '#2dd4bf', icon: <CheckCircle2 size={32}/> },
-      { label: '부르면 대답을 하나요?', desc: '언어 반응', sub: '부르는 소리에 반응', action: '상처 세척', color: '#fb923c', icon: <Mic size={32}/> },
-      { label: '꼬집을 때만 반응하나요?', desc: '통증 반응', sub: '강한 자극에만 반응', action: '기도 확보', color: '#fb923c', icon: <Zap size={32}/> },
-      { label: '전혀 반응이 없나요?', desc: '무반응 (긴급)', sub: '의식 및 반응 없음', action: '심폐소생술', color: '#f43f5e', icon: <AlertOctagon size={32}/> },
-    ]
-    return (
-      <div style={{ height: 'calc(100vh - 72px)', background: '#020617', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 40, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: '10%', left: '10%', width: '40vw', height: '40vw', background: 'radial-gradient(circle, rgba(56,189,248,0.05) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '10%', right: '10%', width: '30vw', height: '30vw', background: 'radial-gradient(circle, rgba(244,63,94,0.05) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
-
-        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', marginBottom: 48 }}>
-          <h1 style={{ fontSize: 46, fontWeight: 950, color: '#fff', marginBottom: 16, letterSpacing: '-1.5px', textShadow: '0 4px 12px rgba(0,0,0,0.5)', whiteSpace: 'nowrap' }}>환자의 현재 의식 수준을 판별하십시오</h1>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-            <div style={{ height: 2, width: 30, background: '#38bdf8' }} />
-            <p style={{ fontSize: 22, color: '#94a3b8', fontWeight: 700, margin: 0, whiteSpace: 'nowrap' }}>골든타임 확보를 위한 AI 긴급 프로토콜 가동</p>
-            <div style={{ height: 2, width: 30, background: '#38bdf8' }} />
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: 24, maxWidth: 1280, width: '100%', position: 'relative', zIndex: 10, alignItems: 'start' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, flex: 1 }}>
-            {triageData.map((t, i) => (
-              <button
-                key={i}
-                onClick={() => handleTriageSelect(t)}
-                onMouseEnter={() => {
-                  const guide = ACTION_GUIDES[t.action]
-                  if (guide) guide.steps.forEach(s => { if (s.stepImage) { const img = new window.Image(); img.src = s.stepImage } })
-                }}
-                style={{ 
-                  background: 'rgba(30, 41, 59, 0.4)', backdropFilter: 'blur(12px)', border: '2px solid rgba(255,255,255,0.08)', borderRadius: 32, padding: '32px 32px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: 24, boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-                }} 
-                className="triage-btn"
-              >
-                <div style={{ width: 72, height: 72, borderRadius: 22, background: `${t.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.color, border: `2.5px solid ${t.color}40`, flexShrink: 0, boxShadow: `0 0 20px ${t.color}15` }}>{t.icon}</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 29, fontWeight: 900, color: t.color, letterSpacing: '1.5px', marginBottom: 6, opacity: 0.9, whiteSpace: 'nowrap' }}>{t.sub}</div>
-                  <div style={{ fontSize: 36, fontWeight: 950, color: '#fff', marginBottom: 4, letterSpacing: '-0.5px', whiteSpace: 'nowrap' }}>{t.label}</div>
-                  <div style={{ fontSize: 28, color: '#94a3b8', fontWeight: 700, whiteSpace: 'nowrap' }}>{t.desc}</div>
-                </div>
-                <ChevronRight size={32} color="#1e293b" style={{ opacity: 0.5, flexShrink: 0 }} />
-                <div className="btn-glow" style={{ position: 'absolute', inset: 0, background: `linear-gradient(135deg, ${t.color}15, transparent)`, opacity: 0, transition: '0.3s' }} />
-              </button>
-            ))}
-          </div>
-
-        </div>
-        <style>{`
-          .triage-btn:hover { background: rgba(255,255,255,0.05) !important; transform: translateY(-8px) scale(1.02); border-color: rgba(255,255,255,0.2) !important; boxShadow: 0 20px 40px rgba(0,0,0,0.4); }
-          .triage-btn:hover .btn-glow { opacity: 1 !important; }
-          .triage-btn:hover svg { transform: scale(1.1); transition: 0.3s; }
-        `}</style>
-      </div>
-    )
-  }
 
   if (triageStep === 'SUMMARY') {
     return (
@@ -555,16 +544,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     <div style={{ height: 'calc(100vh - 72px)', width: '100%', background: '#020617', color: '#fff', position: 'relative', overflow: 'hidden', fontFamily: '"Pretendard", sans-serif', display: 'flex', flexDirection: 'column' }}>
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at center, transparent 0%, #020617 98%)' }} />
       
-      {selectedTriage && (
-        <div style={{ position: 'relative', zIndex: 10, background: `${selectedTriage.color}15`, borderBottom: `1px solid ${selectedTriage.color}30`, padding: '12px 24px', display: 'flex', alignItems: 'center', gap: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ fontSize: 14, fontWeight: 800, color: selectedTriage.color, opacity: 0.8 }}>TRIAGE RESULT :</span><span style={{ fontSize: 18, fontWeight: 950, color: '#fff' }}>{selectedTriage.desc} ({selectedTriage.label})</span></div>
-          <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ fontSize: 14, fontWeight: 800, color: selectedTriage.color, opacity: 0.8 }}>AI PROTOCOL :</span><span style={{ fontSize: 18, fontWeight: 950, color: selectedTriage.color }}>{currentActionData?.title} 가동 중</span></div>
-          <div style={{ marginLeft: 'auto' }}>
-            <button onClick={() => {setTriageStep('CHECK'); setSelectedTriage(null)}} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '6px 16px', borderRadius: 8, color: '#64748b', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>의식 재판별</button>
-          </div>
-        </div>
-      )}
       <div style={{ position: 'relative', zIndex: 1, flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '480px 1fr 440px', gridTemplateRows: '1fr 110px', gap: '10px', padding: '10px', boxSizing: 'border-box' }}>
         <section style={{ gridRow: '1', display: 'flex', flexDirection: 'column' }}>
           <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -650,7 +629,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                 </div>
               )}
 
-              {activeAction === '골절 / 탈구' && activeDisplayIndex === 2 && coldTimer >= 0 && (
+              {activeAction === '타박상' && activeDisplayIndex === 0 && coldTimer >= 0 && (
                 <div style={{ 
                   position: 'absolute', 
                   bottom: '8%', 
@@ -697,7 +676,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                 </div>
               )}
 
-              {activeAction === '상처 세척' && activeDisplayIndex === 0 && washTimer >= 0 && (
+              {activeAction === '찰과상' && activeDisplayIndex === 0 && washTimer >= 0 && (
                 <div style={{ 
                   position: 'absolute', 
                   bottom: '8%', 
@@ -750,14 +729,21 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
           {activeAction ? (
             <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', padding: '24px', position: 'relative' }}>
               
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <div>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8 }}>
-                    <div style={{ background: currentActionData.color, color: '#000', padding: '4px 12px', borderRadius: 8, fontSize: 14, fontWeight: 950 }}>RISK LEVEL {currentActionData.riskLevel}</div>
-                    <div style={{ color: currentActionData.color, fontSize: 18, fontWeight: 800 }}>AI 진단 : {currentActionData.diagnosis}</div>
-                  </div>
-                  <h2 style={{ fontSize: 52, fontWeight: 950, letterSpacing: '-2px', margin: 0 }}>{currentActionData.title}</h2>
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
+                  {currentActionData.severity && (
+                    <div style={{ background: SEVERITY_COLORS[currentActionData.severity], color: '#000', padding: '4px 12px', borderRadius: 8, fontSize: 13, fontWeight: 950 }}>{currentActionData.severity}</div>
+                  )}
+                  <div style={{ background: currentActionData.color, color: '#000', padding: '4px 12px', borderRadius: 8, fontSize: 13, fontWeight: 950 }}>RISK {currentActionData.riskLevel}</div>
+                  <div style={{ color: currentActionData.color, fontSize: 17, fontWeight: 800 }}>AI 진단 : {currentActionData.diagnosis}</div>
                 </div>
+                <h2 style={{ fontSize: 46, fontWeight: 950, letterSpacing: '-2px', margin: '0 0 6px 0' }}>{currentActionData.title}</h2>
+                {currentActionData.description && (
+                  <p style={{ fontSize: 16, color: '#94a3b8', fontWeight: 600, margin: '0 0 4px 0', lineHeight: 1.6 }}>{currentActionData.description}</p>
+                )}
+                {currentActionData.legalBasis && (
+                  <div style={{ fontSize: 13, color: '#475569', fontWeight: 700 }}>📋 법적 근거 : {currentActionData.legalBasis}</div>
+                )}
               </div>
 
               {/* 알레르기 경고 배너 (Task 3-1) */}
@@ -808,9 +794,8 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
             </div>
           ) : (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: 20 }}>
-              <div style={{ width: 120, height: 120, borderRadius: '50%', background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}><AlertTriangle size={70} color="#ef4444"/></div>
-              <h2 style={{ fontSize: 48, fontWeight: 950, marginBottom: 12 }}>비의료인 자율 대응 모드</h2>
-              <p style={{ fontSize: 26, color: '#94a3b8', fontWeight: 700, maxWidth: 650, lineHeight: 1.5 }}>환자의 의식 수준 판별을 통해<br/>적절한 응급처치 가이드를 활성화하십시오.</p>
+              <div style={{ width: 100, height: 100, borderRadius: '50%', background: 'rgba(56,189,248,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}><Activity size={52} color="#38bdf8"/></div>
+              <p style={{ fontSize: 22, color: '#475569', fontWeight: 700 }}>하단 버튼에서 처치 항목을 선택하십시오.</p>
             </div>
           )}
         </section>
@@ -850,11 +835,6 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
               <VitalMini label="혈압(직접)" value={vitals.bp} unit="mmHg" color="#8b5cf6" icon={<Zap size={16}/>} isManual isAlert={checkAlert('bp', vitals.bp)} range="90/60-140/90" onClick={() => handleOpenEdit('bp', '혈압', vitals.bp, 'mmHg')} />
               <VitalMini label="체온(직접)" value={vitals.temp} unit="°C" color="#f59e0b" icon={<Thermometer size={16}/>} isManual isAlert={checkAlert('temp', vitals.temp)} range="36.1-37.2" onClick={() => handleOpenEdit('temp', '체온', vitals.temp, '°C')} />
               
-              {/* 환자 의식 상태 요약 (6번째 칸 활용) */}
-              <div style={{ background: 'rgba(56,189,248,0.05)', border: '1.5px dashed rgba(56,189,248,0.2)', borderRadius: 16, padding: 12, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: 4 }}>
-                <div style={{ fontSize: 16, color: '#38bdf8', fontWeight: 800 }}>의식 수준</div>
-                <div style={{ fontSize: 25, fontWeight: 950, color: '#fff' }}>{selectedTriage?.desc || '판별 전'}</div>
-              </div>
             </div>
             
             {editTarget && (
@@ -903,32 +883,17 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
             )}
           </div>
 
-          {/* Timeline Section */}
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: 24, padding: '20px', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)', minHeight: 0 }}>
-            <div style={{ fontWeight: 900, marginBottom: 16, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}><History size={18} /><span>대응 타임라인</span></div>
-            <div style={{ flex: 1, overflowY: 'auto' }}>
-              {sessionLogs.map((log, i) => (
-                <div key={i} style={{ display: 'flex', gap: 14, marginBottom: 14 }}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#020617', border: `3px solid ${log.type === 'SUCCESS' ? '#22c55e' : '#38bdf8'}`, flexShrink: 0, marginTop: '6px' }} />
-                  <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'flex-start' }}>
-                    <div style={{ fontSize: '16px', color: '#e2e8f0', fontWeight: 750, lineHeight: 1.3 }}>{log.text}</div>
-                    <div style={{ fontSize: '12px', color: '#64748b', whiteSpace: 'nowrap', flexShrink: 0, fontWeight: 600 }}>{log.time}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </aside>
-        <section style={{ gridColumn: '1 / 4', gridRow: '2', display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '8px', marginTop: '4px' }}>
+        <section style={{ gridColumn: '1 / 4', gridRow: '2', display: 'grid', gridTemplateColumns: `repeat(${Object.keys(ACTION_GUIDES).length}, 1fr)`, gap: '8px', marginTop: '4px' }}>
           {Object.keys(ACTION_GUIDES).map(key => (
             <button
               key={key}
-              onClick={() => {setActiveAction(key); setHoveredAction(null); setCompletedSteps([]); setSelectedTriage(null); setShowCompletionPanel(false); setSelectedStepIndex(null); setIsBurnTimerActive(false); setBurnTimer(1200); setIsColdTimerActive(false); setColdTimer(1200); setIsWashTimerActive(false); setWashTimer(300);}}
+              onClick={() => {setActiveAction(key); setHoveredAction(null); setCompletedSteps([]); setShowCompletionPanel(false); setSelectedStepIndex(null); setIsBurnTimerActive(false); setBurnTimer(1200); setIsColdTimerActive(false); setColdTimer(1200); setIsWashTimerActive(false); setWashTimer(300);}}
               onMouseEnter={() => setHoveredAction(key)}
               onMouseLeave={() => setHoveredAction(null)}
-              style={{ background: activeAction === key ? `linear-gradient(135deg, ${ACTION_GUIDES[key].color}, ${ACTION_GUIDES[key].color}dd)` : `${ACTION_GUIDES[key].color}15`, border: '2px solid', borderColor: activeAction === key ? 'transparent' : `${ACTION_GUIDES[key].color}30`, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              <div style={{ color: activeAction === key ? '#fff' : ACTION_GUIDES[key].color }}><ActionButtonIcon label={key} size={26} /></div>
-              <div style={{ fontSize: 28, fontWeight: 950, color: '#fff', letterSpacing: '-1px' }}>{key}</div>
+              style={{ background: activeAction === key ? `linear-gradient(135deg, ${ACTION_GUIDES[key].color}, ${ACTION_GUIDES[key].color}dd)` : `${ACTION_GUIDES[key].color}15`, border: '2px solid', borderColor: activeAction === key ? 'transparent' : `${ACTION_GUIDES[key].color}30`, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', overflow: 'hidden' }}>
+              <div style={{ color: activeAction === key ? '#fff' : ACTION_GUIDES[key].color, flexShrink: 0 }}><ActionButtonIcon label={key} size={22} /></div>
+              <div style={{ fontSize: 22, fontWeight: 950, color: '#fff', letterSpacing: '-0.5px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{key}</div>
             </button>
           ))}
         </section>
@@ -994,12 +959,14 @@ function VitalMini({ label, value, unit, color, icon, onClick, isManual, isAlert
 function ActionButtonIcon({ label, size = 24 }) {
   if (label === '심폐소생술') return <Heart size={size} />
   if (label === '하임리히법') return <Zap size={size} />
-  if (label === '지혈/압박') return <Activity size={size} />
-  if (label === '기도 확보') return <Wind size={size} />
-  if (label === '골절 / 탈구') return <Bone size={size} />
-  if (label === '익수 / 저체온') return <Droplets size={size} />
-  if (label === '상처 세척') return <Scissors size={size} />
+  if (label === '찰과상') return <Scissors size={size} />
+  if (label === '타박상') return <Shield size={size} />
   if (label === '화상') return <Flame size={size} />
+  if (label === '절상') return <Activity size={size} />
+  if (label === '열상') return <AlertTriangle size={size} />
+  if (label === '자창') return <ShieldAlert size={size} />
+  if (label === '기도 확보') return <Wind size={size} />
+  if (label === '익수/저체온') return <Droplets size={size} />
   return <Info size={size} />
 }
 
