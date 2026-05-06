@@ -332,6 +332,8 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     const now = new Date()
     setEndTime(now)
     const logTime = now.toLocaleTimeString('ko-KR', { hour12: false })
+    
+    // TODO: [BACKEND] 수동 입력된 처치 데이터 및 전체 세션 로그를 DB(tb_logs 등)에 저장하는 POST API 연동 필요
     setSessionLogs([{ time: logTime, text: "모든 처치 데이터 동기화 및 전송 완료 (tb_logs)", type: 'SUCCESS' }, ...sessionLogs])
     setTriageStep('SUMMARY')
   }

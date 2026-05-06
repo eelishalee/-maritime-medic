@@ -5,6 +5,7 @@ import EmergencyGuide from './EmergencyGuide.jsx'
 
 function getPatientTimeline(patient) {
   if (!patient) return []
+  // TODO: [BACKEND] 실제 DB의 tb_logs 또는 별도 히스토리 테이블에서 환자별 사고 이력을 조회하여 구성해야 함
   const id = patient.id || ''
   const note = patient.note || ''
   const chronic = patient.chronic || '없음'

@@ -15,6 +15,7 @@ export default function Login({ onLogin }) {
     if (!loginData.ship.trim()) { setError('선박 번호를 입력하세요.'); return }
     setError('')
     setLoading(true)
+    // TODO: [BACKEND] 실제 Auth API 호출하여 선박/기기 번호 검증 및 토큰 발급 로직 구현 필요
     setTimeout(() => { setLoading(false); onLogin(loginData) }, 800)
   }
 

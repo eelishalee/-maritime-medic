@@ -14,6 +14,7 @@ import parkAvatar from './assets/photo/003.jpeg'
 export default function App() {
   const [auth, setAuth] = useState(null)
   const [page, setPage] = useState('main')
+  // TODO: [BACKEND] 실제 로그인 성공 시 서버에서 받아온 환자(선원) 정보로 초기화해야 함
   const [activePatient, setActivePatient] = useState({
     id: 'S26-003',
     name: '박기관',

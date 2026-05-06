@@ -31,6 +31,7 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
   const [chat, setChat] = useState([])
 
   // ─── 데이터 동기화 ───
+  // TODO: [BACKEND] 실제 운영 환경에서는 WebSocket 또는 Polling을 통해 실시간 바이탈 데이터를 수신하고 자동 동기화해야 함
   useEffect(() => {
     if (!patient) return
 
@@ -144,6 +145,7 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
     const q = prompt
     setPrompt('')
     
+    // TODO: [BACKEND] 실제 AI 추론 서버(LLM API) 호출 및 환자 컨텍스트(patient 데이터) 전달 로직 구현 필요
     setTimeout(() => {
       const reply = getAiReply(q, patient)
       setChat(prev => [...prev, { role: 'ai', text: reply }])
