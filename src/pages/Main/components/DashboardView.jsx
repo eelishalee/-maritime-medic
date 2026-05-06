@@ -24,11 +24,10 @@ function getPatientTimeline(patient) {
       { time: '09:12', title: '건강 모니터링 시스템 연결', color: '#64748b', detail: `• 몸 상태 측정 장비 연결 완료\n• 페니실린 약 절대 금지 설정 완료` },
     ],
     'S26-003': [
-      { time: '15:05', title: '드레싱 및 약물 투여', color: '#38bdf8', detail: `• 열상 부위에 연고 도포 후 탄력 붕대로 단단히 고정\n• 아스피린 알레르기 주의하여 타이레놀 500mg 복용\n• 상처 부위 부종 여부 관찰을 위해 팔을 높게 유지하도록 조치` },
-      { time: '14:50', title: '상처 세척 및 이물질 제거', color: '#facc15', detail: `• 생리식염수를 이용하여 상처 부위의 금속 가루와 오염물질 세척 완료\n• 출혈 부위에 멸균 거즈를 덧대고 압박 유지\n• 심박수 94 · 혈압 158/95 — 통증으로 인해 다소 상승됨` },
-      { time: '14:42', title: '현장 확인 및 1차 조치', color: '#fb923c', detail: `• 상처 확인: 팔꿈치 아래 약 8cm 찰과상 및 중앙부 3cm 깊은 열상 관찰\n• 주변 동료가 깨끗한 거즈로 직접 압박 지혈 시행` },
-      { time: '14:38', title: '작업 중 외상 사고 발생', color: '#f43f5e', detail: `• 위치: 2번 엔진 인근 정비 구역\n• 파이프 교체 작업 중 날카로운 금속 돌출부에 우측 팔을 긁히고 베임\n• 상처 부위에서 선홍색 피가 지속적으로 배어 나옴` },
-      { time: '09:12', title: '건강 모니터링 시스템 연결', color: '#64748b', detail: `• 실시간 바이탈 측정 및 상처 재출혈 감시 시작\n• 감염 징후(발열, 고름) 여부를 4시간 간격으로 체크 예정` },
+      { time: '14:10', title: '작업 중 외상 사고 발생', color: '#f43f5e', detail: `• 사고: 기계실 파이프 정비 중 파손된 파편에 우측 팔꿈치 아래가 깊게 베임` },
+      { time: '14:15', title: '상처 확인 및 손상 평가', color: '#fb923c', detail: `• 손상: 약 6cm 가량의 깊은 절상 — 선홍색 피가 솟구치는 활동성 출혈 관찰` },
+      { time: '14:25', title: '지혈 조치 및 상태 확인', color: '#facc15', detail: `• 상태: 사고 직후 빠른 압박 지혈로 현재는 출혈이 멎었으나 환부 주변이 부어오름` },
+      { time: '14:40', title: '집중 감시 및 주의사항 설정', color: '#38bdf8', detail: `• 주의: 고혈압이 있으며 지혈 상태를 15분 간격으로 재확인해야 함` },
     ],
     'S26-004': [
       { time: '09:45', title: '다리 눌림 사고 발생', color: '#f43f5e', detail: `• 위치: 선수 갑판 하역 구역\n• 800kg 짐판이 떨어지면서 왼쪽 종아리가 눌림\n• 다리 모양이 많이 변하고 부어 있음, 뼈 부러짐 의심` },
@@ -225,8 +224,7 @@ export default function DashboardView({
       }))
 
       const baseTimeline = getPatientTimeline(activePatient)
-
-      setDynamicTimeline([...baseTimeline, ...newTimeline])
+      setDynamicTimeline([...baseTimeline])
     }
 
     loadRecords()

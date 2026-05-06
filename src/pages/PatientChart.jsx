@@ -26,6 +26,7 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
   // ─── 상태 선언 (useEffect 보다 위로 이동하여 호이스팅 문제 해결) ───
   const [vitals, setVitals] = useState({ hr: '-', spo2: '-', temp: '-', bp: '-', rr: '-' })
   const [mainComplaint, setMainComplaint] = useState('')
+  const [location, setLocation] = useState('')
   const [painAreas, setPainAreas] = useState([])
   const [selectedSymptoms, setSelectedSymptoms] = useState([])
   const [detailedNote, setDetailedNote] = useState('')
@@ -129,6 +130,7 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
 
       // 기존 선택값 초기화
       setMainComplaint('')
+      setLocation('')
       setPainAreas([])
       setSelectedSymptoms([])
       setDetailedNote('')
@@ -261,6 +263,7 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
       occurrenceTime: occurrenceTime,
       vitals: { ...vitals },
       mainComplaint: mainComplaint,
+      location: location,
       painAreas: painAreas,
       selectedSymptoms: selectedSymptoms,
       detailedNote: detailedNote,
@@ -775,13 +778,20 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
                                 </div>
                               )}
 
-                              {/* 발현 시각 */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 15 }}>
-                                <div style={{ fontSize: 24, color: '#64748b', fontWeight: 700 }}>
-                                  증상 발현 시각 : <span style={{ color: '#94a3b8' }}>{rec.occurrenceTime || '-'}</span>
-                                </div>
-                                <div style={{ fontSize: 22, color: '#475569', fontWeight: 600 }}>
-                                  기록 저장 : {new Date(rec.timestamp).toLocaleString('ko-KR')}
+                              {/* 사고 정보 및 발현 시각 */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 15 }}>
+                                {rec.location && (
+                                  <div style={{ fontSize: 24, color: '#38bdf8', fontWeight: 800 }}>
+                                    사고 장소 : <span style={{ color: '#fff' }}>{rec.location}</span>
+                                  </div>
+                                )}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <div style={{ fontSize: 24, color: '#64748b', fontWeight: 700 }}>
+                                    증상 발현 시각 : <span style={{ color: '#94a3b8' }}>{rec.occurrenceTime || '-'}</span>
+                                  </div>
+                                  <div style={{ fontSize: 22, color: '#475569', fontWeight: 600 }}>
+                                    기록 저장 : {new Date(rec.timestamp).toLocaleString('ko-KR')}
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -960,7 +970,10 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
                     </div>
                   </div>
                 </div>
-                <InputBox label="상세한 증상 이야기" placeholder="상세 내용을 적어주세요." isTextArea value={detailedNote} onChange={(v) => { setDetailedNote(v); setShowPlan(false); }} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+                  <InputBox label="사고 장소" placeholder="사고가 발생한 구체적인 장소 (예: 2번 엔진 인근 정비 구역)" value={location} onChange={(v) => { setLocation(v); setShowPlan(false); }} />
+                  <InputBox label="상세한 증상 이야기" placeholder="상세 내용을 적어주세요." isTextArea value={detailedNote} onChange={(v) => { setDetailedNote(v); setShowPlan(false); }} />
+                </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 25, marginTop: 10 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12, background: 'rgba(56,189,248,0.03)', padding: '20px', borderRadius: 20, border: '1.5px solid rgba(56,189,248,0.1)' }}>
