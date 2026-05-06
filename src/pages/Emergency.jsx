@@ -16,7 +16,7 @@ const ACTION_GUIDES = {
     legalBasis: null,
     hasMetronome: true,
     steps: [
-      { title: '의식 및 호흡 확인', desc: '어깨를 두드리며 "괜찮으세요?"라고 묻고, 가슴이 오르내리는지 10초간 확인하십시오.', tip: '숨을 안 쉬면 즉시 시작합니다.', stepImage: '/assets/Fracture_Dislocation/CPR-01.png' },
+      { title: '의식 및 호흡 확인', desc: '어깨를 두드리며 "괜찮으세요?"라고 묻고, 가슴이 오르내리는지 10초간 확인하십시오.', tip: '이 단계를 클릭하면 골든타임 타이머(4분)가 작동합니다.', stepImage: '/assets/Fracture_Dislocation/CPR-01.png' },
       { title: '도움 및 AED 요청', desc: '주변 사람 중 한 명을 지목해 "비상 상황 전파" 및 "AED(심장충격기)"를 가져와 달라고 지시하십시오.', stepImage: '/assets/Fracture_Dislocation/CPR-02.png' },
       { title: '가슴 압박 시행', desc: '가슴 중앙에 깍지 낀 손을 대고, 팔꿈치를 펴서 수직으로 5~6cm 깊이로 강하게 누르십시오.', tip: '분당 100~120회 속도를 유지하세요.', stepImage: '/assets/Fracture_Dislocation/CPR-03.png' },
       { title: 'AED 패드 부착', desc: '전원을 켜고 패드 하나는 오른쪽 쇄골 아래, 다른 하나는 왼쪽 옆구리에 붙인 뒤 음성 지시에 따르십시오.', tip: '분석 중에는 환자에게서 떨어지십시오.', stepImage: '/assets/Fracture_Dislocation/CPR-04.png' }
@@ -409,6 +409,10 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         setWashTimer(300)
         setIsWashTimerActive(true)
       }
+      if (activeAction === '심폐소생술' && index === 0) {
+        setGoldenTimer(240)
+        setIsGoldenTimerActive(true)
+      }
 
       if (activeAction && ACTION_GUIDES[activeAction]) {
         const stepTitle = ACTION_GUIDES[activeAction].steps[index].title
@@ -445,6 +449,8 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const [isColdTimerActive, setIsColdTimerActive] = useState(false)
   const [washTimer, setWashTimer] = useState(300)
   const [isWashTimerActive, setIsWashTimerActive] = useState(false)
+  const [goldenTimer, setGoldenTimer] = useState(240) // 4분 (240초)
+  const [isGoldenTimerActive, setIsGoldenTimerActive] = useState(false)
 
   useEffect(() => {
     let interval;
@@ -463,8 +469,13 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
         setWashTimer(prev => prev - 1)
       }, 1000)
     }
+    if (activeAction === '심폐소생술' && isGoldenTimerActive && goldenTimer > 0) {
+      interval = setInterval(() => {
+        setGoldenTimer(prev => prev - 1)
+      }, 1000)
+    }
     return () => clearInterval(interval)
-  }, [activeAction, isBurnTimerActive, burnTimer, isColdTimerActive, coldTimer, isWashTimerActive, washTimer])
+  }, [activeAction, isBurnTimerActive, burnTimer, isColdTimerActive, coldTimer, isWashTimerActive, washTimer, isGoldenTimerActive, goldenTimer])
 
   const formatBurnTime = (seconds) => {
     const m = Math.floor(seconds / 60)
@@ -581,6 +592,53 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
               {activeAction === '심폐소생술' && stepNum === 3 && (
                 <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', background: beat ? '#ef4444' : '#b91c1c', borderRadius: '0 0 32px 32px', padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: '0.1s', zIndex: 50, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', border: '2px solid rgba(255,255,255,0.2)', borderTop: 'none' }}>
                   <Zap size={36} fill="#fff" color="#fff" /><div style={{ fontSize: 32, fontWeight: 950, color: '#fff', whiteSpace: 'nowrap', textShadow: '0 2px 10px rgba(0,0,0,0.3)', letterSpacing: '-1px' }}>깜빡임 속도에 맞춰 압박하세요</div>
+                </div>
+              )}
+
+              {activeAction === '심폐소생술' && goldenTimer >= 0 && (
+                <div style={{ 
+                  position: 'absolute', 
+                  bottom: '8%', 
+                  right: '3%', 
+                  width: '180px', 
+                  height: '180px', 
+                  borderRadius: '50%', 
+                  background: 'rgba(2, 6, 23, 0.9)', 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  zIndex: 60,
+                  border: `8px solid ${goldenTimer === 0 ? '#ef4444' : '#facc15'}`,
+                  boxShadow: `0 15px 40px ${goldenTimer === 0 ? 'rgba(239,68,68,0.4)' : 'rgba(0,0,0,0.6)'}`,
+                  animation: (isGoldenTimerActive && goldenTimer > 0) ? 'pulse 1.5s infinite' : 'none',
+                  transition: 'all 0.5s ease'
+                }}>
+                  <div style={{ position: 'absolute', top: '30px', fontSize: 22, fontWeight: 900, color: goldenTimer === 0 ? '#ef4444' : '#facc15', letterSpacing: '-0.5px', transition: 'all 0.5s ease' }}>{goldenTimer === 0 ? '시간 초과' : '골든 타임'}</div>
+                  <div style={{ fontSize: 48, fontWeight: 950, color: '#fff', lineHeight: 1, fontFamily: '"Pretendard", sans-serif', marginTop: '10px' }}>{formatBurnTime(goldenTimer)}</div>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setGoldenTimer(240); setIsGoldenTimerActive(false); }}
+                    style={{ 
+                      position: 'absolute',
+                      bottom: '15px',
+                      background: 'rgba(255,255,255,0.1)', 
+                      border: 'none', 
+                      borderRadius: '50%', 
+                      width: 32, 
+                      height: 32, 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      cursor: 'pointer',
+                      color: '#fff',
+                      transition: '0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                    title="타이머 리셋"
+                  >
+                    <RefreshCw size={16} />
+                  </button>
                 </div>
               )}
 
@@ -894,9 +952,33 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
               onClick={() => {setActiveAction(key); setHoveredAction(null); setCompletedSteps([]); setShowCompletionPanel(false); setSelectedStepIndex(null); setIsBurnTimerActive(false); setBurnTimer(1200); setIsColdTimerActive(false); setColdTimer(1200); setIsWashTimerActive(false); setWashTimer(300);}}
               onMouseEnter={() => setHoveredAction(key)}
               onMouseLeave={() => setHoveredAction(null)}
-              style={{ background: activeAction === key ? `linear-gradient(135deg, ${ACTION_GUIDES[key].color}, ${ACTION_GUIDES[key].color}dd)` : `${ACTION_GUIDES[key].color}15`, border: '2px solid', borderColor: activeAction === key ? 'transparent' : `${ACTION_GUIDES[key].color}30`, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', overflow: 'hidden' }}>
-              <div style={{ color: activeAction === key ? '#fff' : ACTION_GUIDES[key].color, flexShrink: 0 }}><ActionButtonIcon label={key} size={22} /></div>
-              <div style={{ fontSize: 22, fontWeight: 950, color: '#fff', letterSpacing: '-0.5px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{key}</div>
+              style={{ 
+                background: activeAction === key ? `linear-gradient(135deg, ${ACTION_GUIDES[key].color}, ${ACTION_GUIDES[key].color}dd)` : `${ACTION_GUIDES[key].color}15`, 
+                border: '2px solid', 
+                borderColor: activeAction === key ? 'transparent' : `${ACTION_GUIDES[key].color}30`, 
+                borderRadius: 12, 
+                cursor: 'pointer', 
+                display: 'flex', 
+                flexDirection: 'column',
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                gap: '4px', 
+                padding: '8px 4px',
+                overflow: 'hidden' 
+              }}>
+              <div style={{ color: activeAction === key ? '#fff' : ACTION_GUIDES[key].color, flexShrink: 0, transform: 'scale(1.3)' }}><ActionButtonIcon label={key} size={24} /></div>
+              <div style={{ 
+                fontSize: 34, 
+                fontWeight: 950, 
+                color: '#fff', 
+                letterSpacing: '-1.5px', 
+                textAlign: 'center',
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+                marginTop: '4px'
+              }}>
+                {key}
+              </div>
             </button>
           ))}
         </section>
