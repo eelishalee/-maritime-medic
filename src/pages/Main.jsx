@@ -31,9 +31,7 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
   const [prompt, setPrompt] = useState('')
   const [chat, setChat] = useState([])
 
-  // ─── 환자 데이터 및 과거 기록 로드 로직 ───
-  const [activePatientWithHistory, setActivePatientWithHistory] = useState(patient)
-
+  // ─── 데이터 동기화 ───
   useEffect(() => {
     if (!patient) return
 
@@ -44,49 +42,52 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
     } catch (e) {}
 
     if (latestRecord) {
-      // 사이드바 '최근 진료 이력' 카드에 표시될 데이터 주입
-      setActivePatientWithHistory({
-        ...patient,
-        recentHistory: {
-          date: new Date(latestRecord.timestamp).toLocaleDateString('ko-KR'),
-          title: latestRecord.mainComplaint || '진료 기록',
-          detail: `• 증상: ${(latestRecord.selectedSymptoms || []).join(', ') || '없음'}\n• 처치: ${(latestRecord.prescribedMeds || []).join(', ') || '없음'}\n• 특이: ${latestRecord.otherActions || '없음'}`
-        }
-      })
-
-      // 바이탈 동기화 (NaN 방지를 위해 fallback 추가)
       setHr(latestRecord.vitals?.hr || '-')
       setSpo2(latestRecord.vitals?.spo2 || '-')
       setRr(latestRecord.vitals?.rr || '-')
       setBp(latestRecord.vitals?.bp || '-')
       setBt(latestRecord.vitals?.temp || '-')
     } else {
-      setActivePatientWithHistory(patient)
-      
       const seed = patient.id?.split('-').pop() || '0'
-      const baseHr = patient.hr || (70 + (parseInt(seed) % 15))
-      const baseSpo2 = patient.spo2 || (96 + (parseInt(seed) % 4))
-      const baseRr = patient.rr || (14 + (parseInt(seed) % 6))
-      const baseBp = patient.bp || `${115 + (parseInt(seed) % 20)}/${75 + (parseInt(seed) % 15)}`
-      const baseBt = patient.temp || (36.4 + (parseInt(seed) % 6) / 10).toFixed(1)
-
-      setHr(baseHr)
-      setSpo2(baseSpo2)
-      setRr(baseRr)
-      setBp(baseBp)
-      setBt(baseBt)
+      setHr(patient.hr || (70 + (parseInt(seed) % 15)))
+      setSpo2(patient.spo2 || (96 + (parseInt(seed) % 4)))
+      setRr(patient.rr || (14 + (parseInt(seed) % 6)))
+      setBp(patient.bp || `${115 + (parseInt(seed) % 20)}/${75 + (parseInt(seed) % 15)}`)
+      setBt(patient.temp || (36.4 + (parseInt(seed) % 6) / 10).toFixed(1))
     }
 
-    // 진단 어시스턴트는 항상 초기 환자 상태 기반으로 설정 (이전 기록 불러오지 않음)
     setChat(getInitialChat(patient))
     setPrompt('')
   }, [patient?.id, historicalRecord?.timestamp])
 
+  // 렌더링 시점에 환자 정보 확장 (최근 기록 주입)
+  const getActivePatientWithHistory = () => {
+    if (!patient) return null
+    try {
+      const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
+      const latestRecord = records.find(r => r.patientId === patient.id)
+      if (latestRecord) {
+        return {
+          ...patient,
+          recentHistory: {
+            date: new Date(latestRecord.timestamp).toLocaleDateString('ko-KR'),
+            title: latestRecord.mainComplaint || '진료 기록',
+            detail: `• 증상: ${(latestRecord.selectedSymptoms || []).join(', ') || '없음'}\n• 처치: ${(latestRecord.prescribedMeds || []).join(', ') || '없음'}\n• 특이: ${latestRecord.otherActions || '없음'}`
+          }
+        }
+      }
+    } catch (e) {}
+    return patient
+  }
+
+  const activePatientWithHistory = getActivePatientWithHistory()
+
   // ─── 외상 분석 상태 ───
   const [isScanning, setIsScanning] = useState(false)
   const [scanProgress, setScanProgress] = useState(0)
-  const [scanStatus, setScanStatus] = useState(null) // 'scanning' | 'success' | 'error'
+  const [scanStatus, setScanStatus] = useState(null) // 'scanning' | 'success' | 'error' | 'refer'
   const [scanError, setScanError] = useState(null)
+  const [scanResult, setScanResult] = useState(null) // { label: '절상', labelEn: 'Laceration', confidence: 98 }
   const [lowConfidencePopup, setLowConfidencePopup] = useState(false)
   const isScanningRef = useRef(false)
   const scanTimerRef = useRef(null)
@@ -171,6 +172,17 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
         scanTimerRef.current = null
         setScanProgress(100)
         setTimeout(() => {
+          // 실제 AI 모델 연동 시 이 값을 모델 응답으로 교체
+          const results = [
+            { label: '절상', labelEn: 'Laceration', confidence: 98 },
+            { label: '자창', labelEn: 'Stab Wound', confidence: 96 },
+            { label: '열상', labelEn: 'Tear', confidence: 94 },
+            { label: '화상', labelEn: 'Burn', confidence: 99 },
+            { label: '타박상', labelEn: 'Bruise', confidence: 92 },
+            { label: '찰과상', labelEn: 'Abrasion', confidence: 95 }
+          ]
+          const randomResult = results[Math.floor(Math.random() * results.length)]
+          setScanResult(randomResult)
           setScanStatus('success')
         }, 600)
       } else {
@@ -183,10 +195,8 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
     isScanningRef.current = false
     setIsScanning(false)
     setScanStatus(null)
-    onNavigate && onNavigate('emergency', { 
-      traumaType: 'TRAUMA',
-      analysis: '다발성 늑골 골절 및 기흉 의심',
-      evidence: '좌측 흉부 영상에서 늑골 배열의 불연속성 포착'
+    onNavigate && onNavigate('emergency', {
+      traumaType: scanResult?.labelEn || 'TRAUMA',
     })
   }
 
@@ -212,6 +222,7 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
         setScanStatus={setScanStatus}
         scanError={scanError}
         setScanError={setScanError}
+        scanResult={scanResult}
         confirmTraumaAnalysis={confirmTraumaAnalysis}
         onLowConfidenceAlert={() => setLowConfidencePopup(true)}
         setBp={setBp}
@@ -306,25 +317,24 @@ function getInitialChat(patient) {
    → 육지에 있는 의사에게 상담 요청 보냄` },
     ],
     'S26-003': [
-      { role: 'ai', text: `박기관 기관장님의 바이탈 데이터 동기화가 완료되었습니다.\n\n[상태 요약]\n• 사고: 계단 3층 높이(약 2.5m)에서 바닥으로 떨어짐\n• 손상: 오른쪽 가슴을 누르면 몹시 아파함 — 갈비뼈가 여러 개 부러진 것으로 의심됨\n• 상태: 숨을 쉴 때마다 가슴이 아파서 얕고 빠르게 숨을 몰아쉬는 상태임\n• 주의: 고혈압이 있고 아스피린에 알레르기가 있음` },
-      { role: 'ai', text: `[MDTS 권고사항]\n• 가슴 주위를 압박 붕대로 감싸서 통증을 줄여주세요\n• 아스피린은 절대 주지 말고 타이레놀 500mg으로 대체하세요\n• 환자가 편안하게 숨을 쉴 수 있도록 상체를 45도 정도 일으켜 세워주세요\n• 숨소리가 작아지거나 입술이 파래지는지 계속 지켜보세요\n\n[신뢰도: 96%] [가이드: 가슴 부상 대응]` },
+      { role: 'ai', text: `박기관 기관장님의 바이탈 데이터 동기화가 완료되었습니다.\n\n[상태 요약]\n• 사고: 기계실 파이프 정비 중 파손된 파편에 우측 팔꿈치 아래가 깊게 베임\n• 손상: 약 6cm 가량의 깊은 절상 — 선홍색 피가 솟구치는 활동성 출혈 관찰\n• 상태: 사고 직후 빠른 압박 지혈로 현재는 출혈이 멎었으나 환부 주변이 부어오름\n• 주의: 고혈압이 있으며 지혈 상태를 15분 간격으로 재확인해야 함` },
+      { role: 'ai', text: `[MDTS 권고사항]\n• 상처 부위를 심장보다 높게 유지하여 혈류 압력을 낮추세요\n• 지혈대를 사용했다면 착용 시각을 반드시 기록하고, 멸균 거즈로 환부를 보호하세요\n• 통증 조절을 위해 타이레놀 500mg을 복용시키되, 아스피린 알레르기가 있으므로 주의하세요\n• 환부 원위부(손끝)의 맥박과 감각을 30분마다 체크하세요\n\n[신뢰도: 96%] [가이드: 깊은 절상 및 출혈 대응]` },
       { role: 'user', text: '처치 내용 기록해줘' },
       { role: 'ai', text: `[기록된 처치 내역 — 박기관 / 14:38~15:10]
 
-① 가슴 고정
-   → 탄력 붕대로 오른쪽 가슴 부위를 고정함
-   → 환자가 숨쉬기 편하게 상체를 약간 일으킨 자세 유지
+① 지혈 및 세척
+   → 생리식염수로 상처 내 이물질을 깨끗이 씻어냄
+   → 멸균 거즈 도포 후 탄력 붕대로 압박 지혈 완료 (현재 출혈 멎음)
 
 ② 약 먹임
-   → 아스피린 대신 타이레놀 500mg 한 알 복용함
+   → 아스피린 대신 타이레놀 500mg 한 알 복용함 (알레르기 대응)
 
-③ 호흡 관찰
-   → 현재 산소 수치는 정상임
-   → 호흡 곤란 증상이 심해지는지 밀착 감시 중
+③ 상처 관찰
+   → 환부 주변 부종(부기) 관찰되나 손가락 감각 및 움직임은 정상임
+   → 15분마다 거즈가 젖어드는지(재출혈) 확인 예정
 
-④ 숨소리 확인
-   → 양쪽 폐의 숨소리가 모두 들림 — 폐에 구멍이 난 증거는 없음
-   → 30분마다 숨소리 다시 체크 예정` },
+④ 환경 조성
+   → 안정을 위해 침상으로 이동 후 우측 팔을 거상(높게 들기) 상태로 유지` },
     ],
     'S26-004': [
       { role: 'ai', text: `최갑판 갑판장의 바이탈 데이터 동기화가 완료되었습니다.\n\n[외상 초기 분석]\n• 사고: 선수 갑판 중량물 하역 중 800kg 파렛트 낙하로 좌측 하퇴부 압궤\n• 좌측 경골 골절 의심 — 심한 변형 및 부종\n• 기저 허리디스크로 척추 2차 손상 가능성 주의\n• 쇼크 전구 증상(창백·냉한·빈맥) 모니터링 중` },
@@ -456,9 +466,9 @@ function getAiReply(q, patient) {
   const chronic = patient.chronic || '없음'
   const allergies = patient.allergies || '없음'
 
-  if (q.includes('안녕')) return "안녕하세요. MDTS 어시스턴트입니다. 무엇을 도와드릴까요?"
-  if (q.includes('상태') || q.includes('어때')) return `현재 ${patient.name} 환자의 상태는 안정적입니다. 기저 질환인 ${chronic}에 유의하며 모니터링 중입니다.`
-  if (q.includes('약') || q.includes('처방')) return `${patient.name} 환자는 ${allergies} 알레르기가 있으므로 처방 시 주의가 필요합니다.`
+  if (q.includes('안녕')) return "안녕하세요. MDTS 응급 처치 가이드입니다. 무엇을 도와드릴까요?"
+  if (q.includes('상태') || q.includes('어때')) return `현재 ${patient.name} 환자의 상태를 분석 중입니다. 기저 질환인 ${chronic}에 유의하며 모니터링을 유지하십시오.`
+  if (q.includes('약') || q.includes('처방')) return `${patient.name} 환자는 ${allergies} 알레르기가 있으므로 처치 안내 시 주의가 필요합니다.`
   
-  return `분석 결과 :\n• 대상 : ${patient.name} (${patient.role})\n• 특이사항 : ${chronic !== '없음' ? '기저 질환 관리 필요' : '특이 기저질환 없음'}\n• 주의 : 알레르기 (${allergies})\n\n[CONFIDENCE: 92%]\n[EVIDENCE: 통합 환자 DB 연동 및 실시간 바이탈 패턴 분석]\n[GUIDE: SOP-GEN-01]`
+  return `분석 결과 :\n• 대상 : ${patient.name} (${patient.role})\n• 특이사항 : ${chronic !== '없음' ? '기저 질환 관찰 필요' : '특이 기저질환 없음'}\n• 주의 : 알레르기 (${allergies})\n\n[ACCURACY: 92%]\n[EVIDENCE: 통합 환자 데이터 연동 및 실시간 바이탈 패턴 분석]\n[GUIDE: SOP-GEN-01]`
 }

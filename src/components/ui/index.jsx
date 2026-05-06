@@ -116,10 +116,10 @@ export function DashboardVital({ label, value, unit, color, editable, onEdit, li
           </div>
         </div>
         
-        {/* 중앙/하단 : 값 및 단위 */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', width: '100%', gap: 2 }}>
+        {/* 중앙/하단 : 값 및 단위 (우측 하단 배치) */}
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', width: '100%', gap: 6 }}>
           {isConnected ? (
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
               <span style={{ 
                 fontSize: valueSize, 
                 fontWeight: 950, 
@@ -133,7 +133,6 @@ export function DashboardVital({ label, value, unit, color, editable, onEdit, li
                 fontSize: 14, 
                 color: 'rgba(0, 255, 204, 0.5)', 
                 fontWeight: 800,
-                flexShrink: 0,
                 marginBottom: 4
               }}>{unit}</span>
             </div>

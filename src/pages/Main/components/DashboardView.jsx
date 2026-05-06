@@ -21,18 +21,14 @@ function getPatientTimeline(patient) {
       { time: '09:12', title: '건강 모니터링 시스템 연결', color: '#64748b', detail: `• 몸 상태 측정 장비 연결 완료\n• 머리 내부 압력 상승 여부 집중 관찰 중` },
     ],
     'S26-002': [
-      { time: '13:22', title: '팔 부상 사고 발생', color: '#f43f5e', detail: `• 위치: 메인 데크 화물 관리구역\n• 튕겨 나온 와이어 로프에 왼쪽 팔뚝을 강하게 맞음\n• 많이 부어 있고 팔 모양이 휘어짐, 겉으로 피는 안 남` },
-      { time: '13:26', title: '선의 현장 확인', color: '#fb923c', detail: `• 왼쪽 손목 위 뼈가 부러진 것으로 보임\n• 손끝 맥박은 정상 — 피는 잘 통하고 있음\n• 페니실린 약 부작용 확인 → 다른 약으로 준비` },
-      { time: '13:35', title: '뼈 고정 및 찬찜질 조치', color: '#facc15', detail: `• 팔꿈치부터 손목까지 부목으로 고정 후 팔을 들어 올림\n• 부기를 빼기 위해 20분간 찬찜질 시행\n• 심박수 92 · 혈압 122/78 · 산소 98%` },
-      { time: '13:50', title: '진통 조치 및 지켜보기', color: '#38bdf8', detail: `• 진통제 400mg 복용 (페니실린 계열 아님 확인)\n• 30분 뒤에 손끝 감각과 피가 잘 통하는지 다시 확인 예정\n• 육지 의사에게 진료 상담 요청 보냄` },
       { time: '09:12', title: '건강 모니터링 시스템 연결', color: '#64748b', detail: `• 몸 상태 측정 장비 연결 완료\n• 페니실린 약 절대 금지 설정 완료` },
     ],
     'S26-003': [
-      { time: '14:38', title: '계단 추락 사고 발생', color: '#f43f5e', detail: `• 위치: 엔진 제어실 (ECR) 3층 철제 계단\n• 높이 약 2.5m에서 바닥으로 떨어짐\n• 바로 정신이 있는 것을 확인함` },
-      { time: '14:41', title: '선의 현장 확인 및 상태 점검', color: '#fb923c', detail: `• 오른쪽 가슴 부위를 누르면 몹시 아파함\n• 숨을 쉴 때 통증이 심해짐 (갈비뼈 부러짐 의심)\n• 피부가 까진 곳이 여러 군데 있으나 피는 적게 남` },
-      { time: '14:47', title: '몸 상태 측정 및 관찰 시작', color: '#facc15', detail: `• 심박수 95 · 혈압 142/88 · 산소 97%\n• 혈압이 약간 높은 편이라 계속 확인 중\n• 호흡 곤란 징후 집중 모니터링` },
-      { time: '15:02', title: '진통제 복용 및 가슴 고정', color: '#38bdf8', detail: `• 아스피린 알레르기 확인 → 주지 않기로 함\n• 타이레놀 500mg 한 알 복용함\n• 가슴 주위를 탄력 붕대로 감아 고정함` },
-      { time: '09:12', title: '건강 모니터링 시스템 연결', color: '#64748b', detail: `• 몸 상태 측정 장비 연결 완료\n• 실시간 상태 추적 시작` },
+      { time: '15:05', title: '드레싱 및 약물 투여', color: '#38bdf8', detail: `• 열상 부위에 연고 도포 후 탄력 붕대로 단단히 고정\n• 아스피린 알레르기 주의하여 타이레놀 500mg 복용\n• 상처 부위 부종 여부 관찰을 위해 팔을 높게 유지하도록 조치` },
+      { time: '14:50', title: '상처 세척 및 이물질 제거', color: '#facc15', detail: `• 생리식염수를 이용하여 상처 부위의 금속 가루와 오염물질 세척 완료\n• 출혈 부위에 멸균 거즈를 덧대고 압박 유지\n• 심박수 94 · 혈압 158/95 — 통증으로 인해 다소 상승됨` },
+      { time: '14:42', title: '현장 확인 및 1차 조치', color: '#fb923c', detail: `• 상처 확인: 팔꿈치 아래 약 8cm 찰과상 및 중앙부 3cm 깊은 열상 관찰\n• 주변 동료가 깨끗한 거즈로 직접 압박 지혈 시행` },
+      { time: '14:38', title: '작업 중 외상 사고 발생', color: '#f43f5e', detail: `• 위치: 2번 엔진 인근 정비 구역\n• 파이프 교체 작업 중 날카로운 금속 돌출부에 우측 팔을 긁히고 베임\n• 상처 부위에서 선홍색 피가 지속적으로 배어 나옴` },
+      { time: '09:12', title: '건강 모니터링 시스템 연결', color: '#64748b', detail: `• 실시간 바이탈 측정 및 상처 재출혈 감시 시작\n• 감염 징후(발열, 고름) 여부를 4시간 간격으로 체크 예정` },
     ],
     'S26-004': [
       { time: '09:45', title: '다리 눌림 사고 발생', color: '#f43f5e', detail: `• 위치: 선수 갑판 하역 구역\n• 800kg 짐판이 떨어지면서 왼쪽 종아리가 눌림\n• 다리 모양이 많이 변하고 부어 있음, 뼈 부러짐 의심` },
@@ -86,6 +82,8 @@ function getExampleQuestions(patient) {
 
   // 2. 바이탈 분석 질문 (항상 포함)
   questions.push('현재 바이탈 이상 여부 분석해줘')
+  questions.push('응급처치 가이드 기록해줘')
+  questions.push('현재까지의 타임라인 정리해줘')
 
   // 3. 기저질환 기반 질문
   if (chronic.includes('고혈압') && chronic.includes('고지혈')) questions.push('고혈압·고지혈증 환자 통증 관리 방법은?')
@@ -108,12 +106,20 @@ export default function DashboardView({
   activePatient, hr, spo2, rr, bp, bt, chat, prompt, setPrompt,
   handlePromptAnalysis, startEmergencyAction, handleTraumaAnalysis,
   isScanning, scanProgress, scanStatus, setScanStatus, scanError,
-  confirmTraumaAnalysis, setIsScanning, onLowConfidenceAlert,
+  scanResult, confirmTraumaAnalysis, setIsScanning, onLowConfidenceAlert,
   setBp, setBt, onSwitchPatient
 }) {
   const videoRef = useRef(null)
   const streamRef = useRef(null)
   const scanOverlayRef = useRef(null)
+  const chatEndRef = useRef(null)
+
+  // 메시지 추가 시 자동 스크롤
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [chat])
 
   // ─── 환자 선택 드롭다운 상태 ───
   const [isSelectOpen, setIsSelectOpen] = useState(false)
@@ -215,7 +221,7 @@ export default function DashboardView({
         time: new Date(r.timestamp).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }),
         title: r.mainComplaint || '환자 상태 기록 업데이트',
         color: r.isEmergency ? '#f43f5e' : '#38bdf8',
-        detail: `• 주요증상: ${r.selectedSymptoms.join(', ') || '관찰 중'}\n• 조치내용: ${r.prescribedMeds.join(', ') || '경과 관찰'}\n• 특이사항: ${r.otherActions || '없음'}`
+        detail: `• 주요증상: ${(Array.isArray(r.selectedSymptoms) ? r.selectedSymptoms : []).join(', ') || '관찰 중'}\n• 조치내용: ${(Array.isArray(r.prescribedMeds) ? r.prescribedMeds : []).join(', ') || '경과 관찰'}\n• 특이사항: ${r.otherActions || '없음'}`
       }))
 
       const baseTimeline = getPatientTimeline(activePatient)
@@ -266,6 +272,7 @@ export default function DashboardView({
   const isCapScanning = scanStatus === 'scanning'
   const isCapSuccess  = scanStatus === 'success'
   const isCapError    = scanStatus === 'error'
+  const isCapRefer    = scanStatus === 'refer'
 
   return (
     <div style={{ flex: 1, display: 'flex', overflow: 'hidden', height: '100%', position: 'relative', background: '#020408', cursor: 'default' }}>
@@ -309,12 +316,41 @@ export default function DashboardView({
 
             {/* 결과 모달 (Success) */}
             {isCapSuccess && (
-              <div style={{ position: 'absolute', width: 580, background: 'rgba(2, 15, 25, 0.98)', padding: '52px 56px', borderRadius: '40px', color: '#fff', textAlign: 'center', zIndex: 10002, border: '3px solid #26de81', boxShadow: '0 0 80px rgba(38,222,129,0.4)', backdropFilter: 'blur(40px)', animation: 'slideUp 0.4s ease' }}>
-                <div style={{ fontSize: 26, fontWeight: 800, color: '#94a3b8', marginBottom: 20, letterSpacing: '0.5px' }}>분석을 완료했습니다</div>
-                <div style={{ fontSize: 54, fontWeight: 950, color: '#26de81', marginBottom: 8, letterSpacing: '-1px' }}>절상(Laceration)</div>
-                <div style={{ fontSize: 72, fontWeight: 950, color: '#fff', marginBottom: 24, letterSpacing: '-2px', textShadow: '0 0 40px rgba(38,222,129,0.5)' }}>98%</div>
-                <div style={{ fontSize: 20, color: '#94a3b8', lineHeight: 1.6, marginBottom: 40, fontWeight: 600 }}>증상에 맞는 응급처치 가이드를 확인하세요.</div>
-                <button onClick={confirmTraumaAnalysis} style={{ width: '100%', padding: '26px', borderRadius: '20px', border: 'none', background: 'linear-gradient(135deg, #26de81, #0dd9c5)', color: '#000', fontWeight: 950, fontSize: 24, cursor: 'pointer', boxShadow: '0 10px 30px rgba(38,222,129,0.4)', letterSpacing: '0.5px' }}>응급처치 Start</button>
+              <div style={{ position: 'absolute', width: 560, background: 'rgba(8,16,30,0.97)', borderRadius: 32, padding: '52px 48px', color: '#fff', textAlign: 'center', zIndex: 10002, border: '1px solid rgba(38,222,129,0.2)', backdropFilter: 'blur(40px)', animation: 'slideUp 0.4s ease' }}>
+
+                {/* 외상명 */}
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 12, marginBottom: 8 }}>
+                  <span style={{ fontSize: 72, fontWeight: 950, color: '#fff', letterSpacing: '-3px', lineHeight: 1 }}>{scanResult?.label}</span>
+                  <span style={{ fontSize: 20, fontWeight: 600, color: '#26de81' }}>{scanResult?.labelEn}</span>
+                </div>
+
+                {/* 설명 */}
+                <div style={{ fontSize: 22, color: '#475569', lineHeight: 1.7, marginBottom: 36 }}>
+                  {({
+                    '찰과상': '피부 표면이 긁혀 쓸린 상처입니다.',
+                    '타박상': '충격으로 멍이 드는 상처입니다.',
+                    '화상': '열이나 화학물질로 피부가 손상된 상처입니다.',
+                    '절상': '날카로운 물체에 베인 상처입니다.',
+                    '열상': '피부가 불규칙하게 찢어진 상처입니다.',
+                    '자창': '뾰족한 물체에 찔린 상처입니다.',
+                  })[scanResult?.label] || '외상 유형이 분류되었습니다.'}
+                </div>
+
+                {/* 신뢰도 */}
+                <div style={{ fontSize: 64, fontWeight: 950, color: '#26de81', letterSpacing: '-3px', lineHeight: 1, marginBottom: 8 }}>
+                  {scanResult?.confidence}<span style={{ fontSize: 28, fontWeight: 700, color: 'rgba(38,222,129,0.5)', marginLeft: 12 }}>%</span>
+                </div>
+                <div style={{ fontSize: 13, color: '#334155', fontWeight: 700, letterSpacing: '1.5px', marginBottom: 36 }}>AI 분석 정확도</div>
+
+                {/* 버튼 */}
+                <button onClick={confirmTraumaAnalysis} style={{ width: '100%', padding: '22px', borderRadius: 16, border: 'none', background: '#26de81', color: '#001a10', fontWeight: 950, fontSize: 20, cursor: 'pointer' }}>
+                  응급처치 Start
+                </button>
+
+                {/* 면책 */}
+                <div style={{ marginTop: 20, fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>
+                  본 결과는 AI 분석 참고용이며 의료 진단이 아닙니다.
+                </div>
               </div>
             )}
 
@@ -327,6 +363,17 @@ export default function DashboardView({
                 <div style={{ fontSize: 36, fontWeight: 950, color: '#ff4d6d', marginBottom: 20 }}>다시 촬영해 주세요</div>
                 <div style={{ fontSize: 20, color: '#94a3b8', lineHeight: 1.8, marginBottom: 44, fontWeight: 600 }}>화면이 흐리거나 빛이 강해 분석이 어렵습니다.<br/>밝은 곳에서 흔들림 없이 다시 촬영해 주세요.</div>
                 <button onClick={handleTraumaAnalysis} style={{ width: '100%', padding: '26px', borderRadius: '20px', border: 'none', background: '#ff4d6d', color: '#fff', fontWeight: 950, fontSize: 24, cursor: 'pointer', boxShadow: '0 10px 30px rgba(255,77,109,0.4)' }}>다시 촬영하기</button>
+              </div>
+            )}
+
+            {/* 결과 모달 (Refer — 전문의 진료 권고) */}
+            {isCapRefer && (
+              <div style={{ position: 'absolute', width: 580, background: 'rgba(2, 15, 25, 0.98)', padding: '52px 56px', borderRadius: '40px', color: '#fff', textAlign: 'center', zIndex: 10002, border: '3px solid #facc15', boxShadow: '0 0 80px rgba(250,204,21,0.3)', backdropFilter: 'blur(40px)', animation: 'slideUp 0.4s ease' }}>
+                <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'rgba(250,204,21,0.1)', border: '2px solid #facc15', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px' }}>
+                  <AlertTriangle size={52} color="#facc15" />
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 950, color: '#facc15', marginBottom: 24, lineHeight: 1.4 }}>정확한 판단을 위해<br/>의료진 확인이 필요한 상태입니다.</div>
+                <div style={{ fontSize: 20, color: '#94a3b8', lineHeight: 1.8, fontWeight: 600 }}>현재 상태는 AI 분석만으로는<br/>판단이 조심스러운 단계입니다.</div>
               </div>
             )}
           </div>
@@ -343,7 +390,7 @@ export default function DashboardView({
             </div>
           )}
 
-          <div style={{ position: 'absolute', bottom: 60, left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 10001 }}>
+          <div style={{ position: 'absolute', bottom: 60, left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 10010 }}>
             <button onClick={() => { setIsScanning(false); setScanStatus(null); }} style={{ background: 'rgba(0, 0, 0, 0.6)', padding: '18px 60px', borderRadius: '100px', color: '#fff', fontSize: 18, fontWeight: 900, border: '1px solid rgba(255, 255, 255, 0.2)', cursor: 'pointer', backdropFilter: 'blur(15px)' }}>진단 모드 종료</button>
           </div>
         </div>
@@ -464,8 +511,8 @@ export default function DashboardView({
             <DashboardVital label="심박수" value={hr} unit="bpm" color="#ff4d6d" live valueSize={38} />
             <div onClick={toggleSpo2Status} style={{ cursor: 'pointer' }}><DashboardVital label="산소포화도" value={spo2} unit="%" color="#38bdf8" live isConnected={spo2Status === 'normal'} valueSize={38} /></div>
             <DashboardVital label="호흡수" value={rr} unit="/min" color="#8b5cf6" live valueSize={38} />
-            <DashboardVital label="혈압 (입력)" value={bp} unit="mmHg" color="#eab308" editable onEdit={() => openEdit('bp', bp)} valueSize={40} />
-            <DashboardVital label="체온 (입력)" value={bt} unit="°C" color="#f97316" editable onEdit={() => openEdit('bt', bt)} valueSize={40} />
+            <DashboardVital label="혈압(입력)" value={bp} unit="mmHg" color="#eab308" editable onEdit={() => openEdit('bp', bp)} valueSize={40} />
+            <DashboardVital label="체온(입력)" value={bt} unit="°C" color="#f97316" editable onEdit={() => openEdit('bt', bt)} valueSize={40} />
           </div>
           {editTarget && (
             <div style={{ position: 'absolute', top: '110%', left: editTarget === 'bp' ? '70%' : 'auto', right: editTarget === 'bt' ? '45px' : 'auto', transform: editTarget === 'bp' ? 'translateX(-50%) translateY(15px)' : 'translateY(15px)', zIndex: 1000, width: 360, background: '#1e293b', border: '2px solid #38bdf8', borderRadius: 24, padding: 28, boxShadow: '0 20px 50px rgba(0,0,0,0.6)', animation: 'slideUp 0.2s ease', backdropFilter: 'blur(25px)' }}>
@@ -476,7 +523,7 @@ export default function DashboardView({
           )}
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#080b12', overflow: 'hidden', position: 'relative' }}>
-          <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0a0d17', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}><div style={{ fontSize: 18, fontWeight: 900, display: 'flex', alignItems: 'center', gap: 10, color: '#e2e8f0' }}><Sparkles size={20} color="#38bdf8" /> MDTS 진단 어시스턴트</div><div style={{ position: 'absolute', bottom: '-1px', left: 0, right: 0, height: '2px', overflow: 'hidden' }}><div style={{ position: 'absolute', top: 0, left: '-100%', width: '60%', height: '100%', background: 'linear-gradient(90deg, transparent, rgba(0, 229, 204, 0.2), #00e5cc, rgba(0, 229, 204, 0.2), transparent)', boxShadow: '0 0 12px #00e5cc', animation: 'flowingLight 5s infinite linear' }} /></div></div>
+          <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0a0d17', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}><div style={{ fontSize: 18, fontWeight: 900, display: 'flex', alignItems: 'center', gap: 10, color: '#e2e8f0' }}><Sparkles size={20} color="#38bdf8" /> MDTS 응급 처치 가이드</div><div style={{ position: 'absolute', bottom: '-1px', left: 0, right: 0, height: '2px', overflow: 'hidden' }}><div style={{ position: 'absolute', top: 0, left: '-100%', width: '60%', height: '100%', background: 'linear-gradient(90deg, transparent, rgba(0, 229, 204, 0.2), #00e5cc, rgba(0, 229, 204, 0.2), transparent)', boxShadow: '0 0 12px #00e5cc', animation: 'flowingLight 5s infinite linear' }} /></div></div>
           <div id="tuto-ai-chat" style={{ flex: 1, overflowY: 'auto', padding: '12px 20px 120px 20px', display: 'flex', flexDirection: 'column', gap: 14, scrollbarWidth: 'none' }}>
             {chat?.map((m, i) => (
               <div key={i} style={{ display: 'flex', flexDirection: m.role === 'ai' ? 'row' : 'row-reverse', gap: 8 }}>
@@ -484,16 +531,17 @@ export default function DashboardView({
                 <div style={{ flex: 1, maxWidth: '92%' }}><div style={{ padding: '16px 22px', borderRadius: m.role === 'ai' ? '0 20px 20px 20px' : '20px 0 20px 20px', background: m.role === 'ai' ? 'rgba(56, 189, 248, 0.05)' : 'rgba(255, 255, 255, 0.03)', border: m.role === 'ai' ? '1px solid rgba(56, 189, 248, 0.2)' : '1px solid rgba(255, 255, 255, 0.1)', fontSize: 22, fontWeight: 500, lineHeight: 1.5, color: '#e2e8f0' }}><AiMessageRenderer text={m.text} /></div></div>
               </div>
             ))}
+            <div ref={chatEndRef} style={{ height: 40, flexShrink: 0 }} />
           </div>
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 20px 20px 20px', background: 'linear-gradient(to top, #05070a 80%, transparent)', borderTop: '1px solid rgba(255,255,255,0.05)', zIndex: 10 }}>
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 24px 20px 24px', background: 'linear-gradient(to top, #05070a 80%, transparent)', borderTop: '1px solid rgba(255,255,255,0.05)', zIndex: 10 }}>
             {/* 예시 질문 칩 */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-              {getExampleQuestions(activePatient).map((q) => (
+            <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap', maxWidth: '100%' }}>
+              {getExampleQuestions(activePatient).slice(0, 4).map((q) => (
                 <button
                   key={q}
                   onClick={() => setPrompt(q)}
                   style={{
-                    padding: '6px 14px', borderRadius: 20, fontSize: 14, fontWeight: 700,
+                    padding: '8px 18px', borderRadius: 20, fontSize: 15, fontWeight: 700,
                     background: 'rgba(56,189,248,0.07)', border: '1px solid rgba(56,189,248,0.25)',
                     color: '#7dd3fc', cursor: 'pointer', whiteSpace: 'nowrap',
                     transition: 'all 0.15s',
@@ -505,9 +553,9 @@ export default function DashboardView({
                 </button>
               ))}
             </div>
-            <div style={{ width: '100%', background: '#0a0f1e', borderRadius: '20px', padding: '6px 6px 6px 20px', display: 'flex', alignItems: 'center', gap: 12, border: '1px solid rgba(56,189,248,0.2)', height: 72, boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>
-              <input placeholder="질문하세요..." value={prompt} onChange={e => setPrompt(e.target.value)} onKeyPress={e => e.key === 'Enter' && handlePromptAnalysis()} style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: '#fff', fontSize: 18 }} />
-              <button onClick={handlePromptAnalysis} style={{ padding: '0 28px', height: '100%', borderRadius: '14px', border: 'none', background: '#38bdf8', color: '#000', fontWeight: 950, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>질문하기 <ArrowUp size={20} strokeWidth={3} /></button>
+            <div style={{ width: '100%', background: '#0a0f1e', borderRadius: '20px', padding: '6px 6px 6px 24px', display: 'flex', alignItems: 'center', gap: 15, border: '1px solid rgba(56,189,248,0.25)', height: 80, boxShadow: '0 8px 30px rgba(0,0,0,0.4)' }}>
+              <input placeholder="응급처치 가이드를 질문하거나 상황 대응 타임라인을 작성해보세요" value={prompt} onChange={e => setPrompt(e.target.value)} onKeyPress={e => e.key === 'Enter' && handlePromptAnalysis()} style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: '#fff', fontSize: 20, fontWeight: 500 }} />
+              <button onClick={handlePromptAnalysis} style={{ padding: '0 40px', height: 'calc(100% - 4px)', borderRadius: '16px', border: 'none', background: '#38bdf8', color: '#000', fontWeight: 950, fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, transition: '0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#7dd3fc'} onMouseOut={e => e.currentTarget.style.background = '#38bdf8'}>실행하기 <ArrowUp size={24} strokeWidth={3} /></button>
             </div>
           </div>
         </div>
@@ -555,7 +603,7 @@ function ProfileImage({ avatar }) {
 
 function AiMessageRenderer({ text }) {
   if (!text) return null;
-  const confMatch = text.match(/\[CONFIDENCE: (.*?)\]/);
+  const confMatch = text.match(/\[ACCURACY: (.*?)\]/);
   const evidenceMatch = text.match(/\[EVIDENCE: (.*?)\]/);
   const guideMatch = text.match(/\[GUIDE: (.*?)\]/);
   const confidence = confMatch ? confMatch[1] : null;
@@ -579,7 +627,7 @@ function AiMessageRenderer({ text }) {
           {confidence && (
             <div style={{ background: 'rgba(0,0,0,0.3)', padding: '14px 20px', borderRadius: 14, border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <span style={{ fontSize: 15, fontWeight: 800, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 8 }}><ShieldCheck size={18}/> AI 진단 신뢰도</span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 8 }}><ShieldCheck size={18}/> AI 분석 정확도</span>
                 <span style={{ fontSize: 20, fontWeight: 950, color: '#38bdf8' }}>{confidence}</span>
               </div>
               <div style={{ height: 6, background: 'rgba(255,255,255,0.05)', borderRadius: 3, overflow: 'hidden' }}><div style={{ width: confidence, height: '100%', background: 'linear-gradient(90deg, #0ea5e9, #38bdf8)', borderRadius: 3 }} /></div>

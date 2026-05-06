@@ -735,7 +735,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
                     <div style={{ background: SEVERITY_COLORS[currentActionData.severity], color: '#000', padding: '4px 12px', borderRadius: 8, fontSize: 13, fontWeight: 950 }}>{currentActionData.severity}</div>
                   )}
                   <div style={{ background: currentActionData.color, color: '#000', padding: '4px 12px', borderRadius: 8, fontSize: 13, fontWeight: 950 }}>RISK {currentActionData.riskLevel}</div>
-                  <div style={{ color: currentActionData.color, fontSize: 17, fontWeight: 800 }}>AI 진단 : {currentActionData.diagnosis}</div>
+                  <div style={{ color: currentActionData.color, fontSize: 17, fontWeight: 800 }}>AI 분석 : {currentActionData.diagnosis}</div>
                 </div>
                 <h2 style={{ fontSize: 46, fontWeight: 950, letterSpacing: '-2px', margin: '0 0 6px 0' }}>{currentActionData.title}</h2>
                 {currentActionData.description && (

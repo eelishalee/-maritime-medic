@@ -56,36 +56,38 @@ export default function App() {
     setPage(newPage)
   }
 
-  if (!auth) return <Login onLogin={(val) => { sessionStorage.removeItem('mdts_tutorial_seen'); setAuth(val) }} />
-
   return (
     <AlertProvider>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', overflow: 'hidden' }}>
-        <Layout
-          activePage={page}
-          onNavigate={handleNavigate}
-          auth={{ shipNo: auth.ship || 'MV KOREA STAR', deviceNo: auth.device || 'MED-001' }}
-          onLogout={() => setAuth(null)}
-          isOnline={false}
-        />
-        <div style={{ flex: 1, overflow: 'hidden' }}>
-          {page === 'main'      && <Main patient={activePatient} onNavigate={handleNavigate} onSwitchPatient={setActivePatient} />}
-          {page === 'crew'      && (
-            <CrewManagement onSelectPatient={p => { setActivePatient(p); handleNavigate('chart') }} />
-          )}
-          {page === 'emergency' && (
-            <Emergency
-              patient={activePatient}
-              initialAction={emergencyData?.traumaType || emergencyData?.type}
-              onNavigate={handleNavigate}
-            />
-          )}
-          {page === 'chart'     && (
-            <PatientChart patient={activePatient} onNavigate={handleNavigate} onSwitchPatient={setActivePatient} />
-          )}
-          {page === 'settings'  && <Settings />}
+      {!auth ? (
+        <Login onLogin={(val) => setAuth(val)} />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', overflow: 'hidden' }}>
+          <Layout
+            activePage={page}
+            onNavigate={handleNavigate}
+            auth={{ shipNo: auth.ship || 'MV KOREA STAR', deviceNo: auth.device || 'MED-001' }}
+            onLogout={() => setAuth(null)}
+            isOnline={false}
+          />
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            {page === 'main'      && <Main patient={activePatient} onNavigate={handleNavigate} onSwitchPatient={setActivePatient} />}
+            {page === 'crew'      && (
+              <CrewManagement onSelectPatient={p => { setActivePatient(p); handleNavigate('chart') }} />
+            )}
+            {page === 'emergency' && (
+              <Emergency
+                patient={activePatient}
+                initialAction={emergencyData?.traumaType || emergencyData?.type}
+                onNavigate={handleNavigate}
+              />
+            )}
+            {page === 'chart'     && (
+              <PatientChart patient={activePatient} onNavigate={handleNavigate} onSwitchPatient={setActivePatient} />
+            )}
+            {page === 'settings'  && <Settings />}
+          </div>
         </div>
-      </div>
+      )}
     </AlertProvider>
   )
 }

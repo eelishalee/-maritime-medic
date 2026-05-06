@@ -61,11 +61,6 @@ export default function PatientInfo({ patient }) {
   const {hr,hist} = useVitals(patient.hr||84)
   const [imgError, setImgError] = useState(false)
   
-  // 환자 변경 시 이미지 에러 상태 초기화
-  useEffect(() => {
-    setImgError(false)
-  }, [patient])
-
   const [bp,  setBp]  = useState(patient.bp   || '158/95')
   const [bt,  setBt]  = useState(String(patient.temp || '37.6'))
   const [spo2]        = useState(patient.spo2 || 94)
