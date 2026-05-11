@@ -50,7 +50,7 @@ const CHECKLIST = [
 const SYS_LOGS_INITIAL = [
   { t:'09:31', type:'success', msg:'박기관 바이탈 → 부산원격의료센터 전송 완료' },
   { t:'09:28', type:'info',    msg:'원격 의료 연결 세션 시작 · 최원장 접속 확인' },
-  { t:'09:25', type:'warning', msg:'이선장 혈압 148/95 — 주의 임계값 초과' },
+  { t:'09:25', type:'warning', msg:'혈압 주의 임계값 초과 알림 — 모니터링 유지' },
   { t:'09:20', type:'success', msg:'AI 외상 분석 완료 — 박기관 좌측 흉부 골절 의심' },
   { t:'09:10', type:'error',   msg:'위성 전송 실패 — 재시도 대기 중 (3회 시도)' },
 ]
