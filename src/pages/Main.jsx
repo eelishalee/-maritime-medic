@@ -308,39 +308,8 @@ function getInitialChat(patient) {
     ],
   }
 
-  if (scenarios[patient.id]) return scenarios[patient.id]
-
-  // 기본 더미 — 기저질환/알레르기/응급 여부 기반 자동 생성
-  const msgs = []
-  msgs.push({
-    role: 'ai',
-    text: `${patient.name} ${patient.role}님의 바이탈 데이터 동기화가 완료되었습니다.\n\n[초기 분석 요약]\n• 기저질환: ${chronic}\n• 알레르기: ${allergies}\n${note && note !== '특이사항 없음' ? `• 특이사항: ${note}` : '• 현재 특이 이상 징후 없음'}`
-  })
-
-  try {
-    const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
-    const lastRecord = records.find(r => r.patientId === patient.id)
-    if (lastRecord) {
-      msgs.push({
-        role: 'ai',
-        text: `[가장 최근 기록 요약 - ${new Date(lastRecord.timestamp).toLocaleDateString()}]\n• 주증상: ${lastRecord.mainComplaint || '관찰 중'}\n• 시행 조치: ${(lastRecord.prescribedMeds || []).join(', ') || '경과 관찰'}\n\n상태 변화를 지속적으로 체크하고 있습니다.`
-      })
-    } else if (patient.isEmergency) {
-      msgs.push({
-        role: 'ai',
-        text: `[MDTS 긴급 권고]\n• 현재 집중 관리 대상으로 등록되어 있습니다.\n• 알레르기(${allergies}) 확인 후 처방하십시오.\n• 이상 징후 감지 시 응급 처치 가이드를 즉시 활성화하십시오.\n\n[CONFIDENCE: 88%]`
-      })
-    } else {
-      msgs.push({
-        role: 'ai',
-        text: `[MDTS 자동 권고]\n• ${chronic !== '없음' ? `${chronic} 관련 정기 점검을 유지하십시오.` : '특별한 기저질환 없음 — 정상 모니터링 중입니다.'}\n• 알레르기(${allergies}) 투약 주의 플래그가 설정되어 있습니다.\n\n[CONFIDENCE: 90%]`
-      })
-    }
-  } catch (e) {
-    console.error("채팅 초기화 오류:", e)
-  }
-
-  return msgs
+  // 박기관(S26-003)만 하드코딩 채팅 반환, 나머지는 빈 배열
+  return scenarios[patient.id] || []
 }
 
 // ─── AI 답변 시뮬레이션 ───

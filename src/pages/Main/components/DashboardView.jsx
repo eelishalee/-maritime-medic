@@ -23,19 +23,8 @@ function getPatientTimeline(patient) {
     ],
   }
 
-  if (scenarios[id]) return scenarios[id]
-
-  // 기본 기록 — 증상/평소질환 기반 자동 생성
-  const timeline = []
-  if (isEmergency) {
-    timeline.push({ time: '09:00', title: '이상 증상 처음 보고됨', color: '#f43f5e', detail: `• ${note || '몸 상태가 좋지 않음을 감지'}\n• 선의에게 알리고 직접 확인 요청함` })
-    timeline.push({ time: '09:10', title: '선의 1차 확인 완료', color: '#fb923c', detail: `• 평소 질환 확인: ${chronic}\n• 알레르기: ${allergies}\n• 몸 상태 측정 및 계속 지켜보기 지시` })
-  }
-  if (chronic !== '없음') {
-    timeline.push({ time: '08:30', title: '평소 질환 상태 점검', color: '#facc15', detail: `• ${chronic} 관련 정기적인 확인 시행\n• 드시는 약에 이상 반응이 있는지 확인` })
-  }
-  timeline.push({ time: '09:12', title: '건강 모니터링 시스템 연결', color: '#64748b', detail: `• 몸 상태 측정 장비 연결 완료\n• 알레르기(${allergies}) 약 사용 주의 표시` })
-  return timeline
+  // 박기관(S26-003)만 하드코딩 타임라인 반환, 나머지는 빈 배열
+  return scenarios[id] || []
 }
 
 function getExampleQuestions(patient) {
