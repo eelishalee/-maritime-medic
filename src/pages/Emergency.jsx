@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Brain, Heart, Zap, Shield, ShieldAlert, Cpu, AlertCircle, Wind, Clock, Video, Pill, History, User, Info, Activity, Scissors, Plus, Thermometer, Mic, X, ChevronRight, HeartPulse, ChevronLeft, CheckCircle2, AlertTriangle, ArrowDown, FileText, Ruler, Droplets, MapPin, Phone, Upload, Camera, Edit3, Bone, Flame, RefreshCw, Send, Check, LayoutDashboard} from 'lucide-react'
 import { useAlert } from '../utils/AlertContext'
+import { fetchLatestVital, mapVitalToFrontend, updateVital } from '../utils/api'
 import { CardiacIllustration, TraumaIllustration, UnconsciousIllustration, RespiratoryIllustration } from '../components/EmergencyIllustrations'
 import CameraModal from '../components/CameraModal'
 
@@ -288,13 +289,36 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
   const [bpm] = useState(120)
   const [beat, setBeat] = useState(false)
   
-  const [vitals, setVitals] = useState(() => ({ 
-    hr: patient?.hr || patient?.vitals?.hr || 96, 
-    spo2: patient?.spo2 || patient?.vitals?.spo2 || '94.2', 
-    bp: patient?.bp || patient?.vitals?.bp || '158/95', 
-    temp: patient?.temp || patient?.vitals?.temp || '37.6', 
-    rr: patient?.rr || patient?.vitals?.rr || 24 
-  }))
+  const [vitals, setVitals] = useState(() => {
+    if (patient?.id === 'S26-003') {
+      return { hr: 96, spo2: '94.2', bp: '158/95', temp: '37.6', rr: 24 }
+    }
+    return { hr: '-', spo2: '-', bp: '-', temp: '-', rr: '-' }
+  })
+
+  // 박기관 외: API에서 실제 바이탈 로드 + 폴링
+  useEffect(() => {
+    if (!patient || patient.id === 'S26-003') return;
+    const crewDbId = patient.crewDbId || parseInt(patient.id?.split('-')[1]);
+    const poll = async () => {
+      try {
+        const data = await fetchLatestVital(crewDbId);
+        if (data) {
+          const v = mapVitalToFrontend(data);
+          setVitals(prev => ({
+            hr: v.hr !== '-' ? v.hr : prev.hr,
+            spo2: v.spo2 !== '-' ? v.spo2 : prev.spo2,
+            bp: v.bp !== '-' ? v.bp : prev.bp,
+            temp: v.temp !== '-' ? v.temp : prev.temp,
+            rr: v.rr !== '-' ? v.rr : prev.rr,
+          }));
+        }
+      } catch {}
+    };
+    poll();
+    const interval = setInterval(poll, 5000);
+    return () => clearInterval(interval);
+  }, [patient?.id])
 
   const [editTarget, setEditTarget] = useState(null)
   const [inputValue, setInputValue] = useState('')
@@ -320,6 +344,15 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     }
     const now = new Date().toLocaleTimeString('ko-KR', { hour12: false })
     setVitals(prev => ({ ...prev, [editTarget.key]: val }))
+    // 박기관 제외: 서버 DB에도 저장
+    if (patient && patient.id !== 'S26-003') {
+      const crewDbId = patient.crewDbId || parseInt(patient.id?.split('-')[1]);
+      if (editTarget.key === 'bp') {
+        updateVital(crewDbId, { blood_pressure: val }).catch(() => {});
+      } else if (editTarget.key === 'temp') {
+        updateVital(crewDbId, { temperature: parseFloat(val) }).catch(() => {});
+      }
+    }
     setSessionLogs([{
       time: now,
       text: `${editTarget.label} 수동 업데이트 : ${val}${editTarget.unit}`,
@@ -328,12 +361,25 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
     setEditTarget(null)
   }
 
-  const handleSyncData = () => {
+  const handleSyncData = async () => {
     const now = new Date()
     setEndTime(now)
     const logTime = now.toLocaleTimeString('ko-KR', { hour12: false })
-    
-    // TODO: [BACKEND] 수동 입력된 처치 데이터 및 전체 세션 로그를 DB(tb_logs 등)에 저장하는 POST API 연동 필요
+
+    // 박기관 외: 현재 바이탈을 서버 DB에 저장
+    if (patient && patient.id !== 'S26-003') {
+      const crewDbId = patient.crewDbId || parseInt(patient.id?.split('-')[1]);
+      try {
+        await updateVital(crewDbId, {
+          heart_rate: parseInt(vitals.hr) || 0,
+          spo2: parseInt(vitals.spo2) || 0,
+          respiration_rate: parseInt(vitals.rr) || 0,
+          blood_pressure: vitals.bp || '0',
+          temperature: parseFloat(vitals.temp) || 0,
+        });
+      } catch {}
+    }
+
     setSessionLogs([{ time: logTime, text: "모든 처치 데이터 동기화 및 전송 완료 (tb_logs)", type: 'SUCCESS' }, ...sessionLogs])
     setTriageStep('SUMMARY')
   }
@@ -892,7 +938,7 @@ export default function Emergency({ patient, initialAction, onNavigate }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <VitalMini label="심박수" value={vitals.hr} unit="bpm" color="#ff3b5c" icon={<HeartPulse size={16}/>} isAlert={checkAlert('hr', vitals.hr)} range="60-100" />
               <VitalMini label="산소포화도" value={vitals.spo2} unit="%" color="#38bdf8" icon={<Wind size={16}/>} isAlert={checkAlert('spo2', vitals.spo2)} range="95-100" />
-              <VitalMini label="호흡수" value={vitals.rr || 24} unit="/min" color="#10b981" icon={<Activity size={16}/>} isAlert={checkAlert('rr', vitals.rr || 24)} range="12-20" />
+              <VitalMini label="호흡수" value={vitals.rr} unit="/min" color="#10b981" icon={<Activity size={16}/>} isAlert={checkAlert('rr', vitals.rr)} range="12-20" />
               <VitalMini label="혈압(직접)" value={vitals.bp} unit="mmHg" color="#8b5cf6" icon={<Zap size={16}/>} isManual isAlert={checkAlert('bp', vitals.bp)} range="90/60-140/90" onClick={() => handleOpenEdit('bp', '혈압', vitals.bp, 'mmHg')} />
               <VitalMini label="체온(직접)" value={vitals.temp} unit="°C" color="#f59e0b" icon={<Thermometer size={16}/>} isManual isAlert={checkAlert('temp', vitals.temp)} range="36.1-37.2" onClick={() => handleOpenEdit('temp', '체온', vitals.temp, '°C')} />
               

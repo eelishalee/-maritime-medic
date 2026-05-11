@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Search, Plus, UserPlus, Users, Anchor, Cog, Coffee, ShieldAlert, CheckCircle2, ChevronRight, Phone, Heart, Activity, X, Ruler, Scale, MapPin, Calendar, FileText, Pill, User as UserIcon, ChevronDown, Trash2, PenLine, Camera } from 'lucide-react'
 import { useAlert } from '../utils/AlertContext'
+import { fetchCrew, fetchLatestVitals, mapCrewToFrontend } from '../utils/api'
 
 
 // ─── 이미지 자산 매핑 (Vite) ───
@@ -64,6 +65,28 @@ export default function CrewManagement({ onSelectPatient }) {
     chronic: '', allergies: '', pastHistory: '', lastMed: '', note: '',
     contact: '', emergencyName: '', emergency: '', avatar: null
   })
+
+  // DB에서 선원 목록 로드하여 병합 (박기관=S26-003은 하드코딩 유지)
+  useEffect(() => {
+    fetchCrew().then(dbCrewList => {
+      setCrew(prev => {
+        const merged = [...prev];
+        for (const dbCrew of dbCrewList) {
+          const frontId = `S26-${String(dbCrew.crew_id).padStart(3, '0')}`;
+          if (frontId === 'S26-003') continue; // 박기관 하드코딩 유지
+          const existing = merged.findIndex(c => c.id === frontId);
+          const mapped = mapCrewToFrontend(dbCrew);
+          // 기존 하드코딩 데이터가 있으면 DB 데이터로 의료정보만 갱신
+          if (existing >= 0) {
+            merged[existing] = { ...merged[existing], chronic: mapped.chronic, allergies: mapped.allergies, blood: mapped.blood, lastMed: mapped.lastMed, crewDbId: dbCrew.crew_id };
+          } else {
+            merged.push(mapped);
+          }
+        }
+        return merged;
+      });
+    }).catch(() => {});
+  }, []);
 
   const [dateEditor, setDateEditor] = useState(null)
   const fileInputRef = useRef(null)

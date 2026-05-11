@@ -10,6 +10,7 @@ import {
 } from 'recharts'
 import { SHIP_INFO, DEVICE_INFO } from '../utils/constants'
 import { useAlert } from '../utils/AlertContext'
+import { fetchCrew, mapCrewToFrontend } from '../utils/api'
 
 const C = {
   bg: '#0b0c10', panel: '#111318', panel2: '#161b22',
@@ -166,6 +167,27 @@ export default function Settings() {
       return saved ? JSON.parse(saved) : CREW_FALLBACK
     } catch { return CREW_FALLBACK }
   })
+
+  // DB에서 선원 목록 로드하여 병합
+  useEffect(() => {
+    fetchCrew().then(dbCrewList => {
+      setCREW(prev => {
+        const merged = [...prev];
+        for (const dbCrew of dbCrewList) {
+          const frontId = `S26-${String(dbCrew.crew_id).padStart(3, '0')}`;
+          if (frontId === 'S26-003') continue;
+          const idx = merged.findIndex(c => c.id === frontId);
+          const mapped = mapCrewToFrontend(dbCrew);
+          if (idx >= 0) {
+            merged[idx] = { ...merged[idx], chronic: mapped.chronic, allergies: mapped.allergies, blood: mapped.blood, crewDbId: dbCrew.crew_id };
+          } else {
+            merged.push({ ...mapped, isEmergency: false });
+          }
+        }
+        return merged;
+      });
+    }).catch(() => {});
+  }, []);
 
   const [now, setNow] = useState(new Date())
   const [checks, setChecks] = useState({ 0: true, 1: true, 6: true })

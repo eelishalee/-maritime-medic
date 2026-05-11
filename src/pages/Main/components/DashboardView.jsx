@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Activity, History, RotateCcw, Droplets, Upload, AlertTriangle, Camera, Mic, User, Pill, AlertCircle, MapPin, Phone, Anchor, Weight, Ruler, HeartPulse, Paperclip, ArrowUp, Sparkles, CheckCircle2, Clock, Database, ChevronRight, ChevronDown, Info, ShieldCheck, Zap, Crosshair, Eye, Maximize, Thermometer, Wind } from 'lucide-react'
 import { DashboardVital, InfoItem, TimelineItem } from '../../../components/ui'
 import EmergencyGuide from './EmergencyGuide.jsx'
+import { updateVital } from '../../../utils/api'
 
 function getPatientTimeline(patient) {
   if (!patient) return []
@@ -161,8 +162,22 @@ export default function DashboardView({
   }
 
   const saveEdit = () => {
-    if (editTarget === 'bp') setBp(editValue)
-    if (editTarget === 'bt') setBt(editValue)
+    if (editTarget === 'bp') {
+      setBp(editValue)
+      // 박기관 제외: 서버 DB에도 저장
+      if (activePatient && activePatient.id !== 'S26-003') {
+        const crewDbId = activePatient.crewDbId || parseInt(activePatient.id?.split('-')[1]);
+        updateVital(crewDbId, { blood_pressure: editValue }).catch(() => {});
+      }
+    }
+    if (editTarget === 'bt') {
+      setBt(editValue)
+      // 박기관 제외: 서버 DB에도 저장
+      if (activePatient && activePatient.id !== 'S26-003') {
+        const crewDbId = activePatient.crewDbId || parseInt(activePatient.id?.split('-')[1]);
+        updateVital(crewDbId, { temperature: parseFloat(editValue) }).catch(() => {});
+      }
+    }
     setEditTarget(null)
   }
 

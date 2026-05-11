@@ -7,6 +7,7 @@ import {
   Camera, Droplets, FileText, ChevronRight, Trash2
 } from 'lucide-react'
 import { useAlert } from '../utils/AlertContext'
+import { fetchLatestVital, mapVitalToFrontend, updateVital } from '../utils/api'
 
 // --- 컴포넌트 내부에서 사용되는 UI 조각들 ---
 
@@ -112,21 +113,17 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
       setPatient(p)
       onSwitchPatient?.(p)
       
-      const getInitialVitals = () => {
-        const v = { hr: '-', spo2: '-', temp: '-', bp: '-', rr: '-' };
-        const idNum = parseInt(p.id.split('-')[1]) || 0;
-        const sensorType = idNum % 5; // 0:HR, 1:SpO2, 2:Temp, 3:BP, 4:RR
-
-        if (sensorType === 0) v.hr = '72';
-        else if (sensorType === 1) v.spo2 = '98';
-        else if (sensorType === 2) v.temp = '36.5';
-        else if (sensorType === 3) v.bp = '120/80';
-        else if (sensorType === 4) v.rr = '16';
-        
-        return v;
-      };
-
-      setVitals(getInitialVitals());
+      if (p.id === 'S26-003') {
+        // 박기관: 하드코딩 초기값
+        setVitals({ hr: '92', spo2: '98', rr: '18', temp: '37.8', bp: '158/95' });
+      } else {
+        // 나머지: API에서 최신 바이탈 조회
+        setVitals({ hr: '-', spo2: '-', temp: '-', bp: '-', rr: '-' });
+        const crewDbId = p.crewDbId || parseInt(p.id.split('-')[1]);
+        fetchLatestVital(crewDbId).then(data => {
+          if (data) setVitals(mapVitalToFrontend(data));
+        }).catch(() => {});
+      }
 
       // 기존 선택값 초기화
       setMainComplaint('')
@@ -143,32 +140,33 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
     }
   }, [selectedId, dynamicCrewList])
 
-  // 실시간 센서 데이터 시뮬레이션
+  // 실시간 센서 데이터 — 박기관은 하드코딩, 나머지는 API에서 조회
   useEffect(() => {
+    if (!patient) return;
     let interval;
-    if (patient) {
-      interval = setInterval(() => {
-        setVitals(prev => {
-          const next = { ...prev };
-          const idNum = parseInt(patient.id.split('-')[1]) || 0;
-          const sensorType = idNum % 5;
 
-          if (patient.id === 'S26-003') {
-            next.hr = (92 + Math.floor(Math.random() * 5) - 2).toString();
-            next.spo2 = (98 + Math.floor(Math.random() * 2) - 1).toString();
-            next.rr = (18 + Math.floor(Math.random() * 3) - 1).toString();
-            next.temp = (37.8 + (Math.random() * 0.2 - 0.1)).toFixed(1);
-            next.bp = `158/${95 + Math.floor(Math.random() * 4) - 2}`;
-          } else {
-            if (sensorType === 0) next.hr = (72 + Math.floor(Math.random() * 4) - 2).toString();
-            else if (sensorType === 1) next.spo2 = (97 + Math.floor(Math.random() * 3)).toString();
-            else if (sensorType === 2) next.temp = (36.5 + (Math.random() * 0.2 - 0.1)).toFixed(1);
-            else if (sensorType === 3) next.bp = `120/${80 + Math.floor(Math.random() * 4) - 2}`;
-            else if (sensorType === 4) next.rr = (16 + Math.floor(Math.random() * 2) - 1).toString();
-          }
-          return next;
+    if (patient.id === 'S26-003') {
+      // 박기관: 하드코딩 시뮬레이션
+      interval = setInterval(() => {
+        setVitals({
+          hr: (92 + Math.floor(Math.random() * 5) - 2).toString(),
+          spo2: (98 + Math.floor(Math.random() * 2) - 1).toString(),
+          rr: (18 + Math.floor(Math.random() * 3) - 1).toString(),
+          temp: (37.8 + (Math.random() * 0.2 - 0.1)).toFixed(1),
+          bp: `158/${95 + Math.floor(Math.random() * 4) - 2}`,
         });
       }, 3000);
+    } else {
+      // 나머지 선원: API에서 실제 센서 데이터 조회
+      const crewDbId = patient.crewDbId || parseInt(patient.id.split('-')[1]);
+      const pollVitals = async () => {
+        try {
+          const data = await fetchLatestVital(crewDbId);
+          if (data) setVitals(mapVitalToFrontend(data));
+        } catch {}
+      };
+      pollVitals();
+      interval = setInterval(pollVitals, 5000);
     }
     return () => clearInterval(interval);
   }, [patient?.id]);
@@ -188,9 +186,19 @@ export default function PatientChart({ patient: initialPatient, onNavigate, onSw
         return
       }
       setVitals(prev => ({ ...prev, bp: val }))
+      // 박기관 제외: 서버 DB에도 저장
+      if (patient.id !== 'S26-003') {
+        const crewDbId = patient.crewDbId || parseInt(patient.id.split('-')[1]);
+        updateVital(crewDbId, { blood_pressure: val }).catch(() => {});
+      }
     } else if (editTarget === 'temp') {
       if (isNaN(parseFloat(val))) { showAlert('숫자를 입력하세요.', '입력 오류', 'warning'); return }
       setVitals(prev => ({ ...prev, temp: val }))
+      // 박기관 제외: 서버 DB에도 저장
+      if (patient.id !== 'S26-003') {
+        const crewDbId = patient.crewDbId || parseInt(patient.id.split('-')[1]);
+        updateVital(crewDbId, { temperature: parseFloat(val) }).catch(() => {});
+      }
     }
     setEditTarget(null)
     setShowPlan(false)

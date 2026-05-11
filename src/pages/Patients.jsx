@@ -5,7 +5,7 @@ import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxi
 const PATIENTS = [
   {
     id: 1, name: '강바다', age: 58, role: '선장 (Captain)', blood: 'O+', risk: 'high',
-    bp: '158/98', hr: 92, temp: 37.2, spo2: 94, weight: 82, height: 172,
+    bp: '-', hr: '-', temp: '-', spo2: '-', weight: 82, height: 172,
     conditions: ['만성 고혈압', '협심증 의증'],
     history: [
       { date: '2026-04-10', type: '응급', note: '야간 당직 중 흉통 호소, 니트로글리세린 투여' },
@@ -16,7 +16,7 @@ const PATIENTS = [
   },
   {
     id: 2, name: '이해무', age: 45, role: '기관장 (Chief Engineer)', blood: 'A+', risk: 'medium',
-    bp: '135/85', hr: 78, temp: 38.5, spo2: 97, weight: 78, height: 176,
+    bp: '-', hr: '-', temp: '-', spo2: '-', weight: 78, height: 176,
     conditions: ['열성 질환', '탈수 증상'],
     history: [
       { date: '2026-04-12', type: '내과', note: '기관실 고온 작업 후 발열 및 오한 발생' },
@@ -26,7 +26,7 @@ const PATIENTS = [
   },
   {
     id: 3, name: '박선교', age: 32, role: '1등 항해사 (1st Officer)', blood: 'B-', risk: 'low',
-    bp: '118/72', hr: 64, temp: 36.5, spo2: 99, weight: 70, height: 180,
+    bp: '-', hr: '-', temp: '-', spo2: '-', weight: 70, height: 180,
     conditions: ['정상', '피로 누적'],
     history: [
       { date: '2026-04-01', type: '일반', note: '수면 부족으로 인한 가벼운 어지럼증' },
@@ -36,7 +36,7 @@ const PATIENTS = [
   },
   {
     id: 4, name: '최파도', age: 29, role: '갑판원 (Deckhand)', blood: 'AB+', risk: 'high',
-    bp: '110/70', hr: 105, temp: 35.2, spo2: 92, weight: 75, height: 174,
+    bp: '-', hr: '-', temp: '-', spo2: '-', weight: 75, height: 174,
     conditions: ['저체온증', '골절 의심'],
     history: [
       { date: '2026-04-14', type: '응급', note: '작업 중 해상 추락 후 구조, 저체온증 집중 관리' },

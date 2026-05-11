@@ -58,12 +58,13 @@ function NoteModal({ onSave, onClose }) {
 }
 
 export default function PatientInfo({ patient }) {
-  const {hr,hist} = useVitals(patient.hr||84)
+  const isPark = patient.id === 'S26-003'
+  const {hr,hist} = useVitals(patient.hr || (isPark ? 84 : 0))
   const [imgError, setImgError] = useState(false)
-  
-  const [bp,  setBp]  = useState(patient.bp   || '158/95')
-  const [bt,  setBt]  = useState(String(patient.temp || '37.6'))
-  const [spo2]        = useState(patient.spo2 || 94)
+
+  const [bp,  setBp]  = useState(patient.bp   || (isPark ? '158/95' : '-'))
+  const [bt,  setBt]  = useState(String(patient.temp || (isPark ? '37.6' : '-')))
+  const [spo2]        = useState(patient.spo2 || (isPark ? 94 : '-'))
   const [editBp, setEditBp] = useState(false)
   const [editBt, setEditBt] = useState(false)
 

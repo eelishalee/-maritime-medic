@@ -137,9 +137,9 @@ function getRecommended(patient) {
   if (!patient) return null
   const chronic = (patient.chronic || '').toLowerCase()
   const hr = Number(patient.hr) || 0
-  const spo2 = Number(patient.spo2) || 100
-  const temp = Number(patient.temp) || 36.5
-  const bp = parseInt((patient.bp || patient.vitals?.bp || '120/80').split('/')[0]) || 120
+  const spo2 = Number(patient.spo2) || 0
+  const temp = Number(patient.temp) || 0
+  const bp = parseInt((patient.bp || patient.vitals?.bp || '0').split('/')[0]) || 0
   const loc = (patient.location || '').toLowerCase()
   if (spo2 < 90 || hr > 120) return 'cpr'
   if (chronic.includes('고혈압') || bp > 150 || hr > 90) return 'cardiac'
@@ -152,9 +152,9 @@ function calcRiskScore(patient) {
   if (!patient) return 50
   let score = 20
   const hr = Number(patient.hr) || 0
-  const spo2 = Number(patient.spo2) || 100
-  const temp = Number(patient.temp) || 36.5
-  const bp = parseInt((patient.bp || patient.vitals?.bp || '120/80').split('/')[0]) || 120
+  const spo2 = Number(patient.spo2) || 0
+  const temp = Number(patient.temp) || 0
+  const bp = parseInt((patient.bp || patient.vitals?.bp || '0').split('/')[0]) || 0
   const chronic = (patient.chronic || '')
   if (bp >= 160) score += 25
   else if (bp >= 140) score += 15
@@ -173,9 +173,9 @@ function calcRiskScore(patient) {
 function buildDiagnoses(patient) {
   if (!patient) return DIAGNOSES
   const hr = Number(patient.hr) || 0
-  const spo2 = Number(patient.spo2) || 100
-  const temp = Number(patient.temp) || 36.5
-  const bp = parseInt((patient.bp || patient.vitals?.bp || '120/80').split('/')[0]) || 120
+  const spo2 = Number(patient.spo2) || 0
+  const temp = Number(patient.temp) || 0
+  const bp = parseInt((patient.bp || patient.vitals?.bp || '0').split('/')[0]) || 0
   const chronic = (patient.chronic || '').toLowerCase()
   const allergies = (patient.allergies || '')
   const loc = (patient.location || '').toLowerCase()
@@ -270,14 +270,18 @@ export default function AnalysisEmergency({ patient }) {
   const dynamicDiagnoses = buildDiagnoses(patient)
   const riskScore = calcRiskScore(patient)
 
-  // 환자 실데이터로 바이탈 구성
-  const bpRaw = patient?.bp || patient?.vitals?.bp || '158/95'
-  const sbp = parseInt(bpRaw.split('/')[0]) || 158
+  // 환자 실데이터로 바이탈 구성 (박기관만 fallback, 나머지는 측정값만)
+  const isPark = patient?.id === 'S26-003'
+  const bpRaw = patient?.bp || patient?.vitals?.bp || (isPark ? '158/95' : '-')
+  const sbp = bpRaw !== '-' ? (parseInt(bpRaw.split('/')[0]) || 0) : 0
+  const hrVal = Number(patient?.hr ?? patient?.vitals?.hr ?? (isPark ? 96 : 0))
+  const spo2Val = Number(patient?.spo2 ?? patient?.vitals?.spo2 ?? (isPark ? 98 : 0))
+  const tempVal = Number(patient?.temp ?? patient?.vitals?.temp ?? (isPark ? 37.6 : 0))
   const patientVitals = [
-    { label: '심박수',      value: Number(patient?.hr   ?? patient?.vitals?.hr   ?? 96),   unit: 'bpm',  normal: '60–100',    status: (Number(patient?.hr ?? 96)) > 100 || (Number(patient?.hr ?? 96)) < 60 ? 'critical' : (Number(patient?.hr ?? 96)) > 90 ? 'warn' : 'normal', trend: 'up',   Icon: Heart,       color: (Number(patient?.hr ?? 96)) > 100 ? '#ff4d6d' : '#ff9f43' },
-    { label: '수축기 혈압', value: sbp,                                                    unit: 'mmHg', normal: '< 120',     status: sbp > 160 ? 'critical' : sbp > 140 ? 'warn' : 'normal', trend: 'up',   Icon: Activity,    color: sbp > 160 ? '#ff4d6d' : '#ff9f43' },
-    { label: '산소포화도',  value: Number(patient?.spo2 ?? patient?.vitals?.spo2 ?? 98),   unit: '%',    normal: '95–100',    status: (Number(patient?.spo2 ?? 98)) < 90 ? 'critical' : (Number(patient?.spo2 ?? 98)) < 95 ? 'warn' : 'normal', trend: 'down', Icon: Droplets,    color: (Number(patient?.spo2 ?? 98)) < 95 ? '#ff4d6d' : '#0dd9c5' },
-    { label: '체온',        value: Number(patient?.temp ?? patient?.vitals?.temp ?? 36.5), unit: '°C',   normal: '36.5–37.5', status: (Number(patient?.temp ?? 36.5)) >= 39 ? 'critical' : (Number(patient?.temp ?? 36.5)) >= 38 ? 'warn' : 'normal', trend: 'up', Icon: Thermometer, color: (Number(patient?.temp ?? 36.5)) >= 38 ? '#ff9f43' : '#0dd9c5' },
+    { label: '심박수',      value: hrVal || '-',   unit: 'bpm',  normal: '60–100',    status: !hrVal ? 'normal' : hrVal > 100 || hrVal < 60 ? 'critical' : hrVal > 90 ? 'warn' : 'normal', trend: 'up',   Icon: Heart,       color: !hrVal ? '#475569' : hrVal > 100 ? '#ff4d6d' : '#ff9f43' },
+    { label: '수축기 혈압', value: sbp || '-',     unit: 'mmHg', normal: '< 120',     status: !sbp ? 'normal' : sbp > 160 ? 'critical' : sbp > 140 ? 'warn' : 'normal', trend: 'up',   Icon: Activity,    color: !sbp ? '#475569' : sbp > 160 ? '#ff4d6d' : '#ff9f43' },
+    { label: '산소포화도',  value: spo2Val || '-', unit: '%',    normal: '95–100',    status: !spo2Val ? 'normal' : spo2Val < 90 ? 'critical' : spo2Val < 95 ? 'warn' : 'normal', trend: 'down', Icon: Droplets,    color: !spo2Val ? '#475569' : spo2Val < 95 ? '#ff4d6d' : '#0dd9c5' },
+    { label: '체온',        value: tempVal || '-', unit: '°C',   normal: '36.5–37.5', status: !tempVal ? 'normal' : tempVal >= 39 ? 'critical' : tempVal >= 38 ? 'warn' : 'normal', trend: 'up', Icon: Thermometer, color: !tempVal ? '#475569' : tempVal >= 38 ? '#ff9f43' : '#0dd9c5' },
   ]
 
   const selectProtocol = (id) => { setProtocolId(id); setStepIdx(0) }
@@ -393,8 +397,8 @@ function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals, dynamicDiagnoses
   const riskColor = riskScore >= 70 ? '#ff4d6d' : riskScore >= 40 ? '#ff9f43' : '#26de81'
 
   // 실데이터 기반 가상 트렌드 생성 (Task 3-5)
-  const currentHr = VITALS.find(v => v.label === '심박수')?.value || 96
-  const currentBp = VITALS.find(v => v.label === '수축기 혈압')?.value || 158
+  const currentHr = VITALS.find(v => v.label === '심박수')?.value || 0
+  const currentBp = VITALS.find(v => v.label === '수축기 혈압')?.value || 0
   
   const dynamicTrend = [
     { t: '08:00', hr: currentHr - 18, bp: currentBp - 16 },
@@ -429,7 +433,7 @@ function AIPanel({ patient, diagIdx, setDiagIdx, patientVitals, dynamicDiagnoses
           {patient?.name || '김선원'}
         </div>
         <div style={{ fontSize: 12, color: '#8da2c0', marginBottom: 10 }}>
-          {patient?.age || 55}세 · {patient?.role || '기관장'} · {patient?.blood || 'A+'}형
+          {patient?.age || '-'}세 · {patient?.role || '-'} · {patient?.blood || '-'}형
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 8, background: 'rgba(255,77,109,0.1)', border: '1px solid rgba(255,77,109,0.3)' }}>
           <AlertTriangle size={12} color="#ff4d6d" />

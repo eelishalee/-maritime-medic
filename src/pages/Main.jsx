@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import DashboardView from './Main/components/DashboardView'
 import MainTutorial from './Main/components/MainTutorial'
+import { fetchLatestVital, mapVitalToFrontend } from '../utils/api'
 
 
 export default function Main({ patient, onNavigate, onSwitchPatient, historicalRecord, tutorialShown, setTutorialShown }) {
@@ -31,34 +32,47 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
   const [chat, setChat] = useState([])
 
   // ─── 데이터 동기화 ───
-  // TODO: [BACKEND] 실제 운영 환경에서는 WebSocket 또는 Polling을 통해 실시간 바이탈 데이터를 수신하고 자동 동기화해야 함
   useEffect(() => {
     if (!patient) return
 
-    let latestRecord = null
-    try {
-      const records = JSON.parse(localStorage.getItem('mdts_patient_records') || '[]')
-      latestRecord = records.find(r => r.patientId === patient.id)
-    } catch (e) {}
-
-    if (latestRecord) {
-      setHr(latestRecord.vitals?.hr || '-')
-      setSpo2(latestRecord.vitals?.spo2 || '-')
-      setRr(latestRecord.vitals?.rr || '-')
-      setBp(latestRecord.vitals?.bp || '-')
-      setBt(latestRecord.vitals?.temp || '-')
+    if (patient.id === 'S26-003') {
+      // 박기관: 하드코딩
+      setHr(patient.hr || 95)
+      setSpo2(patient.spo2 || 97)
+      setRr(patient.rr || 18)
+      setBp(patient.bp || '142/88')
+      setBt(patient.temp || '37.2')
     } else {
-      const seed = patient.id?.split('-').pop() || '0'
-      setHr(patient.hr || (70 + (parseInt(seed) % 15)))
-      setSpo2(patient.spo2 || (96 + (parseInt(seed) % 4)))
-      setRr(patient.rr || (14 + (parseInt(seed) % 6)))
-      setBp(patient.bp || `${115 + (parseInt(seed) % 20)}/${75 + (parseInt(seed) % 15)}`)
-      setBt(patient.temp || (36.4 + (parseInt(seed) % 6) / 10).toFixed(1))
+      // 나머지 선원: 초기값 '-' (측정 전)
+      setHr('-'); setSpo2('-'); setRr('-'); setBp('-'); setBt('-');
+      // API에서 실제 센서 데이터 조회
+      const crewDbId = patient.crewDbId || parseInt(patient.id?.split('-').pop());
+      fetchLatestVital(crewDbId).then(data => {
+        if (data) {
+          const v = mapVitalToFrontend(data);
+          setHr(v.hr); setSpo2(v.spo2); setRr(v.rr); setBp(v.bp); setBt(v.temp);
+        }
+      }).catch(() => {});
     }
 
     setChat(getInitialChat(patient))
     setPrompt('')
   }, [patient?.id, historicalRecord?.timestamp])
+
+  // 실시간 바이탈 폴링 (박기관 제외)
+  useEffect(() => {
+    if (!patient || patient.id === 'S26-003') return;
+    const crewDbId = patient.crewDbId || parseInt(patient.id?.split('-').pop());
+    const poll = setInterval(() => {
+      fetchLatestVital(crewDbId).then(data => {
+        if (data) {
+          const v = mapVitalToFrontend(data);
+          setHr(v.hr); setSpo2(v.spo2); setRr(v.rr); setBp(v.bp); setBt(v.temp);
+        }
+      }).catch(() => {});
+    }, 5000);
+    return () => clearInterval(poll);
+  }, [patient?.id]);
 
   // 렌더링 시점에 환자 정보 확장 (최근 기록 주입)
   const getActivePatientWithHistory = () => {
@@ -112,30 +126,28 @@ export default function Main({ patient, onNavigate, onSwitchPatient, historicalR
 
 
 
-  // ─── 실시간 바이탈 시뮬레이션 (모든 바이탈에 미세 변화 적용) ───
+  // ─── 박기관 전용: 실시간 바이탈 시뮬레이션 ───
   useEffect(() => {
+    if (!patient || patient.id !== 'S26-003') return;
     const t = setInterval(() => {
       setHr(h => {
-        if (h === '-') return '-'
         const val = typeof h === 'number' ? h : parseInt(h)
         if (isNaN(val)) return '-'
         return Math.max(60, Math.min(110, val + Math.round((Math.random() - 0.5) * 2)))
       })
       setSpo2(s => {
-        if (s === '-') return '-'
         const val = parseFloat(s)
         if (isNaN(val)) return '-'
         return Math.max(94, Math.min(100, val + (Math.random() - 0.5) * 0.2)).toFixed(1)
       })
       setRr(r => {
-        if (r === '-') return '-'
         const val = typeof r === 'number' ? r : parseInt(r)
         if (isNaN(val)) return '-'
         return Math.max(12, Math.min(22, val + Math.round((Math.random() - 0.5) * 1)))
       })
     }, 3000)
     return () => clearInterval(t)
-  }, [])
+  }, [patient?.id])
 
   // ─── AI 분석 실행 ───
   const handlePromptAnalysis = () => {
